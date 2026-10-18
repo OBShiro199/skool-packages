@@ -95,9 +95,15 @@ Numbers in tables and stats use \`tabular-nums\`.
 
 ## 3. Layout
 
-- **App shell:** left sidebar 240px (collapsible to 64px icons), top bar 56px with page title, search (cmd+k), usage pill ("1,204 / 6,000 sends"), avatar menu.
-- **Sidebar items:** Dashboard, Campaigns, Inbox (unread count badge), Domains, Analytics, Suppression, Settings. Bottom: trial pill ("Trial: 4 days left") or plan pill, Billing.
+- **App shell:** left sidebar 240px (collapsible to 64px icons), top bar 56px with page title, search (cmd+k), usage pill ("612 / 1,000 sends this month"), avatar menu.
+- **Sidebar, top group:** logo, then Dashboard, Campaigns, Inbox (unread count badge), Domains, Analytics.
+- **Sidebar, bottom group (always this order):** Documentation, Help, Billing, Settings. Above them sits a small plan card in \`--primary-soft\`: "Trial: 4 days left" or "Starter: 212 of 350 leads". One level only, no nested menus, 9 items in total.
+- Active item: \`--primary-soft\` background, \`--primary\` text and icon, 8px radius. Hover: \`--surface-2\`. Item height 36px, icon 16px, label 14px/500.
+- Collapsed (64px): icons only with a tooltip on hover; the plan card becomes a small ring meter.
 - **Mobile (<768px):** sidebar becomes a bottom tab bar with Dashboard, Campaigns, Inbox, Domains, More.
+- **More sheet (mobile):** a bottom Sheet listing Analytics, then a divider, then Documentation, Help, Billing, Settings in the same order as desktop, plus the plan card.
+- **Top bar:** page title left; right side: usage pill, cmd+k search button, theme toggle, avatar menu (Profile, Sign out).
+- **Banners** sit between the top bar and the page: one at a time, priority order: paywall, campaign auto-paused, usage at 80%, domain not verified after 24 h. Each is a soft tint (\`--danger-soft\`, \`--warning-soft\`, \`--primary-soft\`) with dark text, never a solid dark strip.
 
 ## 4. Components
 
@@ -127,15 +133,17 @@ Buttons: primary (solid \`--primary\`), secondary (surface + border), ghost, des
 
 ### 5.1 Landing page (\`/\`)
 
+The full section-by-section spec with exact copy lives in \`@LANDING.md\`. Visual rules here:
+
 1. **Nav:** wordmark, links (How it works, Pricing, Free tool, Login), primary button "Start free trial".
-2. **Hero:** left column: eyebrow "For founders and agencies who send their own outbound". H1 "Cold email that reads like you wrote it." Sub: "Describe who you sell to. Outbounder finds the leads, reads their websites, writes a first line for each one and sends from safe inboxes on your own domain." Primary CTA "Start 7-day free trial", secondary "Try the free first-line generator". Under CTAs: "$79/mo after trial. Cancel in two clicks."
+2. **Hero:** left column: eyebrow "For founders and agencies who send their own outbound". H1 "Cold email that reads like you wrote it." Sub: "Describe who you sell to. Outbounder finds the leads, reads their websites, writes a first line for each one and sends from safe inboxes on your own domain." Primary CTA "Start 7-day free trial", secondary "Try the free first-line generator". Under CTAs: "From $79/mo after the trial. Cancel in two clicks."
    Right column: an animated product card. A lead row ("Sarah Lee, Founder, Northpeak Studio") expands into an EmailPreview where the first line types in with a violet AI mark, then the status pill turns from personalising to ready.
 3. **Proof strip:** "Each email cites something real from the lead's site" with three small cards showing first lines and the source URL under each.
 4. **How it works:** 4 numbered columns: Describe your buyer, Find and verify, Personalise and review, Send and reply. Each with a small screenshot.
-5. **Deliverability section:** dark band. Headline "Safe by default." Four facts with icons: separate outreach domain, 20 a day per inbox to start, plain text with no tracking, unsubscribe on every email.
+5. **Deliverability section:** a soft \`--primary-soft\` band (never a solid black or navy block). Headline "Safe by default." Four facts with icons: separate outreach domain, 20 a day per inbox to start, plain text with no tracking, unsubscribe on every email.
 6. **Unified inbox section:** screenshot of inbox with classification badges. "Know who's interested in one glance."
 7. **Comparison table:** Outbounder vs "4 tools stitched together" (lead database, verifier, sequencer, ChatGPT). Rows: price, setup time, personalisation, deliverability guardrails.
-8. **Pricing card:** single plan, $79/mo, list of limits, CTA.
+8. **Pricing:** two plan cards (Starter $79, Growth $179, Growth marked "Most popular") with a monthly/annual toggle ("2 months free").
 9. **FAQ:** 8 questions (Do I need my own domain? Which leads database? Will this land in spam? Can I edit every email? What happens after the trial?).
 10. **Footer:** links, "Made with Outbounder: every customer came from a cold email sent with this tool."
 
@@ -154,7 +162,8 @@ Buttons: primary (solid \`--primary\`), secondary (surface + border), ghost, des
 - **Step 3, Company:** employee ranges as toggle cards (1-10, 11-50, 51-200, 201-500). Industry keywords chip input. Exclude keywords chip input.
 - **Step 4, Offer:** website URL, "What do you sell, in one sentence?", "One line of proof (optional)", sender name, company, physical address. Character counters.
 - **Live sample panel** (step 4, right side on desktop, below on mobile): skeleton while loading ("Finding a company that matches... Reading northpeak.studio..."), then an EmailPreview with the AI first line highlighted in \`--violet-soft\`. Button "Try another company".
-- Continue on step 4 = "Start 7-day free trial" (to Stripe). Returning: "Checking your trial..." spinner card, then step 5.
+- Continue on step 4 opens the **plan picker** (step 4b): the same two cards as \`/pricing\` at 80% scale with the monthly/annual toggle, Growth preselected for users who picked "Agency" in step 1, Starter for everyone else. Copy under the cards: "Nothing is charged for 7 days. Trial limits: 50 leads, 100 sends." Button "Start 7-day free trial" goes to Stripe Checkout.
+- Returning from Stripe (\`?step=domain\`): "Checking your trial..." spinner card that polls every 2 seconds, then step 5. After 60 seconds without a webhook: "Stripe is taking a while. Refresh in a minute; your card has not been charged twice."
 - **Step 5, Domain:** card with three bullets explaining the separate domain, buttons "Set up my sending domain" and "Do this later".
 
 ### 5.4 Dashboard (\`/app\`)
@@ -170,7 +179,7 @@ Buttons: primary (solid \`--primary\`), secondary (surface + border), ghost, des
 
 StepWizard with 5 steps across the top. Sidebar stays visible.
 
-1. **ICP:** same fields as onboarding steps 1 to 3, prefilled from profile, plus campaign name. Right: "Estimated matches: about 4,300 people" (from Apollo total) updates on change with a 600ms debounce.
+1. **ICP:** same fields as onboarding steps 1 to 3, prefilled from profile, plus campaign name. Right: "Estimated matches: about 4,300 people" (from the Prospeo total count for page 1 [verify the field name]) updates on change with a 600ms debounce.
 2. **Leads:** count selector (25, 50, 100, 250) as segmented control with plan usage under it. "Find leads" button. After click, a live table fills as leads arrive with StatusPill per row and a PipelineBar on top. User can continue while it runs.
 3. **Sequence:** the sequence editor (5.7) embedded.
 4. **Inboxes and schedule:** pick inboxes (checkbox cards showing CapacityMeter and domain health), send days chips (Mon to Sun), window start/end time selects, time zone fallback select. Capacity summary: "2 inboxes x 20 a day x 4 days = 160 sends a week. 100 leads x 3 steps finishes in about 3 weeks."
@@ -199,7 +208,7 @@ StepWizard with 5 steps across the top. Sidebar stays visible.
 
 - Focus layout. Top bar: progress "14 of 64 reviewed", filter (Ready, Needs review, All), "Approve all above 0.8" button (enabled after 10 manual reviews; confirmation dialog shows the count).
 - Left 60%: EmailPreview in edit mode. Subject and body inline editable. First line shown with violet highlight and AiMark. Edited fields get a small "Edited" tag.
-- Right 40%: **Why this line** panel: signal quote, source URL link, scraped summary (3 bullets), Apollo fields (title, company size, location), ConfidenceMeter, skip reason if any in a warning Alert.
+- Right 40%: **Why this line** panel: signal quote, source URL link, scraped summary (3 bullets), lead fields (title, company size, location), ConfidenceMeter, skip reason if any in a warning Alert.
 - Regenerate opens a popover with a hint input ("Mention their new podcast") and "Regenerate" button. While running, the preview body shows a shimmer.
 - Footer: Reject (X), Edit (E), Regenerate (R), Approve (A, primary). J/K to move. After approve, card slides left and the next slides in (200ms).
 - Done state: "All 64 reviewed. 58 approved." Button "Back to launch".
@@ -211,7 +220,9 @@ StepWizard, 4 steps:
 1. **Buy a domain:** explanation card ("Use a separate domain like tryacme.com. Your main domain stays safe."), suggested names generated from the main domain (try, get, use, hey, with prefixes) with a "Check on Porkbun" link each, input "Domain you bought". Warning Alert if it matches the main domain.
 2. **Add DNS records:** list of DnsRecordRow for every record AgentMail returned (MX, SPF TXT, DKIM, DMARC TXT, any verification TXT). Above the list: "Open Porkbun > Domain Management > your domain > DNS. Add each record below. Host is the part before your domain." Tabs: "Porkbun" (default, with Porkbun-specific notes: leave host blank for root, Porkbun appends the domain) and "Other DNS". Each row has its own copy buttons; a "Copy all as text" button at the top.
 3. **Verify:** live status per record. Auto check every 30 seconds for 10 minutes, then a "Check again" button. Each chip moves Waiting > Checking (spinner) > Verified (green tick, small scale animation) or Failed (with "Common fix" tooltip: "Remove the domain name from the Host field"). Overall banner: "DNS can take 5 to 30 minutes. You can leave this page; we'll email you when it's verified."
-4. **Create inboxes:** 2 suggested inboxes prefilled from sender name (\`olly@\`, \`o.rosewell@\`), display name input. "Create 2 inboxes". Each card then shows the email, status warming, and the ramp schedule ("10/day this week, 15 next week, 20 after").
+4. **Create inboxes:** 2 suggested inboxes prefilled from sender name (\`olly@\`, \`o.rosewell@\`), display name input. "Create 2 inboxes". Each card then shows the email, an "Active" pill and the ramp schedule as a 3-segment bar: "20/day for 2 weeks, 25/day for 2 weeks, then up to 30".
+
+Domains list (\`/app/domains\`): one card per domain with the health dot, status pill, "3 of 3 inboxes", today's capacity ("41 of 60 sends left today") and a "Set up a domain" primary button top right, disabled with a tooltip when the plan's domain limit is reached ("Starter includes 2 domains. Upgrade for 3."). Empty state: illustration-free card "Cold email needs its own domain. It takes about 20 minutes." with "Set up my first domain".
 
 Domain detail page: header with domain and health dot, DNS table (same rows, read-only with recheck), inboxes table with CapacityMeter, daily cap slider (disabled with reason until rules pass), pause toggle.
 
@@ -234,18 +245,19 @@ Domain detail page: header with domain and health dot, DNS table (same rows, rea
 
 ### 5.12 Billing and paywall (\`/app/billing\`)
 
-- Active: plan card ($79/mo, renews on date), usage meters (leads, personalised, sends), "Manage billing" (Stripe Portal).
-- Trialing: banner "Trial: 4 days left. Your card is charged $79 on 22 Oct." and the same meters.
-- Inactive paywall: centred card over a blurred dashboard screenshot. H2 "Your campaigns are paused". List of what is waiting ("3 campaigns, 412 leads, 18 replies"). Primary "Restart for $79/mo". Secondary "Manage billing".
+- Active: plan card ("Starter, $79/mo, renews 22 Nov" or "Growth, $1,790/yr"), three UsageMeters (leads, AI writes, sends) with "resets 1 Nov", "Manage billing" (Stripe Portal).
+- Starter users see an upgrade card in \`--primary-soft\`: "Growth: 900 leads, 2,700 sends, 6 inboxes for $179/mo." Button "Upgrade to Growth" opens the portal's plan switch.
+- Trialing: banner "Trial: 4 days left. Your card is charged $79 on 22 Oct." and the same meters with trial limits.
+- Inactive paywall: centred card over a blurred dashboard screenshot. H2 "Your campaigns are paused". List of what is waiting ("3 campaigns, 412 leads, 18 replies"). Primary "Restart Starter for $79/mo", secondary "Choose Growth", link "Manage billing".
 
 ### 5.13 Settings (\`/app/settings\`)
 
-- Tabs: Profile, Sender, Integrations, Appearance.
+- Tabs: Profile, Sender, Sending defaults, Suppression, Appearance.
 - Sender: sender name, company, physical address, signature preview, default send window, time zone.
-- Integrations: Apollo API key input (password field, "Connected, ends in abcd" after save, "Test connection" button).
+- Sending defaults: default send days chips, window start/end, follow-up delays, "Stop on any reply" shown as a locked switch (always on) with the tooltip "Outbounder always stops a sequence when someone replies."
 - Appearance: theme toggle.
 
-### 5.14 Suppression (\`/app/suppression\`)
+### 5.14 Suppression (Settings > Suppression tab)
 
 - Table: email or domain, reason badge, source, date. Add (email or domain), Import CSV, Remove (with confirm). Search.
 
@@ -255,8 +267,10 @@ Domain detail page: header with domain and health dot, DNS table (same rows, rea
 
 ### 5.16 Pricing page (\`/pricing\`)
 
-- H1 "One plan. Everything included." Sub: "7 days free, then $79 a month."
-- Single plan card centred (max 480px): price in Display size with "/mo" in muted, limits list with check icons (1,500 leads found, 1,500 personalised emails, 6,000 sends, 3 sending domains, 9 inboxes, unified inbox with AI labels), primary "Start 7-day free trial".
+- H1 "Leads, first lines and sending in one plan." Sub: "7 days free on either plan."
+- Monthly / Annual segmented toggle centred above the cards; annual shows a \`--success-soft\` pill "2 months free".
+- Two cards side by side (stacked on mobile), max 880px total. Starter: $79/mo or $790/yr, 350 leads, 1,000 sends, 2 domains, 3 inboxes. Growth (border \`--primary\`, "Most popular" pill): $179/mo or $1,790/yr, 900 leads, 2,700 sends, 3 domains, 6 inboxes. Both list: verified emails, AI first lines, unified inbox with AI labels, analytics. Price in Display size with "/mo" in muted; annual shows the yearly total and "= $66/mo" under it.
+- Primary button on each card "Start 7-day free trial" (passes plan and interval to Checkout).
 - Under the card: "What you'd pay for the same stack" small table (lead database, verifier, sequencer, inboxes, AI writing) with a muted total. Numbers dated ("Prices checked Oct 2026").
 - FAQ accordion, 6 items.
 
@@ -277,6 +291,26 @@ Domain detail page: header with domain and health dot, DNS table (same rows, rea
 - Two cards side by side: "Choose {{Competitor}} if..." and "Choose Outbounder if...". Same visual weight; do not make the competitor card look worse.
 - Migration in 3 steps, FAQ, last-updated date at the bottom.
 
+### 5.19 Documentation (\`/app/docs\`)
+
+- Two columns: left list of articles (240px, grouped: Getting started, Deliverability, Domains and DNS, Campaigns, Billing), right article (max 720px, 16/26 body, H2 22px).
+- Articles are MDX files in \`content/docs/\`. First five to write: "How Outbounder works in 5 steps", "Why a separate domain", "Adding DNS records in Porkbun", "The 20-a-day ramp", "Reading the AI labels".
+- Each article ends with "Was this helpful? Yes / No" (writes an \`events\` row) and a link to Help.
+- Search box at the top filters article titles as you type.
+
+### 5.20 Help (\`/app/help\`)
+
+- Card 1, "Pipeline status": four rows (Finding, Verifying, Writing, Sending) each with a green or amber dot from the last cron run time, so users can tell "is it me or is it the app?".
+- Card 2, contact form: topic select (Deliverability, Billing, Bug, Other), message textarea, "Send". Success state: "Thanks. Replies come from a human within one working day."
+- Card 3, "Book a 15-minute setup call" button (Cal.com link) for trial users only.
+- Common fixes accordion: 5 items reusing the PRD "If this breaks" table in plain words.
+
+### 5.21 Usage meters and job progress
+
+- \`UsageMeter\`: label, "212 / 350", thin bar (6px, radius full). Bar \`--primary\` under 80%, \`--warning\` from 80%, \`--danger\` at 100%. Caption "Resets 1 Nov". Used on Billing, the plan card in the sidebar and the "Find leads" step.
+- \`JobProgress\`: shows above the leads table while a lead job runs. "Finding leads: 64 of 100" with a determinate bar, pages done, and "You can leave this page." Failed job: \`--danger-soft\` card with the error in plain words and "Retry".
+- The "Find leads" button shows remaining leads under it: "286 leads left this month". If the request is bigger than what is left, the count selector disables the bigger options with a tooltip.
+
 ## 5b. Transactional email design (Resend)
 
 - Built with React Email. Width 560px, white card on \`#F6F7F9\`, 32px padding, Inter with Arial fallback.
@@ -288,7 +322,7 @@ Domain detail page: header with domain and health dot, DNS table (same rows, rea
 
 ## 5c. Iconography and data viz
 
-- Icons: \`lucide-react\` only. Mapping: Dashboard \`LayoutDashboard\`, Campaigns \`Send\`, Inbox \`Inbox\`, Domains \`Globe\`, Analytics \`BarChart3\`, Suppression \`ShieldOff\`, Settings \`Settings\`, AI \`Sparkles\`, verified \`BadgeCheck\`, scraping \`Globe2\`, bounce \`MailX\`.
+- Icons: \`lucide-react\` only. Mapping: Dashboard \`LayoutDashboard\`, Campaigns \`Send\`, Inbox \`Inbox\`, Domains \`Globe\`, Analytics \`BarChart3\`, Documentation \`BookOpen\`, Help \`LifeBuoy\`, Billing \`CreditCard\`, Settings \`Settings\`, Suppression \`ShieldOff\`, AI \`Sparkles\`, verified \`BadgeCheck\`, scraping \`Globe2\`, bounce \`MailX\`.
 - Charts: Recharts. Series colours in order: \`--primary\`, \`--success\`, \`--accent\`, \`--warning\`, \`--violet\`. Never more than 5 series. Axis text \`--muted-foreground\` 12px. Tooltips are surface cards with border and tabular numbers.
 - Sparklines in StatCards: 64x24, 1.5px stroke, no axes, last point dot.
 - Percentages always with one decimal under 10% ("3.4%") and none above ("42%").
@@ -315,9 +349,21 @@ Tick each one in a Chrome DevTools MCP screenshot pass, light and dark, at 1440p
 - [ ] Domain detail
 - [ ] Unified inbox: list, thread, low-confidence unsubscribe alert, mobile thread
 - [ ] Analytics with data and empty
-- [ ] Billing: trialing, active, paywall
-- [ ] Settings tabs, suppression page, unsubscribe page
+- [ ] Billing: trialing, Starter active with upgrade card, Growth active, paywall; pricing toggle monthly and annual
+- [ ] Settings tabs (incl. Suppression), Documentation, Help, unsubscribe page
 - [ ] 402 limit dialog, auto pause banner, offline bar
+
+## 5f. Error, empty and loading copy per screen
+
+| Screen | Loading | Empty | Error |
+| --- | --- | --- | --- |
+| Dashboard | 4 StatCard skeletons + 2 card skeletons | "Your first campaign starts with your buyer." + "Create campaign" | "Couldn't load your dashboard. Retry" |
+| Campaigns | 5 row skeletons | "No campaigns yet. Most users launch their first in 20 minutes." | Alert with Retry |
+| Leads | JobProgress + 8 row skeletons | "No leads yet. Find 25 to start." | Failed job card with Retry |
+| Review | Preview shimmer | "Nothing to review. Leads appear here as Claude writes them." | "Claude couldn't write this one. Edit by hand or skip." |
+| Inbox | 6 thread skeletons | "No replies yet. Replies show up here within a minute." | "Couldn't load replies. Retry" |
+| Domains | 2 card skeletons | See Domains list above | AgentMail error text in plain words + "Try again" |
+| Analytics | Chart skeletons | "Charts appear after your first 20 sends." | Alert with Retry |
 
 ## 6. States
 
@@ -325,7 +371,7 @@ Every data view has four states designed: loading (skeletons matching the layout
 
 | Situation | Treatment |
 | --- | --- |
-| Edge function 402 limit reached | Dialog: "You've used 1,500 of 1,500 leads this month." Link to billing. |
+| Edge function 402 limit reached | Dialog: "You've used 350 of 350 leads this month. They reset on 1 Nov." Buttons "Upgrade to Growth" and "OK". Link to billing. |
 | Pipeline failed lead | Row shows danger pill and the error in the Sheet with "Retry" |
 | AgentMail API down | Toast "Sending paused, retrying in 5 minutes", banner on dashboard if over 15 minutes |
 | Domain not verified after 24h | Amber banner on domain card with a link to the fix guide |
@@ -338,6 +384,8 @@ Toasts (sonner) bottom right, 4 seconds, one line, verb first: "Approved", "Copi
 
 - Durations: 120ms for hovers and presses, 200ms for panels and cards, 300ms for page-level transitions. Easing \`cubic-bezier(0.2, 0.8, 0.2, 1)\`.
 - Pipeline status changes: pill cross-fades, row flashes \`--primary-soft\`.
+- JobProgress bar: width animates 300ms ease-out on every Realtime update; finished state swaps the bar for a success tick that scales 0.8 to 1.
+- UsageMeter colour change (primary to warning) cross-fades over 200ms.
 - Review queue: card slide left on approve, right on reject (translateX 24px + fade).
 - DNS verify tick: scale 0.8 to 1 with a 150ms spring.
 - AI text: first line types in on the landing page only (40ms per character). In the app, AI text fades in.
@@ -352,9 +400,13 @@ Toasts (sonner) bottom right, 4 seconds, one line, verb first: "Approved", "Copi
 - Live regions: pipeline counts and toasts use \`aria-live="polite"\`.
 - Forms: labels always visible (no placeholder-only), errors linked with \`aria-describedby\`.
 - Copy buttons announce "Copied" to screen readers.
+- Charts have a visually hidden data table fallback and a text summary ("Replies rose from 3 to 9 this week").
+- Reduced motion also stops the pulsing dot on working StatusPills (static dot instead).
 - Touch targets 44px on mobile.
 
 ## 9. Mobile
+
+Breakpoints: 360 (small phone), 768 (tablet: sidebar collapses to icons), 1024 (full sidebar), 1440 (review queue gets its 1440 max width).
 
 - Priority on mobile: inbox (reply to interested leads on the go), dashboard, review queue (approve/reject with large buttons and swipe).
 - Leads table becomes a card list: name, company, status pill, step.
@@ -387,7 +439,7 @@ Toasts (sonner) bottom right, 4 seconds, one line, verb first: "Approved", "Copi
 | Route | \`<title>\` | Meta description |
 | --- | --- | --- |
 | \`/\` | Outbounder: cold email that reads like you wrote it | Find B2B leads, personalise every first line from their website and send from safe inboxes on your own domain. 7-day free trial. |
-| \`/pricing\` | Pricing: Outbounder | One plan, $79 a month, everything included. |
+| \`/pricing\` | Pricing: Outbounder | Starter $79 a month or Growth $179 a month. Leads, AI first lines and safe sending included. |
 | \`/tools/first-line-generator\` | Free cold email first-line generator | Paste a company website and get 3 personalised first lines. Free, no signup. |
 | \`/vs/instantly\` | Outbounder vs Instantly | An honest comparison for founders and small agencies. |
 | \`/app/*\` | \`{{Page}}: Outbounder\` | noindex |
