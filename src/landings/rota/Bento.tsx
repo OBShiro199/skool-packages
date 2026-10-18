@@ -100,7 +100,8 @@ const TEXTS: [string, string][] = [
   ['Reminder', 'Early start tomorrow: 06:00 at Cafe Luna.'],
 ]
 function SmsViz() {
-  const { ref, step } = useLoopStep(TEXTS.length + 1, 1300)
+  const { ref, step: s0 } = useLoopStep(TEXTS.length + 1, 1300)
+  const step = Math.max(1, s0)
   return (
     <div ref={ref} className="rt-viz rt-viz-sms" aria-hidden="true">
       <div className="rt-phone is-lock">
@@ -126,7 +127,7 @@ function SwapViz() {
   const { ref, step } = useLoopStep(4, 1200)
   return (
     <div ref={ref} className="rt-viz rt-viz-swap" aria-hidden="true">
-      <div className="rt-sheet">
+      <div className="rt-swapsheet">
         <span className="rt-tile-k">Staff app · swap</span>
         <span className="rt-swap-line"><Chip role="floor">Sat 09-17</Chip><ArrowLeftRight size={12} strokeWidth={1.5} /><span>Mia → Sam</span></span>
         <span className="rt-checked"><Check size={11} strokeWidth={2} />Rules checked: rest, hours, role</span>
@@ -156,7 +157,7 @@ function ClockViz() {
     <div ref={ref} className="rt-viz rt-viz-clock" aria-hidden="true">
       <div className="rt-phone is-clock">
         <span className="rt-phone-notch" />
-        <span className="rt-tile-k">Cafe Luna · Mon 20 Oct</span>
+        <span className="rt-tile-k">Mon 20 Oct</span>
         <motion.span className={`rt-clock-btn ${step % 2 ? 'is-in' : ''}`} animate={{ scale: step % 2 ? 0.97 : 1 }} transition={{ duration: 0.16 }}>
           <Fingerprint size={22} strokeWidth={1.5} />
           {step % 2 ? 'Clocked in' : 'Clock in'}
@@ -213,8 +214,8 @@ function RestCheck() {
     [''],
     [`       ${axis}`, 'is-axis'],
     [`       ${ticks}`, 'is-axis'],
-    [` Fri   ${bar(15, 23, fill)}  15:00-23:00`],
-    [` Sat   ${bar(30, 38, fill)}  06:00-14:00`],
+    [` Fri   ${bar(15, 23, fill)}  15:00-23:00`, 'is-track'],
+    [` Sat   ${bar(30, 38, fill)}  06:00-14:00`, 'is-track'],
     [`       ${gap}`, done ? 'is-warn' : 'is-hide'],
     [''],
     [' gap   7 hours between shifts', done ? '' : 'is-hide'],

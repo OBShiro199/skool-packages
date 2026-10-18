@@ -9,21 +9,22 @@ const STEPS = [
   { t: 'Paste the snippet on your website', b: 'Or share your quote page link and QR code.' },
   { t: 'Get booked jobs, not phone tag', b: 'Prices go out instantly. You get a text when someone books.' },
 ]
-const ASCII = `  how a price is worked out
-  ─────────────────────────────────────
-  call-out base               £40
-  bedrooms     3 × £30      + £90
-                            ───────
-                              £130
-  deep clean   × 1.4          £182
-  SW15         zone A       + £0
-  minimum      £70            ok
-  ─────────────────────────────────
-  range        -0% / +25%
-  rounded      to £5   →  £180 to £230
-  ─────────────────────────────────
-  photos       checked, flag only
-  price        unchanged ✓`
+const ASCII = `how a price is worked out
+────────────────────────────────────
+call-out base                    £40
+bedrooms       3 × £30         + £90
+                            ────────
+subtotal                        £130
+deep clean     × 1.4            £182
+SW15           zone A           + £0
+minimum        £70         ok, above
+────────────────────────────────────
+range          price to +25%        
+rounded        to the nearest £5    
+customer sees           £180 to £230
+────────────────────────────────────
+photos         checked, flag only   
+price          unchanged            `
 
 export function HowItWorks() {
   const reduce = useReducedMotion()

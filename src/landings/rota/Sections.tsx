@@ -338,7 +338,7 @@ export function Pricing() {
                 <div><dt>Clock-in with location check</dt><dd>{p.clock}</dd></div>
                 <div><dt>Texts from your business name</dt><dd>{p.sender}</dd></div>
               </dl>
-              <p className="rt-extras"><Check size={13} strokeWidth={2} aria-hidden="true" />{i === 0 ? EVERYTHING : 'Everything else: same as Starter'}</p>
+              <p className="rt-extras"><Check size={13} strokeWidth={2} aria-hidden="true" />{EVERYTHING}</p>
               <Button
                 href={`/signup?plan=${p.id}&interval=${annual ? 'year' : 'month'}`}
                 onClick={() => track('lp_cta_clicked', { location: 'pricing', plan: p.id, interval: annual ? 'year' : 'month' })}

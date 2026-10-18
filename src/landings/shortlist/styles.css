@@ -511,3 +511,6 @@
   .lp-shortlist .sl-mini-col .sl-stage i { display: none; }
   .lp-shortlist .sl-mini-card.is-moving .sl-avatar { display: none; }
 }
+@media (min-width: 900px) {
+  .lp-shortlist .sl-stage-inner .sl-sc { transform: scale(1.18); }
+}
