@@ -70,7 +70,7 @@ function TodayMock() {
 
 export function Hero() {
   return (
-    <header className="hv-section hv-hero" id="top">
+    <section className="hv-section hv-hero" id="top">
       <div className="hv-rail hv-hero-grid">
         <div className="hv-hero-copy">
           <Eyebrow>For founders, agencies and recruiters who post on LinkedIn</Eyebrow>
@@ -92,6 +92,6 @@ export function Hero() {
         </div>
         <TodayMock />
       </div>
-    </header>
+    </section>
   )
 }
