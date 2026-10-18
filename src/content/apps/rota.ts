@@ -64,12 +64,12 @@ export const rota: AppDef = {
   costs: {
     usage: { label: 'Texts (SMS segments) sent per business per month, at the UK rate', unit: 'texts', default: 120, min: 0, max: 800, step: 20 },
     plans: [
-      { id: 'starter-monthly', name: 'Starter', price: 39, interval: 'month', includes: 'Per location: up to 15 staff, 100 texts (400 in the US and Canada), 6 Claude drafts a month, rota builder, swaps, open shifts, time off, clock-in, CSV export' },
-      { id: 'starter-yearly', name: 'Starter (yearly)', price: 390, interval: 'year', includes: 'Same as Starter, 2 months free' },
-      { id: 'team-monthly', name: 'Team', price: 69, interval: 'month', includes: 'Per location: up to 40 staff, 180 texts (720 in the US and Canada), 10 Claude drafts a month, geofenced clock-in, everything in Starter' },
-      { id: 'team-yearly', name: 'Team (yearly)', price: 690, interval: 'year', includes: 'Same as Team, 2 months free' },
-      { id: 'pro-monthly', name: 'Pro', price: 149, interval: 'month', includes: 'Per location: up to 100 staff, 400 texts (1,600 in the US and Canada), 12 Claude drafts a month, texts from your business name, everything in Team' },
-      { id: 'pro-yearly', name: 'Pro (yearly)', price: 1490, interval: 'year', includes: 'Same as Pro, 2 months free' },
+      { id: 'starter-monthly', usageCap: 100, name: 'Starter', price: 39, interval: 'month', includes: 'Per location: up to 15 staff, 100 texts (400 in the US and Canada), 6 Claude drafts a month, rota builder, swaps, open shifts, time off, clock-in, CSV export' },
+      { id: 'starter-yearly', usageCap: 100, name: 'Starter (yearly)', price: 390, interval: 'year', includes: 'Same as Starter, 2 months free' },
+      { id: 'team-monthly', usageCap: 180, name: 'Team', price: 69, interval: 'month', includes: 'Per location: up to 40 staff, 180 texts (720 in the US and Canada), 10 Claude drafts a month, geofenced clock-in, everything in Starter' },
+      { id: 'team-yearly', usageCap: 180, name: 'Team (yearly)', price: 690, interval: 'year', includes: 'Same as Team, 2 months free' },
+      { id: 'pro-monthly', usageCap: 400, name: 'Pro', price: 149, interval: 'month', includes: 'Per location: up to 100 staff, 400 texts (1,600 in the US and Canada), 12 Claude drafts a month, texts from your business name, everything in Team' },
+      { id: 'pro-yearly', usageCap: 400, name: 'Pro (yearly)', price: 1490, interval: 'year', includes: 'Same as Pro, 2 months free' },
     ],
     lines: [
       { name: 'Shift texts (UK alphanumeric sender)', vendor: 'Twilio', kind: 'perUnit', amount: 0.06, freeTier: 'Trial credit only, and trial texts go to verified numbers with a prefix [verify].', note: 'UK outbound listed at $0.0463 to $0.056 per segment on Twilio pages checked Oct 2026 [verify], rounded up to $0.06 to cover carrier fees. Every template fits one segment. US/Canada texts are about $0.0113 ($0.0083 + about $0.003 carrier fee), so US plans get 4 times the allowance for less money.', url: 'https://www.twilio.com/en-us/sms/pricing/gb' },

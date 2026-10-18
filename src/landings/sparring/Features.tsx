@@ -129,7 +129,8 @@ const DRAFT = [
   ['Wins the call', 'Ask about close time before any pitch.'],
 ]
 function BuilderVis() {
-  const { ref, step } = useLoop(DRAFT.length + 3, 900, DRAFT.length + 2)
+  const { ref, step } = useLoop(DRAFT.length + 3, 900, 0)
+  const filled = step < 3 ? DRAFT.length : step - 3
   return (
     <div ref={ref} className="sp-bv">
       <div className="sp-bv-form">
@@ -144,7 +145,7 @@ function BuilderVis() {
         {DRAFT.map(([k, v], i) => (
           <div className="sp-bv-row" key={k}>
             <span>{k}</span>
-            <motion.b initial={false} animate={{ opacity: step > i ? 1 : 0, y: step > i ? 0 : 4 }} transition={{ duration: 0.3, ease: EASE }}>{v}</motion.b>
+            <motion.b initial={false} animate={{ opacity: filled > i ? 1 : 0, y: filled > i ? 0 : 4 }} transition={{ duration: 0.3, ease: EASE }}>{v}</motion.b>
           </div>
         ))}
       </div>

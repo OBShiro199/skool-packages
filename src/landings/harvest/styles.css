@@ -506,8 +506,9 @@
   .lp-harvest .hv-lane { height: 28px; }
   .lp-harvest .hv-lane-line { left: 50%; right: auto; top: 2px; bottom: 2px; border-top: 0; border-left: 1px dashed var(--accent-edge); }
   .lp-harvest .hv-lane-token { display: none; }
-  .lp-harvest .hv-mini-table th:nth-child(2) { width: 108px; }
-  .lp-harvest .hv-mini-table th:nth-child(3) { width: 76px; }
+  .lp-harvest .hv-mini-table th:nth-child(2) { width: 100px; }
+  .lp-harvest .hv-mini-table th:nth-child(3) { width: 80px; }
+  .lp-harvest .hv-mini-table td.hv-num { font-size: 12px; }
   .lp-harvest .hv-mini-table td, .lp-harvest .hv-mini-table th { padding: 0 8px; }
   .lp-harvest .hv-meter-parts li { grid-template-columns: 112px minmax(0, 1fr) 40px; }
   .lp-harvest .hv-how { grid-template-columns: minmax(0, 1fr); gap: 28px; }
