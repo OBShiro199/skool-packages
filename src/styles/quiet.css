@@ -221,3 +221,16 @@ body:has(.course-nav) .toasts { bottom: 78px; }
 .kit-preview-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; overflow: hidden; }
 .build-link { align-items: flex-start; }
 .build-link .count { line-height: 20px; }
+
+/* Phase strip: full names, never truncated; scrolls sideways when it doesn't fit */
+.phase-strip { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(max-content, 1fr); scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; overscroll-behavior-x: contain; }
+.phase-strip::-webkit-scrollbar { display: block; height: 4px; }
+.phase-strip::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 4px; }
+.ps-item { padding-right: 18px; }
+.ps-label { overflow: visible; text-overflow: clip; }
+.phase-strip-wrap { position: relative; }
+.ps-edge { position: absolute; top: 0; bottom: 1px; z-index: 2; width: 44px; display: grid; place-items: center; border: 0; color: var(--ink-2); opacity: 0; pointer-events: none; transition: opacity .16s; cursor: pointer; }
+.ps-edge.on { opacity: 1; pointer-events: auto; }
+.ps-edge.left { left: 0; background: linear-gradient(90deg, #fff 55%, rgba(255,255,255,0)); justify-items: start; padding-left: 10px; }
+.ps-edge.right { right: 0; background: linear-gradient(270deg, #fff 55%, rgba(255,255,255,0)); justify-items: end; padding-right: 10px; }
+.ps-edge:hover { color: var(--ink); }

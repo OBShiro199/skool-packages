@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowLeft, ArrowRight, Calculator, Check, Clock, FolderDown, Lock, Trophy } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Calculator, ChevronLeft, ChevronRight, Check, Clock, FolderDown, Lock, Trophy } from 'lucide-react'
 import { getApp, getPhases } from '../content/apps'
 import type { Task } from '../content/types'
 import { useStore, useUser } from '../lib/store'
@@ -131,6 +131,22 @@ export default function BuildPage() {
     for (const [id, ref] of allItems) if (ref.trigger === trigger && !now[id] && ref.task.id === task?.id) onToggle(id, true)
   }, [allItems, task?.id, onToggle]) // eslint-disable-line
 
+  // Edge arrows on the phase strip when phases sit off-screen to either side.
+  const stripRef = useRef<HTMLElement>(null)
+  const [edges, setEdges] = useState({ l: false, r: false })
+  const updateEdges = () => {
+    const el = stripRef.current
+    if (!el) return
+    const l = el.scrollLeft > 4, r = el.scrollLeft + el.clientWidth < el.scrollWidth - 4
+    setEdges((e) => (e.l === l && e.r === r ? e : { l, r }))
+  }
+  const scrollStrip = (d: 1 | -1) => stripRef.current?.scrollBy({ left: d * stripRef.current.clientWidth * 0.6, behavior: 'smooth' })
+  useEffect(() => {
+    updateEdges()
+    window.addEventListener('resize', updateEdges)
+    return () => window.removeEventListener('resize', updateEdges)
+  })
+
   // Keep the active phase visible in the strip on narrow screens (horizontal scroll only).
   useEffect(() => {
     const strip = document.querySelector<HTMLElement>('.phase-strip')
@@ -184,7 +200,9 @@ export default function BuildPage() {
           </div>
         </header>
 
-        <nav className="phase-strip" aria-label="Phases">
+        <div className="phase-strip-wrap">
+          <button className={`ps-edge left ${edges.l ? 'on' : ''}`} aria-label="Earlier phases" tabIndex={edges.l ? 0 : -1} onClick={() => scrollStrip(-1)}><ChevronLeft size={15} /></button>
+          <nav ref={stripRef} className="phase-strip" aria-label="Phases" onScroll={updateEdges}>
           {phases.map((p, i) => {
             const s = stats.perPhase[i]
             const active = !extra && i === pi
@@ -201,6 +219,8 @@ export default function BuildPage() {
             )
           })}
         </nav>
+          <button className={`ps-edge right ${edges.r ? 'on' : ''}`} aria-label="Later phases" tabIndex={edges.r ? 0 : -1} onClick={() => scrollStrip(1)}><ChevronRight size={15} /></button>
+        </div>
 
         <div className="course-stage">
           <AnimatePresence mode="wait" initial={false} custom={dir}>
