@@ -293,7 +293,7 @@ export function Pricing() {
                   <h3 className="hd-h3">{p.name}</h3>
                   {p.badge && <span className="hd-pill hd-pill-accent"><i className="hd-status-dot" /> {p.badge}</span>}
                 </div>
-                {p.line && <p className="hd-plan-line">{p.line}</p>}
+                {p.line ? <p className="hd-plan-line">{p.line}</p> : <p className="hd-plan-line" aria-hidden="true">&nbsp;</p>}
                 <div className="hd-price" aria-live="polite">
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.span key={`${p.id}-${yearly}`} className="hd-price-num" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18 }}>

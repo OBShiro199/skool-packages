@@ -886,7 +886,7 @@ grant execute on function public.relabel_reply(uuid, public.reply_class) to auth
 -- ELI5: RLS is a guard on every table that checks "is this your row?"
 -- on every read and write. (select auth.uid()) is the signed-in user.
 -- One policy per action. No 'for all'. Tables with no policy for an
--- action simply refuse it (only the secret key gets through).
+-- action refuse it (only the secret key gets through).
 -- ---------------------------------------------------------------------
 alter table public.plans enable row level security;
 alter table public.profiles enable row level security;

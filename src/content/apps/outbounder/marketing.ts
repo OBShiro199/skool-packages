@@ -12,7 +12,7 @@ const outbound: Task[] = [
     minutes: 60,
     xp: 50,
     blocks: [
-      eli5('Why sell it with itself?', 'If your cold emails get replies, that is the best demo there is. Every prospect who replies has just felt the product working on them. And every problem you hit, your customers would have hit first.'),
+      eli5('Why sell it with itself?', 'If your cold emails get replies, that is the best demo there is. Every prospect who replies has felt the product working on them. And every problem you hit, your customers would have hit first.'),
       steps(
         'Stripe Dashboard > Product catalogue > Coupons > **+ New**: 100% off, duration Forever, name "Founder". Apply it to your own Growth subscription in Customers > you > Subscription > Add coupon.',
         'Buy 2 lookalike domains on Porkbun for the product, e.g. tryoutbounder.com and getoutbounder.com (use your real brand). About $22 for both.',
@@ -27,7 +27,7 @@ const outbound: Task[] = [
         ['5 onwards', '4', '30', '480'],
       ]),
       mistakes([
-        { mistake: 'Sending your first campaign from your main domain "just this once".', fix: 'Never. Outbounder blocks it for customers; do not bypass it for yourself. Your Stripe receipts and Resend emails live on that domain.' },
+        { mistake: 'Sending your first campaign from your main domain "only this once".', fix: 'Never. Outbounder blocks it for customers; do not bypass it for yourself. Your Stripe receipts and Resend emails live on that domain.' },
         { mistake: 'Using a fake persona so it feels less salesy.', fix: 'Send as yourself, the founder. "I built this" gets more replies from founders than any SDR name.' },
         { mistake: 'Waiting until launch to set up domains.', fix: 'Domains and inboxes take a day to verify and weeks to ramp. Set them up now so they are ready when the product is.' },
       ]),
@@ -64,7 +64,7 @@ Want me to run 10 first lines for {{company}}'s ideal clients, free?
 STEP 2 · day 3 · same thread
 {{first_name}}, one number: writing a real first line takes most people 3 to 5 minutes. Outbounder does 25 in about 2, and you approve every one.
 
-Happy to send the 10 for {{company}} either way. Just reply with who you sell to.
+Happy to send the 10 for {{company}} either way. Reply with who you sell to.
 
 STEP 3 · day 8 · new thread
 Subject: pipeline next quarter
@@ -259,7 +259,7 @@ const inbound: Task[] = [
 Read @PRD.md section 7.2 and @DESIGN.md section 5.11 and @LANDING.md (square marketing style). Build /tools/first-line-generator and /api/tools/first-line.
 - Route: zod body { url }, normalise to https://host, SSRF guard (no IPs, localhost, .local, .internal). Rate limit 3 per hashed IP per day and 300 per day globally (events table), 429 after.
 - Firecrawl the homepage only (1 credit). Claude claude-sonnet-5-5 with the PRD 12.1 system prompt but asking for 3 first lines, JSON schema { lines: [{ first_line, signal }] }, effort low.
-- After 3 uses, an email field unlocks 10 more: save to a tool_signups row via the secret key and send one Resend email with the results and a trial link (email_log dedupe tool:<email>).
+- After 3 uses, an email field opens 10 more: save to a tool_signups row via the secret key and send one Resend email with the results and a trial link (email_log dedupe tool:<email>).
 - Add the page to the sitemap with the SEO title "Free cold email first-line generator".
 Plan first, then wait for my OK.`),
       steps(
@@ -276,7 +276,7 @@ Plan first, then wait for my OK.`),
       mistakes([
         { mistake: 'No rate limit, a bot runs 10,000 scrapes overnight.', fix: 'The global 300 a day cap is the safety net. Check the events count each morning for the first week.' },
         { mistake: 'Results look generic.', fix: 'Show the quoted signal under each line. If the site has no usable text, say so instead of guessing.' },
-        { mistake: 'The tool asks for signup first.', fix: 'Three free uses without signup. The email gate only unlocks more.' },
+        { mistake: 'The tool asks for signup first.', fix: 'Three free uses without signup. The email gate only adds more.' },
       ]),
     ],
     checklist: [['Build the free tool', 'copy:out-mk-in-tool-prompt'], 'Post the screen recording on LinkedIn and X', 'Submit to 5 tool directories'],
@@ -555,7 +555,7 @@ export const launchTasks: Task[] = [
         'Next Monday: switch on the Google Search test only if you have at least 1 trial from outbound, so you know the funnel converts.',
       ),
       code('out-launch-post', 'Launch post template', 'txt', `
-I just launched Outbounder.
+I launched Outbounder today.
 
 It finds verified B2B leads, reads each company's website, writes a first line about something real, and sends from safe inboxes on your own domain.
 

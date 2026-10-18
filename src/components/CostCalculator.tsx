@@ -112,8 +112,8 @@ export function CostCalculator({ app }: { app: AppDef }) {
         <table>
           <thead><tr><th>Tool</th><th>How it is charged</th><th>Free tier</th><th style={{ textAlign: 'right' }}>At {customers.toLocaleString()} customers</th></tr></thead>
           <tbody>
-            {r.lines.map(({ l, cost }) => (
-              <tr key={l.name}>
+            {r.lines.map(({ l, cost }, li) => (
+              <tr key={`${l.name}-${li}`}>
                 <td>
                   <b>{l.name}</b>
                   <div className="muted" style={{ fontSize: 12.5 }}>{l.vendor}{l.url && <> · <a href={l.url} target="_blank" rel="noreferrer">pricing <ExternalLink size={10} /></a></>}</div>

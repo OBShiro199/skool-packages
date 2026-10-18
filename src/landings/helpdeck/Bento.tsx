@@ -98,7 +98,8 @@ function AnswerVisual() {
 
 /* 8.3 Handoff card then inbox email */
 function HandoffVisual() {
-  const { ref, step } = useLoopStep(3, 1800)
+  const { ref, step, reduce } = useLoopStep(3, 1800)
+  const hidden = !reduce && step === 2
   return (
     <div className="hd-vis hd-vis-handoff" ref={ref} role="img" aria-label="An amber handoff card in the chat, then the transcript email arriving in an inbox">
       <div aria-hidden="true" className="hd-handoff-stack">
@@ -106,7 +107,7 @@ function HandoffVisual() {
           <p>I'm not sure about this one. Want a human to email you?</p>
           <div className="hd-handoff-field"><Mail size={13} /> sam@northwind.io <span>Send</span></div>
         </div>
-        <motion.div className="hd-mail" animate={{ opacity: step >= 1 ? 1 : 0, x: step >= 1 ? 0 : 24 }} transition={{ duration: 0.4, ease: EASE }}>
+        <motion.div className="hd-mail" animate={{ opacity: hidden ? 0 : 1, x: hidden ? 24 : 0 }} transition={{ duration: 0.4, ease: EASE }}>
           <span className="hd-mail-icon"><Inbox size={13} /></span>
           <div>
             <strong>Handoff: "Do you offer a nonprofit discount?"</strong>
@@ -169,7 +170,7 @@ const CONVOS = [
 ]
 
 function InboxVisual() {
-  const { ref, step, reduce } = useLoopStep(6, 900)
+  const { ref, step, reduce, inView } = useLoopStep(6, 900)
   return (
     <div className="hd-vis hd-vis-inbox" ref={ref} role="img" aria-label="Conversations inbox with Low confidence badges on questions the bot could not answer">
       <div className="hd-inbox" aria-hidden="true">
@@ -185,7 +186,7 @@ function InboxVisual() {
               {c.tag && (
                 <motion.span
                   className={`hd-badge ${c.tag}`}
-                  animate={{ opacity: reduce || step > i ? 1 : 0 }}
+                  animate={{ opacity: reduce || !inView || step > i ? 1 : 0 }}
                   transition={{ duration: 0.3, ease: EASE }}
                 >
                   {c.tag === 'low' ? 'Low confidence' : 'Handoff'}

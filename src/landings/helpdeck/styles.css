@@ -168,7 +168,7 @@
 .lp-helpdeck .hd-chat-head span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); line-height: 16px; }
 .lp-helpdeck .hd-chat-avatar { width: 28px; height: 28px; border-radius: var(--radius-box); display: grid !important; place-items: center; color: var(--blue-ink); background: var(--blue-soft); border: 1px solid var(--blue-edge); flex: none; }
 .lp-helpdeck .hd-chat-x { margin-left: auto; color: var(--faint); }
-.lp-helpdeck .hd-chat-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; height: 372px; overflow: hidden; justify-content: flex-end; }
+.lp-helpdeck .hd-chat-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; height: 340px; overflow: hidden; justify-content: flex-end; }
 .lp-helpdeck .hd-chat-input { border-top: 1px solid var(--hairline); height: 40px; padding: 0 12px; font-size: 13px; color: var(--ghost); display: flex; align-items: center; justify-content: space-between; }
 .lp-helpdeck .hd-chat-input span { font-size: 12px; color: var(--faint); }
 .lp-helpdeck .hd-bubble { max-width: 88%; padding: 8px 10px; border-radius: 8px; font-size: 13px; line-height: 18px; letter-spacing: -0.014em; }
@@ -410,6 +410,7 @@
 .lp-helpdeck .hd-ascii-card { margin-top: 32px; background: var(--surface); border: 1px solid var(--hairline); overflow: hidden; }
 .lp-helpdeck .hd-ascii-head { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-bottom: 1px solid var(--hairline); font-size: 13px; font-weight: 500; color: var(--ink); }
 .lp-helpdeck .hd-ascii-file { margin-left: auto; font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--faint); }
+.lp-helpdeck .hd-ascii, .lp-helpdeck .hd-code, .lp-helpdeck .hd-scene-code, .lp-helpdeck .hd-code-file { font-variant-ligatures: none; font-feature-settings: 'liga' 0, 'calt' 0; }
 .lp-helpdeck .hd-ascii { font-family: var(--mono); font-size: 13px; line-height: 1.6; color: var(--body); padding: 24px 32px; white-space: pre; overflow: hidden; letter-spacing: 0; }
 .lp-helpdeck .hd-ascii-narrow { display: none; }
 

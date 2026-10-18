@@ -122,8 +122,8 @@ export function BlockView({ b }: { b: Block }) {
           <table>
             <thead><tr><th>Key</th><th>Where to find it</th><th>Paste into</th><th /></tr></thead>
             <tbody>
-              {b.rows.map((r) => (
-                <tr key={r.name}>
+              {b.rows.map((r, i) => (
+                <tr key={`${r.name}-${i}`}>
                   <td><code>{r.name}</code></td>
                   <td>{inline(r.where)}</td>
                   <td><span className="chip">{r.pasteInto}</span></td>
@@ -145,7 +145,7 @@ export function BlockView({ b }: { b: Block }) {
       return (
         <div className="blk-table">
           <table>
-            <thead><tr>{b.head.map((h) => <th key={h}>{h}</th>)}</tr></thead>
+            <thead><tr>{b.head.map((h, i) => <th key={i}>{h}</th>)}</tr></thead>
             <tbody>{b.rows.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j}>{inline(c)}</td>)}</tr>)}</tbody>
           </table>
         </div>
@@ -154,7 +154,7 @@ export function BlockView({ b }: { b: Block }) {
       return (
         <div className="row wrap" style={{ gap: 8 }}>
           {b.items.map((l) => (
-            <a key={l.url} className="btn btn-sm" href={l.url} target="_blank" rel="noreferrer">{l.label} <ExternalLink size={13} /></a>
+            <a key={`${l.url}-${l.label}`} className="btn btn-sm" href={l.url} target="_blank" rel="noreferrer">{l.label} <ExternalLink size={13} /></a>
           ))}
         </div>
       )

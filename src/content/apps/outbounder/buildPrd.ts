@@ -31,7 +31,7 @@ Primary: **a B2B founder or agency owner doing their own outbound**, 1 to 10 peo
 | Segment | Who | Pain in their words | Trigger that makes them buy now |
 | --- | --- | --- | --- |
 | Agency owners | Lead gen, dev, design, SEO, paid media agencies with 1 to 15 staff | "Referrals dried up and I have no pipeline for next quarter" | Lost a retainer client this month |
-| B2B SaaS founders | Pre-seed to seed, $0 to $30k MRR, founder-led sales | "I know who my buyer is, I don't have time to email them one by one" | Launched, or just finished a build sprint and needs users |
+| B2B SaaS founders | Pre-seed to seed, $0 to $30k MRR, founder-led sales | "I know who my buyer is, I don't have time to email them one by one" | Launched, or finished a build sprint and needs users |
 | Recruiters | Solo or boutique agency recruiters selling to hiring managers | "I need to reach 50 hiring managers a week with something better than a template" | A new role brief landed, or a client stopped hiring |
 
 Not for: enterprise SDR teams with 20 seats, B2C senders, anyone who wants to send 10,000 emails a day, anyone buying a list of consumers.
