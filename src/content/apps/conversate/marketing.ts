@@ -161,7 +161,7 @@ Kill rule: if an agency has 0 paying clients 45 days after the call, stop chasin
       { type: 'steps', items: [
         'Set up F5Bot (free) alerts for: "intercom pricing", "intercom alternative", "help centre", "support tickets", "chatbot made up", "customer support saas", "zendesk too expensive". Pick r/SaaS, r/startups, r/shopify, r/ecommerce, r/smallbusiness.',
         'On X, search the same phrases daily and filter by people with "founder" in bio.',
-        'Reply with a real answer first (how to cut repeat questions, what to put in a help centre). Mention Conversate in under 1 in 10 replies, only when asked or obviously useful.',
+        'Reply with a real answer first (how to cut repeat questions, what to put in a help centre). Mention Conversate in under 1 in 10 replies, only when asked or clearly useful.',
         'DM founders who complain about Intercom bills with the script below.',
       ] },
       { type: 'code', id: 'con-mk-out-social-dm', filename: 'dm.txt', lang: 'txt', code: `Reddit reply (no link unless asked):

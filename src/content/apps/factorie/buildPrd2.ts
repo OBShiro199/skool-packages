@@ -50,7 +50,7 @@ Mentions are weighted by position so being listed first counts more than being l
 
 ### 12.6 Worked example
 
-25 prompts on ChatGPT. Brand mentioned in 10 answers: 3 at position 1, 4 at position 3, 3 in prose. \`sum v = 3 x 100 + 4 x 70 + 3 x 60 = 760\`. \`VS = 760 / 25 = 30.4\`. \`MR = 40%\`. \`AP = (3 x 1 + 4 x 3) / 7 = 2.1\`. Competitor X mentioned in 18 answers with W = 12.6; brand W = 3 + 2.8 + 1.8 = 7.6; \`SOV(brand) = 7.6 / (7.6 + 12.6) = 37.6%\`.
+25 prompts on ChatGPT. Brand mentioned in 10 answers: 3 at position 1, 4 at position 3, 3 in prose. \`sum v = 3 x 100 + 4 x 70 + 3 x 60 = 760\`. \`VS = 760 / 25 = 30.4\`. \`MR = 40%\`. \`AP = (3 x 1 + 4 x 3) / 7 = 2.14\`. Competitor X mentioned in 18 answers with W = 12.6; brand W = 3 + 2.8 + 1.8 = 7.6; \`SOV(brand) = 7.6 / (7.6 + 12.6) = 37.6%\`.
 
 ## 13. On-demand rechecks
 
@@ -302,7 +302,7 @@ Write these as Playwright tests where marked [e2e], SQL checks where marked [sql
 4. [sql] Inserting a 26th active prompt for a Starter user directly with the user's JWT fails with the trigger error.
 5. [e2e] After trial start, the first run shows per-engine progress and finishes with status complete or partial; the overview shows 4 score cards.
 6. [sql] Calling \`compute_daily_scores\` twice for the same brand and day leaves the same number of rows (idempotent).
-7. [sql] For the worked example in 12.6 (seeded fixture), VS = 30.4, MR = 40, AP = 2.1, SOV = 37.6.
+7. [sql] For the worked example in 12.6 (seeded fixture), VS = 30.4, MR = 40.0, AP = 2.14, SOV = 37.6 (and competitor X SOV = 62.4).
 8. [curl] POST \`run-checks\` without \`x-cron-secret\` returns 401. With a wrong secret returns 401.
 9. [curl] POST \`check-prompt\` twice with the same job id: second call returns 409 and \`usage_ledger\` has one row for that job.
 10. [curl] User A's JWT reading \`/rest/v1/check_results?brand_id=eq.<B's brand>\` returns \`[]\`.

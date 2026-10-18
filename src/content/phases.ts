@@ -52,8 +52,8 @@ const slugify = (s: string): string =>
 
 const envRow = (v: EnvVar): KeyRow => ({ name: v.name, where: v.where, pasteInto: v.pasteInto, secret: v.secret })
 
-/** Env vars an API needs inside the Next.js app (anything not only for Supabase secrets). */
-const nextEnvVars = (api: ApiDef): EnvVar[] => api.envVars.filter((v) => !/^supabase secrets$/i.test(v.pasteInto.trim()))
+/** Env vars an API needs inside the Next.js app (not keys that live only in Supabase secrets or Trigger.dev). */
+const nextEnvVars = (api: ApiDef): EnvVar[] => api.envVars.filter((v) => !/^(supabase secrets|trigger\.dev env)$/i.test(v.pasteInto.trim()))
 
 /** Every env var name the Next.js app reads, for .env.example and Vercel. */
 const supabaseRows = (pasteInto: string): KeyRow[] => [

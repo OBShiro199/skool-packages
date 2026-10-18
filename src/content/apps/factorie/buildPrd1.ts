@@ -9,7 +9,7 @@ Version 1.0 (prices and model slugs checked Oct 2026). Save this file as \`PRD.m
 - Read sections 1 to 4 once so you know what you are building and for whom.
 - Sections 5 to 17 are the spec. Claude Code builds from them, section by section.
 - Section 22 lists the build milestones. Do them in order. A milestone is done when its acceptance tests in section 21 pass.
-- Every new Claude Code session starts with: "Read @PRD.md and @DESIGN.md. We are on milestone N. Plan first, then wait for my OK."
+- Every new Claude Code session starts with: "Read @PRD.md, @DESIGN_SYSTEM.md and @DESIGN.md. We are on milestone N. Plan first, then wait for my OK."
 - Numbers in this file (limits, prices, formulas) are the source of truth. If you change one, change it here first, then ask Claude Code to update the code to match.
 
 ## 1. Problem

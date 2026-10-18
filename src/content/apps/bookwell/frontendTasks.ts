@@ -66,11 +66,13 @@ Build the owner pages inside the app shell (sidebar: Bookings, Services, Hours, 
   Row menu: Mark completed, Mark no-show (visibility hidden until the start time), Cancel and refund, Cancel and keep deposit (both call bw-booking-action), Copy manage link, Open in Google Calendar.
   Mark completed and no-show are direct updates through the browser Supabase client (RLS and the guard trigger allow only these).
 - Supabase Realtime: subscribe to postgres_changes on bookings filtered by business_id; new rows rise once.
+- When all five checklist rows are done, the card morphs into the share card: booking link, Copy, and a QR code from qrcode.react with a Download PNG button.
 - TextMeter in the sidebar and the Bookings toolbar from the usage_this_month RPC.
 All reads and writes go through the browser Supabase client. RLS scopes them to the owner's business.`),
       steps(
         'Add one service: "Skin fade", 45 min, $35, $10 deposit, 15 min buffer.',
         'Set Monday to Friday 09:00 to 17:00, and add a day off next week.',
+        'Download the QR code from the share card and scan it with your phone camera.',
         'Open your booking page in another tab and book a $0 test service (make one with deposit $0). Watch it appear on the Bookings page without refreshing.',
       ),
       tip('Seed a fake booking', 'Ask Claude Code: "Insert two confirmed test bookings for tomorrow for my business using the Supabase MCP, with blocked_until set" so you can see the Today view without paying a deposit.'),

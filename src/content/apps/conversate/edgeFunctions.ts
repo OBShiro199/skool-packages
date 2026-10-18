@@ -172,7 +172,7 @@ ask:
 10. Post-process: keep only source_ids that were sent; sources = those chunks as { chunk_id, title, url }; answer = cleanAnswer(answer, chunk urls + workspace website). Compute final confidence with the formula in PRD 13.3 using the top similarity.
 11. If final < widget_settings.confidence_threshold: body shown = "I am not sure about this one, and I would rather not guess. Want me to get a human?" Store Claude's draft in sources metadata as { draft } so agents can see it (never sent to the visitor). Record a content gap. Insert notification low_confidence. offerHuman true.
 12. Insert the AI message (role 'ai', body, sources, confidence, needs_human). Meter ai_answer quantity 1, costMicros (Claude + query embedding tokens x 0.06), key 'answer:' + aiMessageId.
-13. If usage just crossed 80% (used + 1 == ceil(cap * 0.8)) insert notification cap_warning (user_id = owner). At 100% insert cap_reached.
+13. If usage has now crossed 80% (used + 1 == ceil(cap * 0.8)) insert notification cap_warning (user_id = owner). At 100% insert cap_reached.
 14. Return 200 { conversationId, token?, message: { id, role: 'ai', body, sources: [{ title, url }], confidence, needsHuman }, mode: 'ai', offerHuman }.
 
 handoff: set handoff_requested_at (if null), visitor email if given (validate), insert a system message "You asked for a human. ...", notification handoff, return { ok: true, realtimeTopic } so the widget can subscribe now.

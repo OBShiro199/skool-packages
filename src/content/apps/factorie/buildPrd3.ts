@@ -111,6 +111,7 @@ Estimated monthly cost line under engines (for transparency, shown only to the u
 | \`SITE_URL\` | Same as NEXT_PUBLIC_SITE_URL (your live https URL; used for CORS, email links and the OpenRouter HTTP-Referer) | Supabase secrets | No |
 | \`CRON_SECRET\` | You make it: \`openssl rand -hex 32\` | Supabase secrets and Supabase Vault | Yes |
 | \`DIGEST_SIGNING_SECRET\` | You make it: \`openssl rand -hex 32\` | Supabase secrets | Yes |
+| \`FOUNDER_USER_ID\` | Your own user id from Supabase > Authentication > Users (unlocks /app/admin/audits) | .env.local, Vercel env | No |
 | \`FOUNDER_EMAIL\` | Your own inbox for admin alerts (engine disabled, top up OpenRouter) | Supabase secrets | No |
 | Stripe variables | See the Payments phase | .env.local, Vercel env | Mixed |
 
