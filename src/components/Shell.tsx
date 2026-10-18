@@ -5,7 +5,6 @@ import { streak, useStore, useUser } from '../lib/store'
 import { getApp } from '../content/apps'
 import { appStats, levelFor } from '../lib/progress'
 import { Bar, Ring } from './Ring'
-import { AppArt } from './AppArt'
 import { AskOlly } from './AskOlly'
 
 function useTheme() {
@@ -60,7 +59,6 @@ export default function Shell() {
         {builds.length === 0 && <p className="muted" style={{ fontSize: 13, padding: '0 10px' }}>No builds yet. Pick a kit to start.</p>}
         {builds.map(({ app, s }) => (
           <NavLink key={app.slug} to={`/app/build/${app.slug}`} className={({ isActive }) => `nav-link build-link ${isActive ? 'active' : ''}`}>
-            <span className="build-thumb"><AppArt app={app} height={22} /></span>
             <span style={{ flex: 1, minWidth: 0 }}>
               {app.name}
               <Bar pct={s.pct} />

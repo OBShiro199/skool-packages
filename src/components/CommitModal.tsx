@@ -6,7 +6,6 @@ import type { AppDef } from '../content/types'
 import { useStore, useUser } from '../lib/store'
 import { Modal } from './Modal'
 import { SignaturePad, type SignaturePadHandle } from './SignaturePad'
-import { AppArt } from './AppArt'
 import { celebrate } from '../lib/confetti'
 
 export function CommitModal({ app, open, onClose, onDone }: { app: AppDef; open: boolean; onClose: () => void; onDone: () => void }) {
@@ -83,9 +82,6 @@ export function CommitModal({ app, open, onClose, onDone }: { app: AppDef; open:
                 <motion.span className="label" style={{ color: '#7DF0B0' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>Pledge signed · {date}</motion.span>
                 <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>You’re in.</motion.h1>
                 <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.85 }}>Let’s start building <span className="serif" style={{ fontSize: '1.3em' }}>{app.name}</span>.</motion.p>
-                <motion.div className="yourein-art" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }}>
-                  <AppArt app={app} height={120} />
-                </motion.div>
                 <motion.button className="btn btn-lg" style={{ background: '#fff', color: '#0F0F0F', borderColor: '#fff' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
                   onClick={() => { setCelebrating(false); onDone() }}>
                   Open my build <ArrowRight size={16} />

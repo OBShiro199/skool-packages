@@ -328,3 +328,6 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; background: v
 .soon-row { display: grid; grid-template-columns: 18px 140px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
 .soon-row:last-child { border-bottom: 0; }
 @media (max-width: 640px) { .soon-row { grid-template-columns: 18px 1fr; } .soon-row .muted:not(svg), .soon-row .label { grid-column: 2; } }
+.detail-hero { grid-template-columns: 1fr; max-width: 760px; }
+.continue { grid-template-columns: 1fr; }
+.rec-card { grid-template-columns: 1fr; }

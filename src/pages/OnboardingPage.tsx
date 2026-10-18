@@ -179,7 +179,6 @@ export default function OnboardingPage() {
               <span className="label" style={{ color: 'var(--money)' }}><Sparkles size={12} style={{ verticalAlign: -1 }} /> Your match</span>
               <h1 className="onb-h1">Build <span className="hl">{rec.name}</span>.</h1>
               <div className="rec-card">
-                <AppArt app={rec} height="auto" />
                 <div className="rec-body">
                   <div className="row between wrap">
                     <b style={{ fontSize: 18 }}>{rec.name}</b>

@@ -5,7 +5,6 @@ import { useUser } from '../lib/store'
 import { getApp } from '../content/apps'
 import { LEVELS, fmtMinutes, taskStats } from '../lib/progress'
 import { useTotals } from '../components/Shell'
-import { AppArt } from '../components/AppArt'
 import { AppCard } from '../components/AppCard'
 import { Bar, Ring } from '../components/Ring'
 import { PhaseIcon } from '../components/PhaseIcon'
@@ -59,7 +58,6 @@ export default function HomePage() {
 
       {active ? (
         <motion.section className="card continue" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="continue-art"><AppArt app={active.app} height="auto" /></div>
           <div className="continue-body">
             <span className="label">Continue building</span>
             <h2>{active.app.name}</h2>
@@ -82,7 +80,6 @@ export default function HomePage() {
         </motion.section>
       ) : rec ? (
         <section className="card continue">
-          <div className="continue-art"><AppArt app={rec} height="auto" /></div>
           <div className="continue-body">
             <span className="label" style={{ color: 'var(--signal)' }}><Sparkles size={12} style={{ verticalAlign: -1 }} /> Your match from onboarding</span>
             <h2>{rec.name}</h2>

@@ -6,7 +6,6 @@ import { getApp, getPhases } from '../content/apps'
 import { CATEGORIES, CORE_STACK } from '../content/catalog'
 import { useUser } from '../lib/store'
 import { fmtMinutes } from '../lib/progress'
-import { AppArt } from '../components/AppArt'
 import { Difficulty } from '../components/AppCard'
 import { CommitModal } from '../components/CommitModal'
 import { PhaseIcon } from '../components/PhaseIcon'
@@ -34,9 +33,6 @@ export default function AppDetailPage() {
       <Link to="/app/library" className="btn btn-sm btn-ghost" style={{ marginBottom: 16 }}><ArrowLeft size={14} /> All kits</Link>
 
       <section className="detail-hero">
-        <motion.div className="detail-art" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
-          <AppArt app={app} height="auto" />
-        </motion.div>
         <div className="detail-info">
           <div className="row wrap" style={{ gap: 6 }}>
             <span className="chip">{cat?.label}</span>
