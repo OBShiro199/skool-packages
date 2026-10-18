@@ -423,3 +423,4 @@ input[type="range"]::-moz-range-thumb { background: var(--surface); border: 1.5p
 .nav-link.active::before { background: var(--tint-line); }
 .next-up { border-left-color: var(--tint-line); }
 .legend-swatch { opacity: .85; }
+.step-list { overflow-anchor: none; }

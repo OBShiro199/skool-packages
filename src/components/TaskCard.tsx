@@ -29,7 +29,7 @@ export function TaskCard({ task, index, total, state, checked, open, onOpen, onT
   const s = taskStats(task, checked)
   const locked = state === 'locked'
   return (
-    <motion.article layout="position" className={`step ${state} ${open ? 'open' : ''}`} id={`task-${task.id}`}>
+    <motion.article className={`step ${state} ${open ? 'open' : ''}`} id={`task-${task.id}`}>
       <button className="step-head" onClick={locked ? undefined : onOpen} aria-expanded={open} disabled={locked}>
         <span className="step-num">
           {state === 'done' ? <Tick on size={28} /> : locked ? <Lock size={14} /> : index + 1}

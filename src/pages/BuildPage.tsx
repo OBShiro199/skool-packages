@@ -26,6 +26,27 @@ export default function BuildPage() {
   const [params, setParams] = useSearchParams()
   const [zipOpen, setZipOpen] = useState(false)
   const [openTask, setOpenTask] = useState<string | null>(null)
+
+  /**
+   * Open or close a step without the page jumping. When a step opens, the one above it may
+   * collapse at the same time, which would push the clicked header up and leave the reader
+   * part-way down. We pin the clicked header to where it was on screen while the
+   * open/close animation runs, then stop.
+   */
+  const focusStep = useCallback((id: string | null, anchorId?: string) => {
+    const el = anchorId ? document.getElementById(`task-${anchorId}`) : null
+    const startTop = el?.getBoundingClientRect().top
+    setOpenTask(id)
+    if (!el || startTop === undefined) return
+    const target = Math.max(80, startTop)
+    const until = performance.now() + 450
+    const pin = () => {
+      const top = el.getBoundingClientRect().top
+      if (Math.abs(top - target) > 1) window.scrollBy(0, top - target)
+      if (performance.now() < until) requestAnimationFrame(pin)
+    }
+    requestAnimationFrame(pin)
+  }, [])
   const [phaseDone, setPhaseDone] = useState<string | null>(null)
 
   const phases = useMemo(() => (app ? getPhases(app) : []), [app])
@@ -199,7 +220,7 @@ export default function BuildPage() {
                     <TaskCard key={t.id} task={t} index={i} total={phase.tasks.length} state={stepStates[i]} checked={checked}
                       open={openTask === t.id} isFirstEver={firstEver && phaseIndex === 0 && i === 0}
                       prevTitle={i > 0 ? phase.tasks[i - 1].title : phases[unlockedUpTo]?.label}
-                      onOpen={() => setOpenTask(openTask === t.id ? null : t.id)} onToggle={(id) => onToggle(id)} />
+                      onOpen={() => focusStep(openTask === t.id ? null : t.id, t.id)} onToggle={(id) => onToggle(id)} />
                   ))}
                 </div>
 
