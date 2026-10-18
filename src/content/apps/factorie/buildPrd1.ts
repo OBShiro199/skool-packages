@@ -324,7 +324,7 @@ All engine calls go to one endpoint:
 POST https://openrouter.ai/api/v1/chat/completions
 Authorization: Bearer <OPENROUTER_API_KEY>        (starts sk-or-v1-)
 Content-Type: application/json
-HTTP-Referer: https://yourdomain.com             (APP_URL; shows your app in OpenRouter rankings)
+HTTP-Referer: https://yourdomain.com             (SITE_URL; shows your app in OpenRouter rankings)
 X-Title: Factorie
 \`\`\`
 

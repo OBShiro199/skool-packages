@@ -108,7 +108,7 @@ Estimated monthly cost line under engines (for transparency, shown only to the u
 | \`FIRECRAWL_API_KEY\` | firecrawl.dev > Dashboard > API Keys (fc-...) | Supabase secrets | Yes |
 | \`RESEND_API_KEY\` | resend.com > API Keys (re_...) | Supabase secrets, Vercel env | Yes |
 | \`EMAIL_FROM\` | e.g. \`Factorie <digest@yourdomain.com>\` | Supabase secrets, Vercel env | No |
-| \`APP_URL\` | Same as NEXT_PUBLIC_SITE_URL | Supabase secrets | No |
+| \`SITE_URL\` | Same as NEXT_PUBLIC_SITE_URL (your live https URL; used for CORS, email links and the OpenRouter HTTP-Referer) | Supabase secrets | No |
 | \`CRON_SECRET\` | You make it: \`openssl rand -hex 32\` | Supabase secrets and Supabase Vault | Yes |
 | \`DIGEST_SIGNING_SECRET\` | You make it: \`openssl rand -hex 32\` | Supabase secrets | Yes |
 | \`FOUNDER_EMAIL\` | Your own inbox for admin alerts (engine disabled, top up OpenRouter) | Supabase secrets | No |
