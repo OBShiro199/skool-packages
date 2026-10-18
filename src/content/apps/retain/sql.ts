@@ -1107,11 +1107,13 @@ begin
       format('%s of %s paid seats used the product in the last 2 weeks.', a.n, s.quantity)
     from tmp_tracked t
     join public.subscriptions_mirror s on s.id = t.subscription_id
+    join public.customers c on c.id = t.customer_id
     cross join lateral (
       select coalesce(max(ud.active_users), 0) as n from public.usage_daily ud
       where ud.customer_id = t.customer_id and ud.day > current_date - 14
     ) a
-    where t.status <> 'canceled' and s.quantity >= 2 and a.n * 2 < s.quantity;
+    where t.status <> 'canceled' and c.last_seen_usage_at is not null
+      and s.quantity >= 2 and a.n * 2 < s.quantity;
   end if;
 
   -- new_customer (5)

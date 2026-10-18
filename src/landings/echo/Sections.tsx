@@ -21,7 +21,7 @@ function ProblemNumber({ to, unit }: { to: number; unit: string }) {
   const v = useCountUp(to, 900, inView)
   return (
     <span ref={ref} className="ec-bignum">
-      <span className="ec-bignum-slot" style={{ minWidth: `${String(to.toLocaleString('en-US')).length}ch` }}>{v.toLocaleString('en-US')}</span>
+      <span className="ec-bignum-slot"><span className="is-ghost" aria-hidden="true">{to.toLocaleString('en-US')}</span><span>{v.toLocaleString('en-US')}</span></span>
       <span className="ec-bignum-unit">{unit}</span>
     </span>
   )
@@ -158,7 +158,7 @@ function DemoScreen() {
         <div className="ec-demo-steps" role="group" aria-label="Walkthrough steps">
           {SCENES.map((s, k) => (
             <button key={s.label} type="button" className={k === scene ? 'is-on' : ''} aria-pressed={k === scene} onClick={() => setScene(k)}>
-              <span className="ec-mono">{s.t}</span> {s.label}
+              <span className="ec-mono">{s.t}</span><span>{s.label}</span>
             </button>
           ))}
         </div>
@@ -412,14 +412,13 @@ export function Pricing() {
               <p className="ec-plan-for">{p.for}</p>
               <div className="ec-price">
                 <span className="ec-price-cur">$</span>
-                <span className="ec-price-slot" style={{ minWidth: `${p.annualMo.length}ch` }}>
+                <span className="ec-price-slot" style={{ minWidth: `${p.annualMo.length + 1.6}ch` }}>
                   <AnimatePresence mode="popLayout" initial={false}>
                     <motion.span key={annual ? 'a' : 'm'} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.2 }}>
-                      {annual ? p.annualMo : p.monthly}
+                      {annual ? p.annualMo : p.monthly}<small>/mo</small>
                     </motion.span>
                   </AnimatePresence>
                 </span>
-                <span className="ec-price-per">/mo</span>
               </div>
               <p className="ec-price-note">{annual ? `${p.annual}, billed yearly` : 'Billed monthly'}</p>
               <Button size="md" onClick={() => { track('lp_cta_clicked', { location: `pricing_${p.id}` }) }} href={`#signup?plan=${p.id}&interval=${annual ? 'year' : 'month'}`}>Start free trial</Button>

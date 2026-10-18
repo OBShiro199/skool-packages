@@ -58,7 +58,7 @@ export const CONCEPTS: Concept[] = [
   { angle: 'Curiosity', why: 'Hides which tool won, so the click is the answer.', bg: 'linear-gradient(135deg, #ffe066 0%, #ffa94d 100%)', head: 'Only 1 worked', headTone: 'dark', expr: 'shocked', side: 'right', prop: 'circle', shirt: '#2f6f6c', time: '18:42' },
   { angle: 'Bold claim', why: 'A strong opinion people want to argue with.', bg: 'linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%)', head: 'Stop paying for AI', headTone: 'light', expr: 'point', side: 'left', prop: 'arrow', shirt: '#1c1c28', time: '18:42' },
   { angle: 'Before and after', why: 'Shows the result in one glance.', bg: 'linear-gradient(90deg, #adb5bd 0%, #adb5bd 50%, #51cf66 50%, #2f9e44 100%)', head: 'Before', sub: 'After', headTone: 'light', expr: 'smile', side: 'right', prop: 'split', shirt: '#364fc7', time: '18:42' },
-  { angle: 'The big number', why: 'One huge number reads at any size.', bg: 'linear-gradient(135deg, #845ef7 0%, #d6336c 100%)', head: '30 → 1', headTone: 'light', expr: 'think', side: 'right', prop: 'number', shirt: '#f59f00', time: '18:42' },
+  { angle: 'The big number', why: 'One huge number reads at any size.', bg: 'linear-gradient(135deg, #845ef7 0%, #d6336c 100%)', head: '30→1', headTone: 'light', expr: 'think', side: 'right', prop: 'number', shirt: '#f59f00', time: '18:42' },
   { angle: 'The reaction', why: 'A big face does the talking.', bg: 'radial-gradient(circle at 30% 50%, #ffd43b 0%, #ff922b 45%, #e8590c 100%)', head: 'Wait…', headTone: 'light', expr: 'shocked', side: 'right', prop: 'burst', shirt: '#c2255c', time: '18:42' },
   { angle: 'The versus', why: 'Two sides make the choice obvious.', bg: 'linear-gradient(90deg, #339af0 0%, #1c7ed6 50%, #fa5252 50%, #e03131 100%)', head: '$0', sub: '$200', headTone: 'light', expr: 'serious', side: 'left', prop: 'vs', shirt: '#212529', time: '18:42' },
 ]
@@ -82,7 +82,7 @@ export function Thumb({ c, badge = true, expr, safe = false, className = '' }: {
         <svg className="mq-t-arrow" viewBox="0 0 60 40" aria-hidden="true"><path d="M4 30 C20 30 30 22 40 12 M30 10 L42 10 L42 22" stroke="#fff" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
       )}
       <Face expr={e} shirt={c.shirt} className={`mq-t-face mq-t-face-${c.prop === 'vs' ? 'mid' : c.side}`} />
-      {badge && <span className="mq-t-time">{c.time}</span>}
+      {badge && !safe && <span className="mq-t-time">{c.time}</span>}
       {safe && <span className="mq-t-safe" aria-hidden="true"><span>Time badge</span></span>}
     </div>
   )

@@ -33,7 +33,7 @@ export const retain: AppDef = {
       envVars: [
         { name: 'STRIPE_APP_INSTALL_URL', where: 'Stripe Dashboard > Apps > your Retain app > External test (or Settings > Install link once published) > copy the Test mode OAuth link (marketplace.stripe.com/oauth/v2/...)', pasteInto: 'Vercel env', secret: false },
         { name: 'STRIPE_APP_WEBHOOK_SECRET', where: 'Stripe > Developers > Webhooks (Workbench > Event destinations) > the destination for events on connected accounts pointing at rt-stripe-events > Signing secret (whsec_...)', pasteInto: 'Supabase secrets', secret: true },
-        { name: 'RETAIN_TOKEN_KEY', where: 'Make one: run openssl rand -base64 32. Used to encrypt each founder\'s Stripe refresh token at rest (AES-GCM)', pasteInto: 'Supabase secrets', secret: true },
+        { name: 'RETAIN_TOKEN_KEY', where: 'Make one: run openssl rand -base64 32. Used to encrypt each founder\'s Stripe tokens and signing secrets at rest (AES-GCM). Also add the same value to Vercel env (server only) for the key-rotation route', pasteInto: 'Supabase secrets', secret: true },
       ],
     },
     {

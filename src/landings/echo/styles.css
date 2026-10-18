@@ -66,7 +66,7 @@
 .lp-echo .ec-trust { font-size: 13px; line-height: 18px; color: var(--muted); letter-spacing: -0.014em; }
 .lp-echo .ec-fine { margin-top: 16px; font-size: 13px; line-height: 18px; color: var(--faint); max-width: 60em; }
 .lp-echo .ec-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px; height: 26px; padding: 0 10px; border-radius: var(--pill);
+  display: inline-flex; align-items: center; gap: 8px; min-height: 26px; padding: 3px 10px; border-radius: var(--pill);
   background: var(--accent-soft); border: 1px solid var(--accent-edge); color: var(--accent-ink);
   font-size: 13px; line-height: 18px; font-weight: 500; letter-spacing: -0.014em; max-width: 100%; align-self: flex-start;
 }
@@ -146,7 +146,7 @@
 .lp-echo .ec-feed-error { min-height: 18px; font-size: 13px; line-height: 18px; color: #b33a3a; }
 
 .lp-echo .ec-hero-visual { position: relative; height: 540px; }
-.lp-echo .ec-ws { position: absolute; top: 0; left: 0; width: 92%; }
+.lp-echo .ec-ws { position: absolute; top: 0; left: 0; width: 86%; }
 .lp-echo .ec-ws-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 44px; padding: 0 14px; border-bottom: 1px solid var(--divider); font-size: 13px; color: var(--faint); }
 .lp-echo .ec-ws-crumb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lp-echo .ec-ws-crumb b { color: var(--ink); font-weight: 500; }
@@ -232,7 +232,9 @@
 .lp-echo .ec-problem + .ec-problem { border-left: 1px solid var(--hairline); }
 .lp-echo .ec-problem:first-child { padding-left: 0; }
 .lp-echo .ec-bignum { display: inline-flex; align-items: baseline; font-family: var(--display); font-variation-settings: 'SOFT' 100, 'WONK' 1; font-size: 64px; line-height: 1; font-weight: 520; letter-spacing: -0.045em; color: var(--ink); font-variant-numeric: tabular-nums lining-nums; }
-.lp-echo .ec-bignum-slot { display: inline-block; text-align: left; }
+.lp-echo .ec-bignum-slot { display: inline-grid; text-align: left; }
+.lp-echo .ec-bignum-slot > span { grid-area: 1 / 1; }
+.lp-echo .ec-bignum-slot .is-ghost { visibility: hidden; }
 .lp-echo .ec-bignum-unit { font-size: 28px; font-style: italic; font-weight: 440; color: var(--accent-ink); letter-spacing: -0.03em; margin-left: 4px; }
 .lp-echo .ec-problem p { color: var(--muted); max-width: 26em; }
 .lp-echo .ec-problem-close { margin-top: 40px; }
@@ -285,8 +287,8 @@
 .lp-echo .ec-demo-bar { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 10px; }
 .lp-echo .ec-demo-toggle { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--btn-edge); color: var(--ink); }
 .lp-echo .ec-demo-toggle:hover { background: var(--hover); }
-.lp-echo .ec-demo-steps { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; }
-.lp-echo .ec-demo-steps button { height: 30px; padding: 0 8px; border-radius: var(--pill); border: 1px solid transparent; font-size: 12px; color: var(--muted); white-space: nowrap; transition: background-color 140ms var(--ease-out), color 140ms var(--ease-out); }
+.lp-echo .ec-demo-steps { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+.lp-echo .ec-demo-steps button { display: grid; justify-items: start; gap: 0; min-height: 40px; padding: 3px 8px; line-height: 16px; text-align: left; overflow: hidden; border-radius: var(--pill); border: 1px solid transparent; font-size: 12px; color: var(--muted); white-space: nowrap; transition: background-color 140ms var(--ease-out), color 140ms var(--ease-out); }
 .lp-echo .ec-demo-steps button .ec-mono { color: var(--faint); }
 .lp-echo .ec-demo-steps button:hover { background: var(--hover); }
 .lp-echo .ec-demo-steps button.is-on { background: var(--accent-soft); border-color: var(--accent-edge); color: var(--accent-ink); font-weight: 500; }
@@ -321,7 +323,7 @@
 .lp-echo .ec-bullets { display: grid; gap: 6px; margin-top: 4px; }
 .lp-echo .ec-bullets li { display: flex; gap: 8px; font-size: 14px; line-height: 20px; color: var(--body); }
 .lp-echo .ec-bullets svg { flex: none; margin-top: 3px; color: var(--accent); }
-.lp-echo .ec-tile-visual { margin-top: auto; min-height: 250px; padding: 24px; display: flex; align-items: center; justify-content: center; background: var(--hero-tint); border-top: 1px solid var(--hairline); background-image: radial-gradient(rgba(138, 107, 224, 0.16) 1px, transparent 1px); background-size: 14px 14px; }
+.lp-echo .ec-tile-visual { flex: 1; min-height: 250px; padding: 24px; display: flex; align-items: center; justify-content: center; background: var(--hero-tint); border-top: 1px solid var(--hairline); background-image: radial-gradient(rgba(138, 107, 224, 0.16) 1px, transparent 1px); background-size: 14px 14px; }
 .lp-echo .ec-tile-visual > * { width: 100%; }
 
 /* 7.1 */
@@ -390,7 +392,7 @@
 .lp-echo .ec-filter-chip { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 8px; border-radius: var(--pill); background: var(--accent-soft); border: 1px solid var(--accent-edge); font-size: 12px; color: var(--muted); white-space: nowrap; }
 .lp-echo .ec-filter-chip b { display: inline-block; min-width: 104px; font-weight: 500; color: var(--accent-ink); }
 .lp-echo .ec-filter-add { height: 26px; padding: 0 8px; display: inline-flex; align-items: center; border: 1px dashed var(--btn-edge); border-radius: var(--pill); font-size: 12px; color: var(--faint); white-space: nowrap; }
-.lp-echo .ec-v-table ul { min-height: 192px; }
+.lp-echo .ec-v-table ul { min-height: 144px; }
 .lp-echo .ec-v-table li { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 12px; border-bottom: 1px solid var(--divider); font-size: 13px; color: var(--ink); }
 .lp-echo .ec-v-table li .ec-ellipsis { flex: 1; }
 .lp-echo .ec-showdot { width: 8px; height: 8px; border-radius: 2px; flex: none; }
@@ -451,7 +453,8 @@
 .lp-echo .ec-price { display: flex; align-items: baseline; gap: 2px; margin-top: 8px; color: var(--ink); font-variant-numeric: tabular-nums; }
 .lp-echo .ec-price-cur { font-size: 24px; font-weight: 500; }
 .lp-echo .ec-price-slot { position: relative; display: inline-block; font-family: var(--display); font-variation-settings: 'SOFT' 100; font-size: 52px; line-height: 56px; font-weight: 520; letter-spacing: -0.04em; font-variant-numeric: tabular-nums lining-nums; }
-.lp-echo .ec-price-slot > span { display: inline-block; }
+.lp-echo .ec-price-slot > span { display: inline-block; white-space: nowrap; }
+.lp-echo .ec-price-slot small { font-family: var(--sans); font-size: 14px; font-weight: 400; letter-spacing: -0.011em; color: var(--muted); margin-left: 2px; }
 .lp-echo .ec-price-per { font-size: 14px; color: var(--muted); }
 .lp-echo .ec-price-note { min-height: 20px; font-size: 13px; line-height: 20px; color: var(--muted); margin-bottom: 8px; }
 .lp-echo .ec-plan .ec-btn { width: 100%; }
@@ -531,7 +534,8 @@
   .lp-echo .ec-feed-row { flex-direction: column; }
   .lp-echo .ec-feed-row .ec-btn { width: 100%; }
   .lp-echo .ec-hero-ctas > .ec-btn { width: 100%; }
-  .lp-echo .ec-hero-visual { height: auto; display: grid; gap: 16px; }
+  .lp-echo .ec-hero-visual { height: auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .lp-echo .ec-ws-tabs span:nth-child(3) { display: none; }
   .lp-echo .ec-ws, .lp-echo .ec-job, .lp-echo .ec-hero-phone { position: relative; inset: auto; width: 100%; left: 0; }
   .lp-echo .ec-ws-body { grid-template-columns: minmax(0, 1fr); }
   .lp-echo .ec-ws-transcript { border-right: 0; border-bottom: 1px solid var(--divider); }
@@ -549,7 +553,8 @@
   .lp-echo .ec-sc-arrow { transform: rotate(90deg); }
   .lp-echo .ec-sc-q { width: 100%; max-width: 260px; }
   .lp-echo .ec-caption { white-space: normal; text-align: center; width: calc(100% - 32px); }
-  .lp-echo .ec-demo-steps button { padding: 0 6px; }
+  .lp-echo .ec-demo-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lp-echo .ec-demo-steps button { padding: 3px 6px; }
   .lp-echo .ec-bento { grid-template-columns: minmax(0, 1fr); }
   .lp-echo .ec-tile-wide, .lp-echo .ec-tile-narrow, .lp-echo .ec-tile-half, .lp-echo .ec-tile-wide:nth-child(1), .lp-echo .ec-tile-wide:nth-child(4) { grid-column: 1 / -1; }
   .lp-echo .ec-tile-copy { padding: 22px 18px 18px; }

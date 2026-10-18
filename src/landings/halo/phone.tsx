@@ -101,7 +101,6 @@ export function RatingScreen({
           <ExternalLink size={14} aria-hidden="true" />
           {tap === 'google' && <span className="hl-thumb" aria-hidden="true" />}
         </span>
-        <span className="hl-gbtn-bridge" aria-hidden="true" />
       </div>
       <p className="hl-rate-opened">{googleOpened ? 'Opened Google in a new tab.' : ''}</p>
       <div className="hl-note">

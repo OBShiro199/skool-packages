@@ -27,7 +27,7 @@ const toPath = (pts: number[], w: number, h: number) => pts.map((v, i) => `${i =
 export function CtrChart({ draw, w = 320, h = 120, delay = 0 }: { draw: boolean; w?: number; h?: number; delay?: number }) {
   const reduce = useReducedMotion()
   const line = (d: string, cls: string, extra: number) => (
-    <motion.path d={d} className={cls} fill="none" strokeWidth="1.5" vectorEffect="non-scaling-stroke"
+    <motion.path d={d} className={cls} fill="none" strokeWidth="1.5"
       initial={{ pathLength: reduce ? 1 : 0 }} animate={{ pathLength: draw || reduce ? 1 : 0 }}
       transition={{ duration: reduce ? 0 : 0.9, delay: reduce ? 0 : delay + extra, ease: MORPH }} />
   )

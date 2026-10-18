@@ -57,8 +57,8 @@ function PersonasVis() {
 
 /* 7.2 Rubric rows with reasons; the scores tick up again each loop. */
 function RubricVis() {
-  const { ref, step, inView, reduce } = useLoop(2, 4200, 1)
-  const run = inView && (reduce || step >= 0)
+  const { ref, step, reduce } = useLoop(2, 4200, 1)
+  const run = useInView(ref, { once: true, amount: 0.3 })
   return (
     <div ref={ref} className="sp-rv">
       <RubricTotal key={`t${reduce ? 'r' : step}`} run={run} />

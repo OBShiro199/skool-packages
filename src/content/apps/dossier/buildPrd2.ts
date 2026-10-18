@@ -41,7 +41,7 @@ Shared rules for every function:
 - **Cap:** \`remaining = plan questions - usage_this_month(ws, 'questions')\`. If 0: 402 \`limit_reached\` with the
   sentence from section 10. If the request is larger than remaining and \`allow_partial\` is not true: 409
   \`over_cap\` with \`{ requested, remaining }\` so the UI can offer "Draft the first N".
-- **Does:** calls \`reserve_questions(ws, run_id, n)\` which writes one usage row (kind \`questions\`, quantity n,
+- **Does:** calls \`reserve_questions(ws, run_id, user_id, n, allow_partial)\` which writes one usage row (kind \`questions\`, quantity n,
   idempotency key \`run:<run_id>\`) inside a transaction that re-checks the cap with \`for update\` on the
   workspace row, so two tabs cannot both pass. Sets the questions to \`queued\`, increments \`draft_count\`, and
   inserts \`ceil(n / 8)\` jobs \`draft_batch\` with \`payload: { run_id, question_ids: [...8], instruction }\`.

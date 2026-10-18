@@ -96,7 +96,7 @@ function EditorVis() {
 
 /* 7.4 Test detail: the schedule strip moves day by day, the CTR chart draws, numbers tick. */
 function TestVis() {
-  const { ref, step, inView } = useLoop(8, 1100, 7)
+  const { ref, step } = useLoop(8, 1100, 7)
   const once = useInView(ref, { once: true, amount: 0.3 })
   const conf = useCount(97, 1200, once, 600)
   return (
@@ -107,7 +107,7 @@ function TestVis() {
       </div>
       <ScheduleStrip today={step} />
       <div className="mq-test-body">
-        <CtrChart draw={once && inView} w={300} h={96} delay={0.2} />
+        <CtrChart draw={once} w={300} h={96} delay={0.2} />
         <table className="mq-nums">
           <thead><tr><th scope="col">Variant</th><th scope="col">Impr.</th><th scope="col">CTR</th><th scope="col">Avg view</th></tr></thead>
           <tbody>
@@ -180,19 +180,20 @@ function ChannelsVis() {
   )
 }
 
-const ASCII = String.raw` day        1   2   3   4   5   6   7   8
- live       A   B   B   A   B   A   A   B
-            |   |   |   |   |   |   |   |
- A days     1 +         4 +     6 + 7       = 18  -> average day 4.5
- B days         2 + 3 +     5 +         8   = 18  -> average day 4.5
+const ASCII = String.raw` day     1  2  3  4  5  6  7  8
+ live    A  B  B  A  B  A  A  B
 
- Same average day, so a slow start or a busy weekend
- lands on both thumbnails equally.
+ A runs on days 1+4+6+7 = 18, avg day 4.5
+ B runs on days 2+3+5+8 = 18, avg day 4.5
+ Same average day: a slow start or a busy
+ weekend lands on both equally.
 
- CTR = clicks / impressions, summed per variant
+ CTR = clicks / impressions, per variant
  A   1,813 / 41,208 = 4.4%
- B   2,382 / 40,377 = 5.9%        (5.9 - 4.4) / 4.4 = +34%
- guardrail: avg view duration  A 7:41   B 7:48   -> B may win`
+ B   2,382 / 40,377 = 5.9%
+     (5.9 - 4.4) / 4.4 = +34% for B
+ guardrail: avg view  A 7:41  B 7:48
+            watch time held -> B may win`
 
 export function Features() {
   return (
@@ -224,8 +225,15 @@ export function Features() {
             label="Test detail with the A B B A B A A B schedule strip, a CTR chart and the numbers table"
           ><TestVis /></Tile>
           <Reveal className="mq-tile mq-span-6 mq-ascii-tile">
-            <div className="mq-ascii-bar"><span>why the order is A B B A B A A B</span><span>test maths</span></div>
+            <div className="mq-tile-text mq-ascii-text">
+              <span className="mq-kicker">Test maths</span>
+              <h3 className="mq-h3">Why the order is A, B, B, A, B, A, A, B.</h3>
+              <p className="mq-body">Marquee changes the thumbnail once a day at midnight Pacific in a balanced order, then compares impressions and clicks per day from YouTube's own reports. The order cancels out most of the effect of busy and slow days.</p>
+            </div>
+            <div className="mq-ascii-box">
+            <div className="mq-ascii-bar"><span>balanced schedule, worked example</span></div>
             <pre className="mq-ascii" aria-label="Worked example: A runs on days 1, 4, 6 and 7, B on days 2, 3, 5 and 8, so both average day 4.5. A gets 1,813 clicks from 41,208 impressions, 4.4 percent. B gets 2,382 from 40,377, 5.9 percent, which is 34 percent higher, and B's watch time held, so B may win.">{ASCII}</pre>
+            </div>
           </Reveal>
           <Tile span={3} eyebrow="Guardrail" title="Clickbait cannot win."
             body="If a thumbnail gets more clicks but viewers leave sooner, Marquee will not crown it. Your watch time is what YouTube rewards, so it is what Marquee protects."

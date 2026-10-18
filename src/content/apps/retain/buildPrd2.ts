@@ -264,8 +264,8 @@ public functions noted below.
 |---|---|---|
 | Customers, scores, signals, cases, sessions, runs | Members of the workspace (RLS) | Edge functions only (secret key) |
 | Offers, reasons, rules, dunning and win-back settings | Members | Owners and admins (RLS), validated by check constraints |
-| \`stripe_connections\` tokens | Nobody from the browser (no select policy; a view exposes status, account id, mode, last sync) | Edge functions only |
-| \`workspace_keys\` secrets | Nobody from the browser. The publishable key is shown through a view. The signing and ingest secrets are shown once on rotate, by the API route, then never again | \`/api/keys/rotate\` with the secret key after an owner/admin check |
+| \`stripe_tokens\` | Nobody from the browser (no policies). \`stripe_connections\` holds only status, account id, mode and last sync, which members can read | Edge functions only |
+| \`workspace_secrets\` | Nobody from the browser. The publishable key is a column on \`workspaces\`. The signing and ingest secrets are shown once on rotate, by the API route, then never again | \`/api/keys/rotate\` with the secret key after an owner/admin check |
 | Retain's own \`subscriptions\` | The user's own row | Billing webhook only |
 | \`usage_ledger\`, \`jobs\`, \`email_log\`, \`stripe_events\` | Members can read their ledger (for meters); the rest nobody | Edge functions only |
 

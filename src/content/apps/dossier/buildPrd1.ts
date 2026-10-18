@@ -239,8 +239,9 @@ SQL step of the playbook. Summary:
 \`\`\`
 
 **Normalising a question** for exact match (\`normalized_hash\`): lower case, Unicode NFKC, strip numbering at the
-start ("1.2.3", "Q14", "a)"), collapse whitespace, remove punctuation except \`%\` and \`/\`, trim, then SHA-256 hex.
-The same function lives in \`lib/normalize.ts\` and \`supabase/functions/_shared/normalize.ts\` with shared tests.
+start ("1.2.3", "Q14", "a)"), turn punctuation except \`%\` and \`/\` into spaces, collapse whitespace, trim, then
+SHA-256 hex. It lives in the database only (\`public.normalize_question()\` and \`public.question_hash()\`), and
+triggers fill \`normalized_hash\` on questions, library answers and variants, so the app never computes it twice.
 
 ## 9. State machines
 
@@ -439,7 +440,7 @@ Show the cap before people hit it:
 | \`assign_questions(p_ids, p_assignee, p_due_at)\` | Review workspace | Role check, the assignee must be a member, queues the digest |
 | \`skip_questions(p_ids, p_reason)\` | Review workspace | Marks "Not applicable" with a reason |
 | \`set_library_owner(p_id, p_owner, p_review_by)\` | Library | Reviewer or above |
-| \`reserve_questions(p_ws, p_run, p_n)\` | ds-draft-run (secret key) | Cap check under a row lock, writes the usage row |
+| \`reserve_questions(p_ws, p_run, p_user, p_n, p_allow_partial)\` | ds-draft-run (secret key) | Cap check under a row lock, writes the usage row. Returns the number granted, 0 at the cap, or minus the remaining count when the request is too big and partial is off |
 | \`claim_jobs(p_runner, p_limit)\`, \`release_stuck_jobs()\` | Runners (secret key) | Queue mechanics with \`for update skip locked\` |
 | \`match_chunks(...)\`, \`match_library(...)\` | ds-ai-worker, ds-library-search (secret key) | Hybrid search inside one workspace |
 

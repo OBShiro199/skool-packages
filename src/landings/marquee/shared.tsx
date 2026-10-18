@@ -42,10 +42,10 @@ export function Reveal({
 export function Mark({ size = 20 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
-      <rect x="1.5" y="4.5" width="17" height="12" rx="3" fill="var(--accent-soft)" stroke="var(--ink)" strokeWidth="1.4" />
-      <circle cx="6" cy="4.5" r="1.6" fill="var(--accent)" />
-      <circle cx="10" cy="4.5" r="1.6" fill="var(--accent)" />
-      <circle cx="14" cy="4.5" r="1.6" fill="var(--accent)" />
+      <rect x="1.5" y="5" width="17" height="12" rx="3" fill="var(--accent-soft)" stroke="var(--ink)" strokeWidth="1.4" />
+      <circle cx="6" cy="5" r="2" fill="var(--accent)" stroke="#fff" strokeWidth="1" />
+      <circle cx="10" cy="5" r="2" fill="var(--accent)" stroke="#fff" strokeWidth="1" />
+      <circle cx="14" cy="5" r="2" fill="var(--accent)" stroke="#fff" strokeWidth="1" />
     </svg>
   )
 }

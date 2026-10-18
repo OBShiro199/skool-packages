@@ -335,9 +335,10 @@ migration in the course is the source of truth; this is the map.
 | \`workspaces\` | id, name, owner_id, slug, brand_name, brand_color, logo_path, product_url, product_oneliner, recent_changes (text[]), support_email, timezone, main_currency | One per SaaS product |
 | \`workspace_members\` | workspace_id, user_id, role (owner, admin, member) | PK on both |
 | \`workspace_invites\` | email, role, token_hash, expires_at | 7 day invites |
-| \`workspace_keys\` | workspace_id, publishable_key (rt_pub_...), signing_secret_enc, ingest_secret_enc, rotated_at | Secrets encrypted; only edge functions decrypt |
+| \`workspace_secrets\` | workspace_id, signing_secret_enc, ingest_secret_enc, rotated_at | No policies. The publishable key (rt_pub_...) lives on \`workspaces\`; these two secrets are encrypted and only server code decrypts them |
 | \`oauth_states\` | state_hash, workspace_id, user_id, expires_at, used_at | 10 minute life |
-| \`stripe_connections\` | workspace_id, account_id (acct_...), livemode, status, access_token_enc, access_expires_at, refresh_token_enc, scope, method (oauth, rak), events_cursor, last_synced_at, last_error | Never readable by the browser; a safe view exposes status only |
+| \`stripe_connections\` | workspace_id, account_id (acct_...), livemode, status, method (oauth, rak), scope, events_cursor, import_progress, last_synced_at, last_error | Members can read it: no secrets here |
+| \`stripe_tokens\` | connection_id, access_token_enc, access_expires_at, refresh_token_enc, restricted_key_enc | No policies at all: only edge functions with the secret key can read it |
 | \`customers\` | workspace_id, stripe_customer_id, email, name, created_at_stripe, card_brand, card_last4, card_exp_month, card_exp_year, external_user_id, deleted | Unique (workspace_id, stripe_customer_id) |
 | \`subscriptions_mirror\` | workspace_id, customer_id, stripe_subscription_id, status, price_id, product_name, quantity, mrr_cents, currency, trial_end, current_period_end, cancel_at_period_end, cancel_at, paused, discount_coupon_id, canceled_at, cancellation_reason | The founder's customers' subscriptions (not Retain's own) |
 | \`subscription_changes\` | workspace_id, subscription_id, kind (upgrade, downgrade, seat_up, seat_down, pause, resume, cancel_scheduled, cancel_undone, canceled), mrr_delta_cents, quantity_delta, at, stripe_event_id | Written by the event applier from previous_attributes |

@@ -132,11 +132,12 @@ const SHOWS: [string, string][] = [['Northwind Talks', 'teal'], ['Field Notes', 
 const EPISODES: [number, string, string][] = [
   [0, 'Ep 41 · Shipping on Fridays', 'Ready'], [1, 'Ep 12 · Soil, then seeds', 'Writing'], [2, 'Ep 9 · The on-call rota', 'Published'],
   [0, 'Ep 40 · Hiring slow', 'Published'], [1, 'Ep 11 · Market day', 'Ready'], [2, 'Ep 8 · Postmortems', 'Published'],
+  [0, 'Ep 39 · Pricing in public', 'Published'], [1, 'Ep 10 · The first frost', 'Published'], [2, 'Ep 7 · Paging less', 'Ready'],
 ]
 function AgencyVisual() {
   const { ref, step } = useLoopStep(4, 2000)
   const filter = step === 3 ? -1 : step
-  const rows = EPISODES.filter(([s]) => filter < 0 || s === filter).slice(0, 4)
+  const rows = EPISODES.filter(([s]) => filter < 0 || s === filter).slice(0, 3)
   return (
     <div ref={ref} className="ec-v-table ec-frame" role="img" aria-label="Episodes table filtered by show, each show with its own colour">
       <div className="ec-filter" aria-hidden="true">
