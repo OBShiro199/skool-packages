@@ -80,7 +80,7 @@ function Float({ className, delay, children }: { className: string; delay: numbe
 export function Hero() {
   const reduce = useReducedMotion()
   const item = (i: number) => ({
-    initial: reduce ? { opacity: 0 } : { opacity: 0, y: 10 },
+    initial: reduce ? false : { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 },
     transition: { duration: reduce ? 0.01 : 0.36, delay: reduce ? 0 : 0.08 + i * 0.07, ease: EASE },
   })
@@ -279,7 +279,7 @@ export function Demo() {
               ))}
             </ol>
             <div className="bw-cta-row">
-              <button type="button" className="bw-btn bw-btn-soft bw-btn-lg" onClick={tryIt}>
+              <button type="button" className="bw-btn bw-btn-primary bw-btn-lg" onClick={tryIt}>
                 {manual ? 'Start again' : 'Try the demo yourself'}
               </button>
               {!manual && (

@@ -9,7 +9,7 @@ const ORDER = ['etcher', 'factorie', 'ethereel', 'conversate', 'outbounder', 'si
  * Kits shown to members. A kit is added here only after it is complete and checked, so
  * half-written kits in this folder never appear in the library.
  */
-export const PUBLISHED = ['bookwell', 'helpdeck', 'signet', 'outbounder']
+export const PUBLISHED = ['bookwell', 'helpdeck', 'signet', 'outbounder', 'folio']
 
 const isApp = (v: unknown): v is AppDef => !!v && typeof v === 'object' && 'slug' in v && 'content' in v
 

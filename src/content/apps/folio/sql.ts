@@ -1018,7 +1018,7 @@ create trigger slide_revisions_set_workspace before insert on public.slide_revis
 -- ---------------------------------------------------------------------
 -- 13. ROW LEVEL SECURITY
 -- ELI5: switched on for every table. One policy per action (select,
--- insert, update, delete). Tables with no policy for an action simply
+-- insert, update, delete). Tables with no policy for an action
 -- refuse that action from the browser. Edge functions use the secret key,
 -- which skips RLS, so they can still write jobs, renders and usage.
 -- ---------------------------------------------------------------------

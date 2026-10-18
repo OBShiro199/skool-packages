@@ -122,7 +122,7 @@ export function Compare() {
                 <tr>
                   <th scope="col"><span className="sr-only">Feature</span></th>
                   {COLS.map((c, i) => (
-                    <th key={c} scope="col" className={i === 0 ? 'own' : ''}>
+                    <th key={c} scope="col" className={i === 0 ? 'bw-col-own' : ''}>
                       {i === 0 ? <span className={`bw-own-head${inView && !reduce ? ' glow' : ''}`}><Wordmark /></span> : c}
                     </th>
                   ))}
@@ -132,7 +132,7 @@ export function Compare() {
                 {ROWS.map(([label, vals]) => (
                   <tr key={label}>
                     <th scope="row">{label}</th>
-                    {vals.map((v, i) => <td key={i} className={i === 0 ? 'own' : ''}><Cell v={v} own={i === 0} /></td>)}
+                    {vals.map((v, i) => <td key={i} className={i === 0 ? 'bw-col-own' : ''}><Cell v={v} own={i === 0} /></td>)}
                   </tr>
                 ))}
               </tbody>
@@ -200,7 +200,7 @@ export function Pricing() {
                   </motion.span>
                 </AnimatePresence>
               </div>
-              <a href="/signup" className={`bw-btn ${p.badge ? 'bw-btn-primary' : 'bw-btn-soft'} bw-btn-lg bw-btn-block`} onClick={(e) => ctaClick(e, `pricing_${p.id}`)}>
+              <a href="/signup" className={`bw-btn ${p.badge ? 'bw-btn-primary' : 'bw-btn-ghost'} bw-btn-lg bw-btn-block`} onClick={(e) => ctaClick(e, `pricing_${p.id}`)}>
                 Start 7-day free trial
               </a>
               <ul className="bw-ticks">
@@ -233,6 +233,17 @@ export const FAQ: [string, string][] = [
 export function Faq() {
   const [open, setOpen] = useState<number | null>(0)
   const reduce = useReducedMotion()
+  // When an item above closes, keep the question you clicked exactly where it was (no jump).
+  const anchor = (btn: HTMLElement) => {
+    const top = btn.getBoundingClientRect().top
+    const t0 = performance.now()
+    const hold = () => {
+      const d = btn.getBoundingClientRect().top - top
+      if (Math.abs(d) > 0.5) window.scrollBy(0, d)
+      if (performance.now() - t0 < 420) requestAnimationFrame(hold)
+    }
+    requestAnimationFrame(hold)
+  }
   return (
     <section className="bw-sec bw-bg" id="faq" aria-labelledby="bw-faq-h">
       <div className="bw-wrap bw-faq">
@@ -243,7 +254,7 @@ export function Faq() {
             return (
               <div key={q} className={`bw-acc-item${isOpen ? ' open' : ''}`}>
                 <h3>
-                  <button type="button" id={`bw-q${i}`} aria-expanded={isOpen} aria-controls={`bw-a${i}`} onClick={() => { setOpen(isOpen ? null : i); if (!isOpen) track('faq_open', { question_index: i }) }}>
+                  <button type="button" id={`bw-q${i}`} aria-expanded={isOpen} aria-controls={`bw-a${i}`} onClick={(e) => { anchor(e.currentTarget); setOpen(isOpen ? null : i); if (!isOpen) track('faq_open', { question_index: i }) }}>
                     <span>{q}</span>
                     <ChevronDown size={18} className="bw-chev" aria-hidden="true" />
                   </button>

@@ -17,7 +17,7 @@ export function Reveal({ children, delay = 0, className, as = 'div' }: { childre
   return (
     <Comp
       className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
+      initial={reduce ? false : { opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: reduce ? 0.01 : 0.36, delay: reduce ? 0 : delay, ease: EASE }}
@@ -28,11 +28,11 @@ export function Reveal({ children, delay = 0, className, as = 'div' }: { childre
 }
 
 /** Runs a step counter while the element is in view. Stops (and stays at `rest`) with reduced motion. */
-export function useLoop(steps: number, ms: number, rest = steps - 1) {
+export function useLoop(steps: number, ms: number, rest = steps - 1, start = 0) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { amount: 0.3 })
   const reduce = useReducedMotion()
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(start)
   useEffect(() => {
     if (reduce || !inView) return
     const id = window.setInterval(() => setStep((s) => (s + 1) % steps), ms)
@@ -60,7 +60,13 @@ export function CountUp({ to, ms = 900, prefix = '', format = (n: number) => n.t
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
   }, [inView, reduce, to, ms])
-  return <span ref={ref} className="bw-num">{prefix}{format(n)}</span>
+  // The final value sits invisibly in the same grid cell, so the width is reserved and nothing shifts.
+  return (
+    <span ref={ref} className="bw-num bw-count">
+      <span aria-hidden="true" className="bw-count-ghost">{prefix}{format(to)}</span>
+      <span>{prefix}{format(n)}</span>
+    </span>
+  )
 }
 
 /** Smooth in-page anchor jump that respects reduced motion and the sticky nav. */

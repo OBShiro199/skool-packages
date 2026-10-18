@@ -20,7 +20,8 @@ function DepositVisual() {
   const pct = 10 / 35
   const on = inView || !!reduce
   return (
-    <div className="bw-vis bw-dep" ref={ref} role="img" aria-label="Service editor for Skin fade, 45 minutes, $35, with the deposit slider at $10 of $35">
+    <div className="bw-vis" ref={ref} role="img" aria-label="Service editor for Skin fade, 45 minutes, $35, with the deposit slider at $10 of $35">
+      <div className="bw-dep">
       <div className="bw-dep-editor" aria-hidden="true">
         <div className="bw-dep-fields">
           <span><small>Service</small><b>Skin fade</b></span>
@@ -49,6 +50,7 @@ function DepositVisual() {
             ))}
           </AnimatePresence>
         </ul>
+      </div>
       </div>
     </div>
   )
@@ -88,7 +90,7 @@ const BOOKED = [
   { d: 3, s: 6, l: 0.75, t: 'Lee', h: '15:00' },
 ]
 function CalendarVisual() {
-  const { ref, step } = useLoop(BOOKED.length + 3, 650, BOOKED.length + 2)
+  const { ref, step } = useLoop(BOOKED.length + 4, 650, BOOKED.length + 2, BOOKED.length + 1)
   const H = 100 / 8
   return (
     <div className="bw-vis bw-week" ref={ref} role="img" aria-label="Week view with grey busy blocks from Google Calendar and amber Bookwell bookings">
@@ -167,7 +169,7 @@ function QrVisual() {
 
 /* ---------- 7.5 No double bookings ---------- */
 function ClashVisual() {
-  const { ref, step } = useLoop(3, 1700, 2)
+  const { ref, step } = useLoop(3, 1700, 2, 1)
   const reduce = useReducedMotion()
   const done = step >= 1
   return (
