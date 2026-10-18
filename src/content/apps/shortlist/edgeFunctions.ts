@@ -222,6 +222,7 @@ Contract (deploy with --no-verify-jwt; JWT checked inside for fulfil):
   - export: gather candidate, applications (answers, stage, dates), stage_events, notes, scorecards, ai_screens (summary and results), interviews, email_log (kind, date, status). Upload JSON to exports/<ws>/<request_id>.json with the admin client. Create 7 day signed URLs for it and for each CV. enqueue privacy_export with the links. status 'completed', completed_by, completed_at.
   - delete: first enqueue privacy_deleted to the email (dedupe 'privdel:'+request_id). For each future scheduled interview: getAccessToken(organiser) and deleteEvent (ignore revoked calendars, log the id). rpc erase_candidate(candidate_id, 'request', uid, request_id) with the admin client; then storage.from('cvs').remove(paths) in batches of 100. status 'completed'.
   - Return { ok: true, files_deleted? }.
+- POST { action: 'fulfil_direct', candidate_id, mode } with user JWT (owner/admin of the candidate's workspace): used by the Candidates page buttons. Insert a data_requests row (email from the candidate, kind access or delete, status 'open', verified_at now, note 'Started by <admin name>') and run the same export or delete code path as fulfil.
 - Log { fn, action, ws, request, outcome } only. Never log the email.
 
 Tests:

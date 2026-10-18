@@ -611,6 +611,17 @@ returns boolean language sql stable security definer set search_path = '' as $$
   );
 $$;
 
+-- How many scorecards exist on an application (so the UI can say
+-- "2 hidden until you submit yours" without revealing their content).
+create or replace function public.scorecard_counts(p_app uuid)
+returns jsonb language plpgsql stable security definer set search_path = '' as $$
+begin
+  if not public.can_view_application(p_app) then raise exception 'not allowed'; end if;
+  return (select jsonb_build_object('total', count(*), 'submitted', count(*) filter (where submitted_at is not null))
+          from public.scorecards where application_id = p_app);
+end;
+$$;
+
 create table public.notifications (
   id bigint generated always as identity primary key,
   workspace_id uuid not null references public.workspaces (id) on delete cascade,
@@ -1065,6 +1076,14 @@ begin
   update public.profiles set current_workspace_id = v_ws where id = v_uid;
   return v_ws;
 end;
+$$;
+
+-- Onboarding: is this careers address free? (RLS hides other companies.)
+create or replace function public.slug_available(p_slug text)
+returns boolean language sql stable security definer set search_path = '' as $$
+  select lower(p_slug) ~ '^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$'
+     and lower(p_slug) not in ('app', 'admin', 'api', 'www', 'careers', 'privacy', 'book', 'demo', 'help', 'docs')
+     and not exists (select 1 from public.workspaces where slug = lower(p_slug));
 $$;
 
 -- Returns the raw token once. The app emails it. Only the hash is kept.

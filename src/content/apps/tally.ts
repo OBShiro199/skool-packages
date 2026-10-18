@@ -73,12 +73,12 @@ export const tally: AppDef = {
   costs: {
     usage: { label: 'Invoices sent per workspace per month', unit: 'invoices', default: 20, min: 1, max: 750, step: 1 },
     plans: [
-      { id: 'solo-monthly', name: 'Solo', price: 19, interval: 'month', includes: '1 seat, 50 invoices sent a month, 1 reminder sequence, 1 sending domain, 100 replies read by AI, 10 voice rewrites, unlimited clients, card and bank payments, recurring, deposits, part payments, late fees, multi-currency, CSV exports' },
-      { id: 'solo-yearly', name: 'Solo (yearly)', price: 190, interval: 'year', includes: 'Same as Solo, 2 months free' },
-      { id: 'studio-monthly', name: 'Studio', price: 39, interval: 'month', includes: '3 seats, 250 invoices sent a month, 5 sequences, 1 sending domain, 500 replies read, 30 voice rewrites, remove the "Sent with Tally" line, Xero and QuickBooks sync when it ships' },
-      { id: 'studio-yearly', name: 'Studio (yearly)', price: 390, interval: 'year', includes: 'Same as Studio, 2 months free' },
-      { id: 'agency-monthly', name: 'Agency', price: 79, interval: 'month', includes: '10 seats, 750 invoices sent a month, unlimited sequences, 3 sending domains (one per brand), 1,500 replies read, 60 voice rewrites, everything in Studio' },
-      { id: 'agency-yearly', name: 'Agency (yearly)', price: 790, interval: 'year', includes: 'Same as Agency, 2 months free' },
+      { id: 'solo-monthly', usageCap: 50, name: 'Solo', price: 19, interval: 'month', includes: '1 seat, 50 invoices sent a month, 1 reminder sequence, 1 sending domain, 100 replies read by AI, 10 voice rewrites, unlimited clients, card and bank payments, recurring, deposits, part payments, late fees, multi-currency, CSV exports' },
+      { id: 'solo-yearly', usageCap: 50, name: 'Solo (yearly)', price: 190, interval: 'year', includes: 'Same as Solo, 2 months free' },
+      { id: 'studio-monthly', usageCap: 250, name: 'Studio', price: 39, interval: 'month', includes: '3 seats, 250 invoices sent a month, 5 sequences, 1 sending domain, 500 replies read, 30 voice rewrites, remove the "Sent with Tally" line, Xero and QuickBooks sync when it ships' },
+      { id: 'studio-yearly', usageCap: 250, name: 'Studio (yearly)', price: 390, interval: 'year', includes: 'Same as Studio, 2 months free' },
+      { id: 'agency-monthly', usageCap: 750, name: 'Agency', price: 79, interval: 'month', includes: '10 seats, 750 invoices sent a month, unlimited sequences, 3 sending domains (one per brand), 1,500 replies read, 60 voice rewrites, everything in Studio' },
+      { id: 'agency-yearly', usageCap: 750, name: 'Agency (yearly)', price: 790, interval: 'year', includes: 'Same as Agency, 2 months free' },
     ],
     lines: [
       { name: 'Reading client replies', vendor: 'Anthropic', kind: 'perUnit', amount: 0.0065, note: 'claude-opus-5-5 at $4/$20 per MTok, low effort. About 1,600 input and 300 output tokens (with thinking) per reply = $0.013, at a worst case of 0.5 replies per invoice = $0.0065 per invoice. Most invoices get no reply. Checked Oct 2026.', url: 'https://www.anthropic.com/pricing' },
