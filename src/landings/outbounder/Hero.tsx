@@ -77,35 +77,36 @@ function HeroCard() {
       </div>
 
       <div className="ob-email">
-        <motion.div
-          className="ob-email-inner"
-          animate={{ opacity: step >= 3 ? 1 : 0, y: step >= 3 ? 0 : 6 }}
-          transition={{ duration: 0.3, ease: EASE }}
-        >
+        <div className="ob-email-inner">
           <div className="ob-email-meta">
             <span><span className="ob-faint">To</span> <span className="ob-mono">{lead.email}</span></span>
-            <span><span className="ob-faint">Subject</span> {lead.subject}</span>
+            <span className="ob-email-subj">
+              <span className="ob-faint">Subject</span>
+              <motion.span animate={{ opacity: step >= 3 ? 1 : 0 }} transition={{ duration: 0.2 }}>{lead.subject}</motion.span>
+              {step < 3 && <span className="ob-skel ob-skel-inline" />}
+            </span>
           </div>
           <p className="ob-email-line">
             <span className="ob-ai-mark"><Sparkles size={12} strokeWidth={2} /></span>
             <span>Hi {lead.name.split(' ')[0]},</span>
+            {step >= 1 && step < 3 && <span className="ob-faint ob-email-hint">{step === 1 ? 'Checking the address twice' : `Reading ${lead.site}`}</span>}
           </p>
           <p className="ob-email-first">
             <span className="ob-email-ghost">{lead.line}</span>
-            <span className="ob-email-typed">{typing.shown}{step === 3 && !typing.done && <i className="ob-caret" />}</span>
+            <span className="ob-email-typed">
+              {step < 3
+                ? <span className="ob-email-wait"><span className="ob-skel" /><span className="ob-skel ob-short" /></span>
+                : <>{typing.shown}{!typing.done && <i className="ob-caret" />}</>}
+            </span>
           </p>
           <p className="ob-email-rest">
             <span /><span /><span className="ob-short" />
           </p>
           <div className="ob-email-source">
-            <span className="ob-faint">Source</span> <span className="ob-mono">{lead.source}</span>
+            <span className="ob-faint">Source</span>
+            <motion.span className="ob-mono" animate={{ opacity: step >= 3 ? 1 : 0.35 }} transition={{ duration: 0.2 }}>{lead.source}</motion.span>
           </div>
-        </motion.div>
-        {step < 3 && (
-          <div className="ob-email-wait">
-            <span className="ob-skel" /><span className="ob-skel" /><span className="ob-skel ob-short" />
-          </div>
-        )}
+        </div>
       </div>
 
       <div className="ob-hcard-queue">

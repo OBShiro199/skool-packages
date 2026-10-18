@@ -214,7 +214,7 @@ One level, no nested menus. 240px wide, collapses to 56px icons under 1100px.
 | Audit log | admin | Filterable list: who, what, when, before/after diff |
 
 ## 7. Data model
-The migration (\`supabase/migrations/0001_etcher.sql\`) is the source of truth. Summary:
+The migration (\`supabase/migrations/0001_init.sql\`) is the source of truth. Summary:
 
 | Table | Key columns | Notes |
 |---|---|---|

@@ -1,7 +1,7 @@
 // Etcher single migration, pasted into Supabase > SQL Editor and run once.
 
 export const sql = `-- =====================================================================
--- Etcher: full database migration (0001_etcher.sql)
+-- Etcher: full database migration (0001_init.sql)
 -- Paste this whole file into Supabase > SQL Editor > New query > Run.
 -- Run it ONCE on a fresh project. Order matters: extensions, enums,
 -- tables, helper functions, triggers, RLS policies, views, storage.

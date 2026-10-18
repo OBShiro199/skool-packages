@@ -527,6 +527,7 @@ create table public.scheduled_posts (
   instagram_url text,
   tiktok_privacy_level text,
   tiktok_consent_at timestamptz,                     -- creator ticked TikTok's consent box on Pass
+  needs_update boolean not null default false,      -- slot, caption or file changed after handover
   attempts integer not null default 0,
   last_error text,
   created_at timestamptz not null default now(),
@@ -698,7 +699,7 @@ as $$
   select coalesce(sum(l.quantity), 0)::integer
     from public.usage_ledger l
    where l.user_id = p_user
-     and l.kind in ('video', 'refund')
+     and l.kind in ('video', 'refund', 'grant')     -- refunds and grants are negative quantities
      and l.created_at >= ((public.plan_limits(p_user) ->> 'period_start')::timestamptz);
 $$;
 
@@ -811,6 +812,52 @@ begin
   return v_row;
 end;
 $$;
+
+-- Move a passed reel to a slot the creator picked (manual queue or drag on
+-- the week view). Same lock as assign_slot so two moves never collide.
+create or replace function public.move_slot(p_video uuid, p_slot timestamptz)
+returns public.scheduled_posts
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_user uuid;
+  v_tz text;
+  v_slots text[];
+  v_row public.scheduled_posts;
+begin
+  select sp.user_id into v_user from public.scheduled_posts sp where sp.video_id = p_video;
+  if v_user is null then
+    raise exception 'not_scheduled';
+  end if;
+  perform pg_advisory_xact_lock(hashtextextended(v_user::text, 0));
+  select cs.timezone, cs.posting_slots into v_tz, v_slots
+    from public.creator_settings cs where cs.user_id = v_user;
+  if p_slot < now() + interval '30 minutes' then
+    raise exception 'slot_too_soon';
+  end if;
+  if not (to_char(p_slot at time zone v_tz, 'HH24:MI') = any (v_slots)) then
+    raise exception 'not_a_slot';
+  end if;
+  if exists (
+    select 1 from public.scheduled_posts sp
+     where sp.user_id = v_user and sp.slot_at = p_slot and sp.video_id <> p_video
+       and sp.status <> 'cancelled' and sp.status <> 'failed'
+  ) then
+    raise exception 'slot_taken';
+  end if;
+  update public.scheduled_posts
+     set slot_at = p_slot,
+         needs_update = (zernio_post_id is not null)
+   where video_id = p_video
+  returning * into v_row;
+  return v_row;
+end;
+$$;
+
+revoke execute on function public.move_slot(uuid, timestamptz) from public, anon, authenticated;
+grant execute on function public.move_slot(uuid, timestamptz) to service_role;
 
 revoke execute on function public.assign_slot(uuid, uuid, text, boolean) from public, anon, authenticated;
 grant execute on function public.assign_slot(uuid, uuid, text, boolean) to service_role;
