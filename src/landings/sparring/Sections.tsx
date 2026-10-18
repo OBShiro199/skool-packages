@@ -53,15 +53,20 @@ const STEPS = [
   { h: 'Make the call.', p: 'Press Call, use your headphones, and talk like it is real. Hang up when you are done (or when they hang up on you).' },
   { h: 'Read your scorecard.', p: 'Score out of 100, coaching notes on the recording, and one thing to fix. Run it again.' },
 ]
-const ASCII = String.raw`  your mic ──► persona voice ──► recording + transcript
-     ▲       (replies in ~1s)              │
-     │                                     ▼
-  run it      scorecard  ◄──  5 lines × 20 pts, scored by Claude
-  again       72 / 100        opener ........ 16   ████████░░
-     ▲        Solid           permission .... 14   ███████░░░
-     │                        pain discovery  11   █████▌░░░░
-     └── top fix ◄────────    objections .... 13   ██████▌░░░
-         "ask, then wait"     next step ..... 18   █████████░`
+const ASCII = String.raw` you ───► persona ───► recording
+ (mic)    (~1s reply)  + transcript
+                            │
+                            ▼
+          Claude scores 5 lines × 20 pts
+ opener ......... 16  [########..]
+ permission ..... 14  [#######...]
+ pain discovery . 11  [#####.....]
+ objections ..... 13  [######....]
+ next step ...... 18  [#########.]
+                            │
+                            ▼
+ scorecard  72 / 100  Solid
+ top fix    "ask, then wait"  ──► run it again`
 export function HowItWorks() {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, amount: 0.4 })
@@ -202,11 +207,11 @@ export function Pricing() {
               <p className="sp-plan-for">{p.for}</p>
               <div className="sp-price" aria-live="polite">
                 <AnimatePresence mode="popLayout" initial={false}>
-                  <motion.span key={annual ? 'y' : 'm'} className="sp-price-n sp-big sp-num" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}>
-                    ${annual ? p.y : p.m}
+                  <motion.span key={annual ? 'y' : 'm'} className="sp-price-in" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}>
+                    <span className="sp-price-n sp-big sp-num">${annual ? p.y : p.m}</span>
+                    <span className="sp-price-int">{annual ? '/year' : '/month'}</span>
                   </motion.span>
                 </AnimatePresence>
-                <span className="sp-price-int">{annual ? '/year' : '/month'}</span>
               </div>
               <p className="sp-price-sub sp-num">{annual ? `$${p.ym}/mo billed yearly` : 'Billed monthly'}</p>
               <a href={`/signup?plan=${p.id}&interval=${annual ? 'year' : 'month'}`} className={`sp-btn sp-btn-lg ${p.popular ? 'sp-btn-primary' : 'sp-btn-ghost'} sp-btn-block`} onClick={(e) => { e.preventDefault(); track('lp_cta_clicked', { location: `pricing_${p.id}` }) }}>Start free trial</a>
@@ -249,7 +254,7 @@ export function Faq() {
       <div className="sp-wrap sp-faq-grid">
         <Reveal className="sp-head">
           <Eyebrow>FAQ</Eyebrow>
-          <h2 id="sp-faq-h" className="sp-h2">Questions, answered plainly</h2>
+          <h2 id="sp-faq-h" className="sp-h2">Frequently asked questions</h2>
         </Reveal>
         <ul className="sp-faq">
           {FAQ.map(([q, a], i) => {

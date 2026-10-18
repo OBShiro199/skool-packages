@@ -383,11 +383,13 @@ create table public.rota_templates (
   workspace_id uuid not null references public.workspaces (id) on delete cascade,
   location_id uuid not null references public.locations (id) on delete cascade,
   name text not null check (char_length(name) between 2 and 60),
+  is_default boolean not null default false,   -- the "normal week" Claude uses for cover
   created_by uuid references auth.users (id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 create index rota_templates_location_idx on public.rota_templates (location_id);
+create unique index rota_templates_one_default_idx on public.rota_templates (location_id) where is_default;
 create index rota_templates_ws_idx on public.rota_templates (workspace_id);
 create index rota_templates_created_by_idx on public.rota_templates (created_by);
 create trigger rota_templates_updated_at before update on public.rota_templates

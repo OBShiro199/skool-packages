@@ -167,9 +167,8 @@ export function Pricing() {
                     {annual ? p.perMonth : `$${p.monthly}`}
                   </motion.span>
                 </AnimatePresence>
-                <span className="hv-muted">a month</span>
               </div>
-              <p className="hv-billed" style={{ visibility: annual ? 'visible' : 'hidden' }}>{p.billed}</p>
+              <p className="hv-billed">a month{annual ? `, ${p.billed}` : ', billed monthly'}</p>
               <Btn full variant={p.popular ? 'primary' : 'secondary'} href="/signup" onClick={() => track('pricing_cta_clicked', { plan: p.name, interval: annual ? 'annual' : 'monthly' })}>Start 7-day trial</Btn>
               <ul className="hv-plan-rows">
                 {p.rows.map(([k, v]) => (

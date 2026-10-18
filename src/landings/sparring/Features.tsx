@@ -1,7 +1,7 @@
 import { useMemo, useRef, type ReactNode } from 'react'
 import { motion, useInView, useReducedMotion } from 'motion/react'
 import { Mail } from 'lucide-react'
-import { Avatar, EASE, Eyebrow, MORPH, RUBRIC, Reveal, Ticks, mss, useCount, useLoop, waveform, type Hue } from './shared'
+import { Avatar, BandTag, EASE, band, Eyebrow, MORPH, RUBRIC, Reveal, Ticks, mss, useCount, useLoop, waveform, type Hue } from './shared'
 
 function Tile({ span, id, eyebrow, title, body, bullets, children, label }: {
   span: 2 | 3 | 4; id?: string; eyebrow: string; title: string; body: string; bullets: string[]; children: ReactNode; label: string
@@ -29,25 +29,28 @@ const LEVELS = ['Easy', 'Normal', 'Hard']
 function PersonasVis() {
   const { ref, step, reduce } = useLoop(3, 1800, 0)
   return (
-    <div ref={ref} className="sp-pv">
-      {PERSONAS.map((p, i) => (
-        <motion.div
-          key={p.i}
-          className={`sp-pcard ${step === i ? 'is-sel' : ''}`}
-          initial={reduce ? false : { rotate: 0, y: 8, opacity: 0 }}
-          whileInView={{ rotate: (i - 1) * 1.5, y: i === 1 ? -4 : 0, opacity: 1 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.5, delay: i * 0.08, ease: EASE }}
-        >
-          <Avatar initials={p.i} hue={p.hue} size={36} />
-          <b>{p.n}</b>
-          <span className="sp-pcard-r">{p.r}</span>
-          <p>{p.line}</p>
-          <div className="sp-diff">
-            {LEVELS.map((l, j) => <span key={l} className={`sp-pill ${step === i && j === (i + 1) % 3 ? 'is-on' : ''}`}>{l}</span>)}
-          </div>
-        </motion.div>
-      ))}
+    <div ref={ref} className="sp-pv-wrap">
+      <div className="sp-pv">
+        {PERSONAS.map((p, i) => (
+          <motion.div
+            key={p.i}
+            className={`sp-pcard ${step === i ? 'is-sel' : ''}`}
+            initial={reduce ? false : { y: 0, opacity: 0 }}
+            whileInView={{ y: i === 1 ? -4 : 0, x: (i - 1) * 4, opacity: 1 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.5, delay: i * 0.08, ease: EASE }}
+          >
+            <Avatar initials={p.i} hue={p.hue} size={36} />
+            <b>{p.n}</b>
+            <span className="sp-pcard-r">{p.r}</span>
+            <p>{p.line}</p>
+          </motion.div>
+        ))}
+      </div>
+      <div className="sp-diff" aria-hidden="true">
+        {LEVELS.map((l, j) => <span key={l} className={`sp-pill ${j === (step + 1) % 3 ? 'is-on' : ''}`}>{l}</span>)}
+        <span className="sp-diff-hint">{['Friendly, 2 objections.', 'Busy and neutral. 3 objections.', 'Hangs up on a weak opener.'][(step + 1) % 3]}</span>
+      </div>
     </div>
   )
 }
@@ -70,7 +73,7 @@ function RubricTotal({ run }: { run: boolean }) {
   return (
     <div className="sp-rv-top">
       <span className="sp-score-total sp-big"><span className="sp-num sp-score-n sp-score-n-sm">{n}</span><span className="sp-score-of">/ 100</span></span>
-      <span className="sp-tag sp-tag-solid">Solid</span>
+      <BandTag b={band(n)} />
       <span className="sp-rv-time">Scored 58s after hang-up</span>
     </div>
   )
@@ -183,7 +186,7 @@ function BoardVis() {
       </div>
       <div className="sp-trend">
         <span className="sp-trend-l">Team average, 12 weeks</span>
-        <svg viewBox="0 0 220 64" aria-hidden="true">
+        <svg viewBox="0 0 220 64" preserveAspectRatio="none" aria-hidden="true">
           <line x1="0" y1="63.5" x2="220" y2="63.5" stroke="var(--hairline)" />
           <motion.path
             d="M0 52 L20 50 L40 46 L60 48 L80 40 L100 37 L120 38 L140 30 L160 27 L180 22 L200 20 L220 14"

@@ -129,20 +129,22 @@ function Walkthrough() {
     const t = window.setTimeout(() => setStep((s) => s + 1), 1800)
     return () => window.clearTimeout(t)
   }, [playing, step])
+  const poster = !playing && step === 0
+  const s = poster ? 2 : step
   const play = () => { track('demo_video_played', { seconds_watched: 0 }); setStep(0); setPlaying(true) }
   return (
     <Reveal delay={0.08} className="hv-video-col">
       <div className="hv-frame hv-video">
         <div className="hv-video-stage" aria-hidden="true">
-          <div className="hv-vs-bar"><Mark size={16} /><span>{step < 2 ? 'Sources' : 'Today'}</span><span className="hv-vs-step hv-data">{step + 1}/6</span></div>
+          <div className="hv-vs-bar"><Mark size={16} /><span>{s < 2 ? 'Sources' : 'Today'}</span><span className="hv-vs-step hv-data">{poster ? '1:00' : `${step + 1}/6`}</span></div>
           <div className="hv-vs-body">
-            <div className={`hv-vs-url${step === 0 ? ' on' : ''}`}><span className="hv-data">linkedin.com/posts/priya-shah_onboarding…</span><span className={`hv-vs-btn${step === 1 ? ' on' : ''}`}>Collect now</span></div>
-            {[0, 1, 2, 3].map((r) => (
-              <div key={r} className={`hv-vs-row${step >= 2 ? ' on' : ''}${step >= 3 && r === 0 ? ' sel' : ''}`} style={{ transitionDelay: reduce ? '0ms' : `${r * 60}ms` }}>
-                <i /><i /><b className={r < 2 ? 'hot' : 'warm'} />
+            <div className={`hv-vs-url${s === 0 ? ' on' : ''}`}><span className="hv-data">linkedin.com/posts/priya-shah_onboarding…</span><span className={`hv-vs-btn${s === 1 ? ' on' : ''}`}>Collect now</span></div>
+            {[0, 1, 2, 3, 4, 5].map((r) => (
+              <div key={r} className={`hv-vs-row${s >= 2 ? ' on' : ''}${s >= 3 && r === 0 ? ' sel' : ''}`} style={{ transitionDelay: reduce ? '0ms' : `${r * 60}ms` }}>
+                <i /><i /><b className={r < 2 ? 'hot' : r < 5 ? 'warm' : 'cold'} />
               </div>
             ))}
-            <div className={`hv-vs-panel${step >= 3 ? ' on' : ''}`}>
+            <div className={`hv-vs-panel${s >= 3 ? ' on' : ''}`}>
               <span className="hv-vs-line" />
               <span className={`hv-vs-opener${step >= 4 ? ' copied' : ''}`}>{step >= 4 ? 'Copied' : 'Opener'}</span>
               <span className={`hv-vs-push${step >= 5 ? ' on' : ''}`}>{step >= 5 ? 'Pushed to HubSpot' : 'Push'}</span>

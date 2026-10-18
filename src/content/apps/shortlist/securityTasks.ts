@@ -198,7 +198,7 @@ curl -s -X POST "$F/sl-resend-webhook" -H "Content-Type: application/json" -d '{
       { type: 'steps', items: [
         'Run the script and compare each line with the comments.',
         'Cancel a real booking link from the app, then open it: "This link has expired" (not the slot grid).',
-        'Book a slot, then open the same booking link in two tabs and click Book on a different slot in both at the same second. One wins, the other shows "Someone just booked that time" or the booked view. SQL: one scheduled interview per request.',
+        'Book a slot, then open the same booking link in two tabs and click Book on a different slot in both at the same second. One wins, the other shows "That time was taken a moment ago" or the booked view. SQL: one scheduled interview per request.',
       ] },
       { type: 'code', id: 'shl-sec-tokens-sql', filename: 'check-tokens.sql', lang: 'sql', code: `-- Only hashes are stored, never raw tokens (43 char base64url would be a leak):
 select count(*) as raw_looking from public.interview_requests where token_hash !~ '^[0-9a-f]{64}$';

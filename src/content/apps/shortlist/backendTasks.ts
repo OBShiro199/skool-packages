@@ -70,7 +70,7 @@ export const backendTasks: Task[] = [
     minutes: 45,
     xp: 55,
     blocks: [
-      { type: 'callout', tone: 'eli5', title: 'What OAuth is doing here', text: 'Each interviewer clicks "Connect", Google asks them "let Shortlist see when you are busy and add events?", and gives Shortlist a long-lived key for just that. You never see their password. The key is encrypted before it is stored, and they can take it back at any time.' },
+      { type: 'callout', tone: 'eli5', title: 'What OAuth is doing here', text: 'Each interviewer clicks "Connect", Google asks them "let Shortlist see when you are busy and add events?", and gives Shortlist a long-lived key for only that. You never see their password. The key is encrypted before it is stored, and they can take it back at any time.' },
       { type: 'table', head: ['Scope', 'What it allows', 'Google review'], rows: [
         ['calendar.freebusy', 'See when the user is busy, no event details', 'Check the scope list in your consent screen [verify]'],
         ['calendar.events', 'Create and delete the interview event', 'Sensitive: verification before going public'],
@@ -237,7 +237,7 @@ curl -s -X POST https://api.resend.com/emails \\
   {
     id: 'shl-be-plans',
     title: 'Create the three plans in Stripe and map them to limits',
-    outcome: 'Starter, Team and Growth exist monthly and yearly, Checkout can sell any of them, and the database knows which limits each price unlocks.',
+    outcome: 'Starter, Team and Growth exist monthly and yearly, Checkout can sell any of them, and the database knows which limits each price allows.',
     minutes: 25,
     xp: 35,
     blocks: [

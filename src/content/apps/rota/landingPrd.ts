@@ -71,7 +71,7 @@ tabular figures.
 - Eyebrow pill: "For cafes, gyms, salons and clinics"
 - H1: **"Next week's rota, done before your coffee goes cold."**
 - Subhead: "Rota drafts your week from everyone's availability, warns you about clashes and overtime, then texts
-  each person their own shifts. Swaps, cover and clock-in happen on their phones. You just approve."
+  each person their own shifts. Swaps, cover and clock-in happen on their phones. You approve with one tap."
 - Buttons: "Start free trial" (primary, 46px large) and "Watch the 60 second demo" (secondary, opens the video in a
   dialog). Under them, faint: "7 days free. From $39 a location a month. Staff use it free."
 - Visual (right on desktop, below on mobile): the rota builder screenshot in a frame, with a phone frame

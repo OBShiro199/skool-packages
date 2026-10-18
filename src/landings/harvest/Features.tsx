@@ -37,7 +37,6 @@ function SourcesVisual() {
     const out: (Engager & { k: number })[] = []
     for (let i = 0; i < 4; i++) {
       const k = step - i
-      if (k < 0 && !reduce) break
       const idx = ((k % ENGAGERS.length) + ENGAGERS.length) % ENGAGERS.length
       out.push({ ...ENGAGERS[idx], k })
     }
@@ -237,10 +236,13 @@ function DigestTileVisual() {
     <div ref={ref} className="hv-inbox" role="img" aria-label="An inbox at 7:00 with the Harvest digest arriving: 12 warm leads from yesterday's posts">
       <div className="hv-inbox-bar"><span>Inbox</span><span className="hv-data">{times[step]}</span></div>
       <div className="hv-inbox-list">
+        <div className="hv-inbox-slot">
+        <div className={`hv-inbox-wait${landed ? ' off' : ''}`} aria-hidden="true"><i className="hv-dot hv-dot-live" />Digest arrives at 07:00</div>
         <div className={`hv-inbox-row new${landed ? ' on' : ''}`}>
           <Mark size={18} />
           <span className="hv-inbox-main"><b>Harvest</b><span><b>12 warm leads from yesterday's posts</b> · Sam Lee · Hot · 86 · Head of Customer Success at Northbeam</span></span>
           <span className="hv-data hv-faint">07:00</span>
+        </div>
         </div>
         <div className="hv-inbox-row"><Avatar name="Ana Ortiz" tone={2} /><span className="hv-inbox-main"><b>Ana Ortiz</b><span>Re: Thursday call notes</span></span><span className="hv-data hv-faint">Mon</span></div>
         <div className="hv-inbox-row"><Avatar name="Billing Team" tone={3} /><span className="hv-inbox-main"><b>Accounts</b><span>October invoice for your records</span></span><span className="hv-data hv-faint">Mon</span></div>

@@ -359,7 +359,7 @@ Vertical tab list 200px on the left inside the page, content 640px:
   (component 9). States: booked (date, time, "Add to calendar" .ics download, Meet link, "Move" and
   "Cancel" buttons), expired ("This link has expired. Reply to the email to get a new one."), no slots
   ("No times left in this window. Reply to the email and the team will send new times."), slot taken
-  (inline under the confirm bar: "Someone just booked that time. Pick another.", grid refreshes in place).
+  (inline under the confirm bar: "That time was taken a moment ago. Pick another.", grid refreshes in place).
 - **Privacy page (\`/privacy/[company]\`):** H2 "Your data at <Company>", short explainer (what is held,
   for how long), email field, two radio options "See my data" / "Delete my data", "Send request". Success
   text replaces the form in place (same height reserved).
@@ -440,7 +440,7 @@ Reduced motion: everything appears in its end state instantly; drag still works.
 | Cap reached | AI summary paused: monthly limit reached. Read the CV, or upgrade for more. |
 | Opted out | AI not used (candidate's choice). Read the CV in full. |
 | Calendar explainer | Shortlist sees only when you are busy, never what your meetings are. |
-| Booking taken | Someone just booked that time. Pick another. |
+| Booking taken | That time was taken a moment ago. Pick another. |
 | Privacy success | If we hold data for this email, we have sent a link to confirm it is you. |
 | Apply AI notice | We use AI to summarise CVs against the criteria above. A person reviews every application and makes every decision. |
 | Retention line | Deletes 12 Mar |
