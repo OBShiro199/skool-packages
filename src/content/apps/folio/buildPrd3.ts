@@ -46,7 +46,7 @@ export const buildPrd3 = `
    60 seconds, then fire the held generate call and open the progress panel.
 - Saving: every step writes to the database so a refresh never loses work.
 - Skip link on step 2 ("I will do this later").
-- When the first carousel is ready, confetti once, then the editor opens with a 3-tip coach mark tour
+- When the first carousel is ready, the editor opens with a toast "First carousel ready" and a 3-tip tour
   (edit text, AI rewrite, export).
 
 ## 25. Security model summary

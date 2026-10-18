@@ -3,7 +3,7 @@
 export const buildPrd1 = `# Folio: build PRD
 
 Save this file as \`PRD.md\` in the root of your project folder. In Claude Code, refer to it as \`@PRD.md\`
-("Read @PRD.md section 12.2 and build fol-generate"). Keep \`@DESIGN.md\` and \`@LANDING.md\` next to it.
+("Read @PRD.md section 12.2 and build fol-generate"). Keep \`@DESIGN_SYSTEM.md\` (Quiet Precision, the base design system), \`@DESIGN.md\` and \`@LANDING.md\` next to it.
 Every section number below is stable, so prompts in the kit can point at them.
 
 ## 0. One paragraph summary

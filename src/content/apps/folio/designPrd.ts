@@ -358,4 +358,51 @@ These fonts are for slides only. The app UI is always Geist.
 8. Billing, Settings, Help, Docs, Paywall.
 9. Screenshot every page at 375px and 1440px. Check the stability rules: click every button, open every menu, and
    confirm nothing around it moved.
+
+## 14. Component states
+| Component | Rest | Hover | Selected or active | Busy | Disabled |
+|---|---|---|---|---|---|
+| Nav item | Muted ink, Phosphor regular | Hover fill | Accent-soft fill, ink text, duotone accent icon | n/a | n/a |
+| \`SourceTabs\` tab | White, button edge | Hover fill | Accent-soft fill, accent-edge border, ink text | n/a | Ghost ink |
+| Slide rail row | White, divider below | Row hover, drag handle visible | Accent-soft fill, accent-edge left border | Live dot in the warning slot while rewriting | n/a |
+| Layout card | White, hairline | Hover fill | Accent-soft fill, accent-edge border | n/a | Ghost ink with tooltip "Hook stays first" |
+| Preset row | White | Hover fill | Accent-edge border while chosen | Spinner over the label after 200ms | Ghost ink at 0 rewrites left |
+| Calendar chip | Tag hue fill and edge | Float shadow, 98% press | Accent-edge ring | Live dot while publishing | Published chips show no drag handle |
+| Plan card | White, hairline | n/a | Accent-edge border on current or recommended | n/a | n/a |
+| Primary button | White, 1px ink edge, 500 | Hover fill | Press to 98% | Spinner overlay, label kept, width kept | Ghost ink, button edge |
+| Secondary button | White, button edge | Hover fill | Press to 98% | As primary | As primary |
+
+## 15. Stability checklist per screen
+Run these by hand after each screen is built. Any item that moves is a bug.
+| Screen | Must not move |
+|---|---|
+| Sidebar | Nav items when the usage meter value changes from "9 of 15" to "10 of 15" or turns amber |
+| Create | The source card when switching tabs, opening "More options" (morphs height downwards only), or when the button starts loading |
+| Create progress | Step rows when a status changes from "Reading the page 40%" to "Writing slides"; all rows exist from the start |
+| Editor toolbar | Export and Schedule buttons when "Saved" appears or the status tag changes from Ready to Exported |
+| Slide rail | Other rows while a row shows its warning dot or the rewrite live dot (slot reserved) |
+| Inspector | Fields when a counter turns amber; the Rewrite button when it is busy |
+| Canvas | The slide frame when text grows; text shrinks inside the slide instead |
+| Export dialog | Dialog width between the progress step and the done step |
+| Schedule dialog | Dialog width between Account, Time and Caption steps |
+| Calendar | Day cells when chips load; "+3 more" is a fixed link, not more rows |
+| Library | Card grid when thumbnails load (fixed 4:5 boxes) and when the selection bar appears (it floats) |
+| Billing | Meter rows when values animate (tabular figures, fixed label widths) |
+
+## 16. Screen inventory for Claude Code
+| Route | Shell | Toolbar contents |
+|---|---|---|
+| \`/login\`, \`/signup\`, \`/reset\` | None | None |
+| \`/onboarding\` | None | Step bar |
+| \`/app/create\` | Sidebar | "Create" · usage line |
+| \`/app/carousels/[id]\` | Sidebar | Back · title · status · Saved · Export · Schedule |
+| \`/app/library\` | Sidebar | Search · count · sort · Create |
+| \`/app/calendar\` | Sidebar | Month · arrows · Today · Month/Week · count |
+| \`/app/brand\`, \`/app/brand/[id]\`, \`/app/brand/[id]/accounts\` | Sidebar | Brand name · Save state · Add brand kit |
+| \`/app/billing\` | Sidebar | Plan name · Manage billing |
+| \`/app/settings\` | Sidebar | Tabs |
+| \`/app/help\` | Sidebar | Search |
+| \`/docs\`, \`/docs/[slug]\` | Marketing nav | n/a |
+| \`/paywall\` | None | None |
+| \`/templates\`, \`/templates/[layout]\` | Marketing nav | n/a |
 `
