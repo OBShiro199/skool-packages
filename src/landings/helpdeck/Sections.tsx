@@ -225,7 +225,7 @@ export function Compare() {
               </tbody>
             </table>
           </div>
-          <p className="hd-foot">Checked Oct 2026. Tell us if anything here is out of date.</p>
+          <p className="hd-foot">Competitor details from public pages. Check each one before you publish.</p>
         </Reveal>
       </div>
     </section>

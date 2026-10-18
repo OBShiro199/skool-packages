@@ -56,6 +56,7 @@ function Nav() {
   }, [open])
   const go = (id: string) => { setOpen(false); scrollToId(id) }
   return (
+    <>
     <nav className={`ob-nav${scrolled ? ' scrolled' : ''}`} aria-label="Main">
       <div className="ob-rail ob-nav-inner">
         <a href="#top" className="ob-nav-brand" aria-label="Outbounder home" onClick={(e) => { e.preventDefault(); go('top') }}><Wordmark /></a>
@@ -72,6 +73,7 @@ function Nav() {
           </button>
         </div>
       </div>
+    </nav>
       <AnimatePresence>
         {open && (
           <motion.div
@@ -88,7 +90,7 @@ function Nav() {
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   )
 }
 

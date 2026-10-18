@@ -188,7 +188,13 @@ function DemoPlayer() {
         {BEATS.map((b, i) => (
           <li key={b.t}>
             <button type="button" className={started && i === beat ? 'on' : ''} onClick={() => { setStarted(true); setBeat(i); setPlaying(true) }}>
-              <span className="ob-chapter-bar"><motion.i animate={{ scaleX: !started ? 0 : i < beat ? 1 : i === beat ? 1 : 0 }} transition={{ duration: i === beat && playing ? BEAT_MS / 1000 : 0.2, ease: 'linear' }} /></span>
+              <span className="ob-chapter-bar">
+                <i
+                  key={`${i}-${beat}`}
+                  className={!started || i > beat ? '' : i < beat ? 'done' : 'run'}
+                  style={{ animationDuration: `${BEAT_MS}ms`, animationPlayState: playing ? 'running' : 'paused' }}
+                />
+              </span>
               <span className="ob-mono">{b.t}</span> {b.label}
             </button>
           </li>

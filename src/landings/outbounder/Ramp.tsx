@@ -157,7 +157,7 @@ function SequenceTerminal() {
     if (reduce) { setShown(SEQ.length); return }
     if (!inView) return
     const id = window.setTimeout(
-      () => setShown((s) => (s >= SEQ.length ? 0 : s + 1)),
+      () => setShown((s) => (s >= SEQ.length ? 1 : s + 1)),
       shown >= SEQ.length ? 4200 : shown === 0 ? 500 : 340,
     )
     return () => window.clearTimeout(id)

@@ -27,7 +27,7 @@ export function Compare() {
       <div className="ob-rail ob-pad">
         <SectionHead
           id="compare-h" title="What it replaces"
-          sub="Prices checked Oct 2026. Outbounder includes leads, verification, AI writing and inboxes in one price."
+          sub="Competitor prices from their public pricing pages; check them before you publish. Outbounder includes leads, verification, AI writing and inboxes in one price."
         />
         <Reveal>
           <div className="ob-table-scroll" tabIndex={0} role="region" aria-label="Comparison table, scrolls sideways">
