@@ -12,7 +12,6 @@ export const CATEGORIES: { id: CategoryId; label: string; blurb: string }[] = [
 export const COMING_SOON: { name: string; oneLiner: string; category: CategoryId }[] = [
   { name: 'Leadloop', oneLiner: 'LinkedIn post engagers turned into a warm lead list every morning.', category: 'sales' },
   { name: 'Callsmith', oneLiner: 'AI cold-call practice partner with scored transcripts.', category: 'sales' },
-  { name: 'Replyguy', oneLiner: 'Drafts on-brand replies to every X mention and DM.', category: 'sales' },
   { name: 'Carousely', oneLiner: 'Turns a blog post into a branded LinkedIn carousel.', category: 'content' },
   { name: 'Thumbforge', oneLiner: 'YouTube thumbnails generated and A/B tested.', category: 'content' },
   { name: 'Podsnip', oneLiner: 'Podcast episodes to show notes, quotes and audiograms.', category: 'content' },

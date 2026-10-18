@@ -1,70 +1,79 @@
-import { useMemo, useState } from 'react'
-import { Search } from 'lucide-react'
+import { useState } from 'react'
+import { Lock, Search } from 'lucide-react'
 import { APPS } from '../content/apps'
-import { CATEGORIES, COMING_SOON, CORE_STACK } from '../content/catalog'
+import { CATEGORIES, COMING_SOON } from '../content/catalog'
 import type { CategoryId } from '../content/types'
 import { useUser } from '../lib/store'
 import { appStats } from '../lib/progress'
-import { AppCard, LockedCard } from '../components/AppCard'
+import { AppCard } from '../components/AppCard'
 
 export default function LibraryPage() {
   const user = useUser()!
   const [cat, setCat] = useState<CategoryId | 'all'>('all')
   const [q, setQ] = useState('')
   const needle = q.trim().toLowerCase()
-
   const matches = (s: string) => !needle || s.toLowerCase().includes(needle)
-  const apps = useMemo(
-    () => APPS.filter((a) => (cat === 'all' || a.category === cat) && matches(`${a.name} ${a.oneLiner} ${a.apis.map((x) => x.name).join(' ')}`)),
-    [cat, needle], // eslint-disable-line
-  )
+
+  const live = APPS.filter((a) => (cat === 'all' || a.category === cat) && matches(`${a.name} ${a.oneLiner} ${a.apis.map((x) => x.name).join(' ')}`))
   const soon = COMING_SOON.filter((a) => (cat === 'all' || a.category === cat) && matches(`${a.name} ${a.oneLiner}`))
   const total = APPS.length + COMING_SOON.length
+  const rec = user.onboarding?.recommended
+  // Your match first, then the rest in catalogue order.
+  const ordered = [...live].sort((a, b) => (b.slug === rec ? 1 : 0) - (a.slug === rec ? 1 : 0))
 
   return (
     <div className="page">
       <header className="page-head">
-        <span className="label">Clone a Software App · {total} kits</span>
+        <span className="label">Clone a Software App</span>
         <h1>Pick the app you will build and sell.</h1>
-        <p>Every kit is a SaaS people already pay for monthly. You get the build PRD, the design PRD, the SQL, every API key step and a marketing plan written for that one app. Claude Code writes the code.</p>
-        <div className="row wrap" style={{ gap: 6, marginTop: 6 }}>
-          <span className="label" style={{ marginRight: 4 }}>Every kit uses</span>
-          {CORE_STACK.map((t) => <span key={t.name} className="chip">{t.name} · {t.job}</span>)}
-        </div>
+        <p>Each kit is a SaaS people already pay for every month. Open one to see what it does, what it costs to run and every step of the build.</p>
       </header>
 
       <div className="lib-filters">
         <div className="row wrap" style={{ gap: 6 }}>
-          <button className={`pill ${cat === 'all' ? 'on' : ''}`} onClick={() => setCat('all')}>All <span className="mono">{total}</span></button>
-          {CATEGORIES.map((c) => {
-            const n = APPS.filter((a) => a.category === c.id).length + COMING_SOON.filter((a) => a.category === c.id).length
-            return <button key={c.id} className={`pill ${cat === c.id ? 'on' : ''}`} onClick={() => setCat(c.id)}>{c.label} <span className="mono">{n}</span></button>
-          })}
+          <button className={`pill ${cat === 'all' ? 'on' : ''}`} onClick={() => setCat('all')}>All kits</button>
+          {CATEGORIES.map((c) => (
+            <button key={c.id} className={`pill ${cat === c.id ? 'on' : ''}`} onClick={() => setCat(c.id)}>{c.label}</button>
+          ))}
         </div>
-        <div className="input-icon lib-search"><Search size={16} /><input className="input" placeholder="Search apps or APIs (Firecrawl, Stripe…)" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+        <div className="input-icon lib-search"><Search size={16} /><input className="input" placeholder="Search by name or API" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       </div>
 
-      {CATEGORIES.filter((c) => cat === 'all' || c.id === cat).map((c) => {
-        const live = apps.filter((a) => a.category === c.id)
-        const locked = soon.filter((a) => a.category === c.id)
-        if (!live.length && !locked.length) return null
-        return (
-          <section key={c.id} className="lib-section">
-            <div className="row between wrap" style={{ marginBottom: 14 }}>
-              <div><h2 style={{ fontSize: 20 }}>{c.label}</h2><p className="muted" style={{ fontSize: 14 }}>{c.blurb}</p></div>
-              <span className="label">{live.length} live · {locked.length} soon</span>
-            </div>
-            <div className="grid cols-3">
-              {live.map((a, i) => (
-                <AppCard key={a.slug} app={a} index={i} match={user.onboarding?.recommended === a.slug}
-                  progress={user.commitments[a.slug] ? appStats(a, user.progress[a.slug]?.checked ?? {}).pct : undefined} />
-              ))}
-              {locked.map((a) => <LockedCard key={a.name} name={a.name} oneLiner={a.oneLiner} label={c.label} />)}
-            </div>
-          </section>
-        )
-      })}
-      {!apps.length && !soon.length && <p className="muted">Nothing matches “{q}”.</p>}
+      <section className="lib-section">
+        <div className="row between" style={{ marginBottom: 14 }}>
+          <h2 style={{ fontSize: 20 }}>Ready to build</h2>
+          <span className="label">{live.length} of {total} kits</span>
+        </div>
+        {ordered.length ? (
+          <div className="grid cols-3">
+            {ordered.map((a, i) => (
+              <AppCard key={a.slug} app={a} index={i} match={rec === a.slug}
+                progress={user.commitments[a.slug] ? appStats(a, user.progress[a.slug]?.checked ?? {}).pct : undefined} />
+            ))}
+          </div>
+        ) : (
+          <p className="muted">No ready kits match. Try another category.</p>
+        )}
+      </section>
+
+      {soon.length > 0 && (
+        <section className="lib-section">
+          <div className="row between" style={{ marginBottom: 14 }}>
+            <h2 style={{ fontSize: 20 }}>Dropping soon</h2>
+            <span className="label">New kits land in the Skool community first</span>
+          </div>
+          <div className="soon-list">
+            {soon.map((a) => (
+              <div key={a.name} className="soon-row">
+                <Lock size={14} className="muted" />
+                <b>{a.name}</b>
+                <span className="muted">{a.oneLiner}</span>
+                <span className="label">{CATEGORIES.find((c) => c.id === a.category)?.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }

@@ -35,7 +35,7 @@ export default function AppDetailPage() {
 
       <section className="detail-hero">
         <motion.div className="detail-art" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
-          <AppArt app={app} height={300} />
+          <AppArt app={app} height="auto" />
         </motion.div>
         <div className="detail-info">
           <div className="row wrap" style={{ gap: 6 }}>
@@ -77,12 +77,12 @@ export default function AppDetailPage() {
           <span className="label">Tech stack</span>
           <div className="stack-list">
             {CORE_STACK.map((t) => (
-              <div key={t.name} className="stack-row"><b>{t.name}</b><span className="muted">{t.job}</span><span className="chip">core</span></div>
+              <div key={t.name} className="stack-row"><b>{t.name}</b><span className="muted">{t.job}</span><span /></div>
             ))}
             {app.apis.map((a) => (
               <div key={a.name} className="stack-row">
                 <b>{a.name}</b><span className="muted">{a.job}</span>
-                <a href={a.signupUrl} target="_blank" rel="noreferrer" className="chip chip-signal">API <ExternalLink size={10} /></a>
+                <a href={a.signupUrl} target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost">Docs <ExternalLink size={12} /></a>
               </div>
             ))}
           </div>
