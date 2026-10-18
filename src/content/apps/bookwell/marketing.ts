@@ -127,7 +127,7 @@ If no: "No problem. Can I check back in a month?" Log the date in the sheet.`),
         'Call with the script. Keep each call under 2 minutes.',
         'Make a page for every yes within 2 hours and text it from your own phone with: "Hi {name}, here is the page I mentioned: {link}. Tap a time and try it. {your name}"',
       ),
-      warn('Calls, not texts', 'Only text a shop after they said yes on the call. Unasked marketing texts break US texting rules and are not allowed on your Bookwell Twilio number at all.'),
+      warn('Calls, not texts', 'Only text a shop after they said yes on the call. Your Bookwell Twilio number is registered for booking texts only: one marketing text from it can get the campaign suspended, which stops every shop\'s reminders.'),
     ],
     checklist: [
       ck('bw-mk-out-call-c1', 'Copy the call script', 'copy:bw-mk-out-call-script'),
@@ -404,7 +404,7 @@ If you hate it, say so in the post, or keep the $50 and do not post. Your call.`
         ['Trials', '5+', '0'],
         ['Cost per trial', 'under $20', 'over $100'],
       ]),
-      warn('Mark it as paid', 'Ask creators to use the platform\'s "Paid partnership" label. It keeps both of you in the clear and does not hurt results with this audience.'),
+      tip('Use the paid partnership label', 'Ask creators to add the platform\'s "Paid partnership" label. Other shop owners trust an open recommendation more, and it gives you the post\'s reach numbers.'),
     ],
     checklist: [
       ck('bw-mk-paid-creators-c1', 'List 10 creators with 2k to 20k followers'),
