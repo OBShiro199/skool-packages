@@ -78,7 +78,7 @@ curl -X POST https://api.voyageai.com/v1/embeddings \\
       mistakes([
         { mistake: '429 Too Many Requests on the first big crawl.', fix: 'Accounts without a card have very low limits. Add a card in Billing; the worker backs off and retries meanwhile.' },
         { mistake: 'The embedding has 2048 numbers.', fix: 'output_dimension is missing, so the default size came back. Always send "output_dimension": 1024.' },
-        { mistake: '401 with a key you just made.', fix: 'Voyage keys start with pa-. If yours does not, you copied the key id, not the secret. Create a new key.' },
+        { mistake: '401 with a brand new key.', fix: 'Voyage keys start with pa-. If yours does not, you copied the key id, not the secret. Create a new key.' },
       ]),
       links([
         { label: 'Voyage dashboard', url: 'https://dashboard.voyageai.com' },

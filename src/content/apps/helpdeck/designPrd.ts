@@ -239,7 +239,7 @@ opens it in a side panel.
   wraps): \`<script src="https://helpdeck.app/w.js" data-bot="BOT_ID" async></script>\`, with a "Copy
   snippet" button (fixed width, label changes to "Copied" for 2 seconds without changing width).
 - Platform tabs as chips: HTML, Webflow, WordPress, Shopify, Framer. Each shows 3 numbered steps:
-  - HTML: "Paste the snippet just before \`</body>\` on every page."
+  - HTML: "Paste the snippet right before \`</body>\` on every page."
   - Webflow: "Site settings, Custom code, Footer code. Paste, Save, Publish."
   - WordPress: "Install a header and footer code plugin (for example WPCode). Footer, paste, Save."
   - Shopify: "Online Store, Themes, Edit code, theme.liquid. Paste before \`</body>\`. Save."
