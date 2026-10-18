@@ -145,8 +145,9 @@ function Walkthrough() {
               </div>
             ))}
             <div className={`hv-vs-panel${s >= 3 ? ' on' : ''}`}>
-              <span className="hv-vs-line" />
-              <span className={`hv-vs-opener${step >= 4 ? ' copied' : ''}`}>{step >= 4 ? 'Copied' : 'Opener'}</span>
+              <span className="hv-vs-name">Sam Lee · Hot · 86</span>
+              <span className="hv-vs-opener">Your point about churn starting in week two matched what we see too.</span>
+              <span className={`hv-vs-copy${step >= 4 ? ' on' : ''}`}>{step >= 4 ? 'Copied' : 'Copy opener'}</span>
               <span className={`hv-vs-push${step >= 5 ? ' on' : ''}`}>{step >= 5 ? 'Pushed to HubSpot' : 'Push'}</span>
             </div>
           </div>

@@ -7,14 +7,16 @@ function Tile({ eyebrow, title, body, className = '', children, delay = 0 }: {
   eyebrow: string; title: string; body: string; className?: string; children: ReactNode; delay?: number
 }) {
   return (
-    <Reveal delay={delay} className={`hv-tile ${className}`}>
-      <div className="hv-tile-copy">
-        <Eyebrow>{eyebrow}</Eyebrow>
-        <h3>{title}</h3>
-        <p>{body}</p>
-      </div>
-      <div className="hv-tile-visual">{children}</div>
-    </Reveal>
+    <div className={`hv-tile ${className}`}>
+      <Reveal delay={delay} className="hv-tile-inner">
+        <div className="hv-tile-copy">
+          <Eyebrow>{eyebrow}</Eyebrow>
+          <h3>{title}</h3>
+          <p>{body}</p>
+        </div>
+        <div className="hv-tile-visual">{children}</div>
+      </Reveal>
+    </div>
   )
 }
 
