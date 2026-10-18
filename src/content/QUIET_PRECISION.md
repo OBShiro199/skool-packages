@@ -51,7 +51,7 @@ they read as chosen, not default.
 | Ink | `#08090a` | Headings |
 | Body | `#3c4149` | Body text |
 | Muted | `#62666d` | Secondary text |
-| Faint | `#8a8f98` | Labels |
+| Faint | `#6f747c` | Labels (darkened from Decibel's `#8a8f98`, which fails 4.5:1 on white) |
 | Ghost | `#b4b8bf` | Placeholders, disabled |
 | Blue | `#5f86e0` | Selected, in progress |
 | Blue soft | `#f1f5fd` | Selected fill |
@@ -203,7 +203,7 @@ Drop these into a new project and build components only from them.
   --surface: #ffffff;  --row-hover: #fafafb;  --hover: #f5f5f6;
   --hairline: #e6e6e9; --divider: #efeff1;   --btn-edge: #dcdde0;
   /* ink */
-  --ink: #08090a; --body: #3c4149; --muted: #62666d; --faint: #8a8f98; --ghost: #b4b8bf;
+  --ink: #08090a; --body: #3c4149; --muted: #62666d; --faint: #6f747c; --ghost: #b4b8bf;
   /* accent */
   --blue: #5f86e0; --blue-soft: #f1f5fd; --blue-edge: #c4d4f5;
   /* status */

@@ -527,6 +527,11 @@
   .lp-conversate .cv-plan { padding: 20px; }
   .lp-conversate .cv-table { font-size: 13px; }
 }
+@media (min-width: 960px) and (max-width: 1099px) {
+  .lp-conversate .cv-hc-row { grid-template-columns: minmax(0, 1fr) 82px 36px; }
+  .lp-conversate .cv-hc-row > :nth-child(2), .lp-conversate .cv-hide-sm { display: none; }
+  .lp-conversate .cv-hc { padding-left: 24px; }
+}
 @media (max-width: 959px) {
   .lp-conversate .cv-feature, .lp-conversate .cv-feature.is-flip { grid-template-columns: 1fr; gap: 28px; }
   .lp-conversate .cv-feature.is-flip .cv-feature-copy { order: 0; }

@@ -5,7 +5,7 @@
 :root, :root[data-theme="dark"], :root[data-theme="light"] {
   --bg: #ffffff; --surface: #ffffff; --row-hover: #fafafb; --fill: #f5f5f6;
   --line: #e6e6e9; --divider: #efeff1; --line-2: #dcdde0;
-  --ink: #08090a; --ink-2: #3c4149; --muted: #62666d; --faint: #8a8f98; --ghost: #b4b8bf;
+  --ink: #08090a; --ink-2: #3c4149; --muted: #62666d; --faint: #6f747c; --ghost: #b4b8bf;
   --signal: #5f86e0; --signal-soft: #f1f5fd; --tint: #f1f5fd; --tint-hover: #e9effc; --tint-line: #c4d4f5; --tint-ink: #3d63c4;
   --money: #27a644; --money-soft: rgba(39,166,68,.08); --ok-tint: rgba(39,166,68,.07); --ok-line: rgba(39,166,68,.35); --ok-ink: #1d7f34;
   --loss: #eb5757; --amber: #d18b0f; --violet: #7a5cd6;
