@@ -65,7 +65,7 @@ a.app-card:hover .pv-halo .pvl-phone { transform: translateY(-10px); }
 .pv-halo .pvl-thanks { margin: 26px 0 0; font-size: 20px; line-height: 1.35; color: #62666d; letter-spacing: -0.015em; }
 .pv-halo .pvl-google { margin-top: 24px; width: 100%; height: 64px; display: flex; align-items: center; justify-content: center; gap: 12px; border-radius: 10px; border: 2px solid #dcdde0; background: #fff; font-size: 22px; font-weight: 600; color: #08090a; letter-spacing: -0.02em; }
 .pv-halo .pvl-g { display: inline-flex; width: 30px; height: 30px; }
-.pv-halo .pvl-sms { position: absolute; left: 470px; top: 560px; width: 330px; padding: 18px 22px; background: #fff; border: 2px solid #e6e6e9; border-radius: 22px 22px 22px 6px; box-shadow: 0 18px 40px -18px rgba(8,9,10,.25); display: flex; flex-direction: column; gap: 8px; }
+.pv-halo .pvl-sms { position: absolute; left: 360px; top: 584px; width: 320px; padding: 18px 22px; background: #fff; border: 2px solid #e6e6e9; border-radius: 22px 22px 22px 6px; box-shadow: 0 18px 40px -18px rgba(8,9,10,.25); display: flex; flex-direction: column; gap: 8px; }
 .pv-halo .pvl-sms-from { display: flex; justify-content: space-between; font-size: 18px; color: #6f747c; }
 .pv-halo .pvl-sms-from b { color: #08090a; font-weight: 600; }
 .pv-halo .pvl-sms p { margin: 0; font-size: 21px; line-height: 1.3; color: #3c4149; letter-spacing: -0.015em; }
