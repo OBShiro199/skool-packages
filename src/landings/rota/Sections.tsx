@@ -377,7 +377,7 @@ export function Faq() {
   return (
     <section className="rt-section" id="faq" aria-labelledby="rt-faq-h">
       <div className="rt-container rt-faq-wrap">
-        <SectionHead id="rt-faq-h" eyebrow="Help" title="Questions, answered in under 70 words." />
+        <SectionHead id="rt-faq-h" eyebrow="Help" title="Questions" />
         <ul className="rt-faq">
           {FAQ.map(([q, a], i) => {
             const isOpen = open === i
