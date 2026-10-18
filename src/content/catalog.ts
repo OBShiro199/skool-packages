@@ -12,7 +12,6 @@ export const CATEGORIES: { id: CategoryId; label: string; blurb: string }[] = [
 export const COMING_SOON: { name: string; oneLiner: string; category: CategoryId }[] = [
   { name: 'Retain', oneLiner: 'Spots Stripe customers about to cancel and wins them back.', category: 'business' },
   { name: 'Quotient', oneLiner: 'Instant online quotes for tradespeople, turned into booked jobs.', category: 'productivity' },
-  { name: 'Dossier', oneLiner: 'Answers security questionnaires and RFPs from your own documents.', category: 'ai-agents' },
 ]
 
 export const CORE_STACK = [

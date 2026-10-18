@@ -177,7 +177,7 @@ a frame. Visuals are real UI states at 2x.
 - Eyebrow: "Leads and analytics"
 - H3: "Every quote in one inbox"
 - Body: "New, quoted, booked, won, lost. See your quote-to-booking rate, average job value and which sources bring
-  jobs, not just clicks."
+  booked jobs, not clicks."
 - Bullets: "Text or email from the lead" · "Mark won with the final value" · "Team access on Crew"
 - Visual: the inbox with status pills and the analytics stat tiles.
 
@@ -252,7 +252,7 @@ a frame. Visuals are real UI states at 2x.
 | Button | Start free trial | Start free trial | Start free trial |
 
 - Small print under the cards: "1 SMS credit = 1 text to a US or Canadian mobile. UK texts use 5 credits. When you
-  reach your quote limit, customers still get through; they just get their price from you instead of instantly."
+  reach your quote limit, customers still get through; they get their price from you instead of instantly."
 - ROI line in Geist 500 24px: "Book one extra $300 job a month and Crew pays for itself almost four times over."
 - Risk reversal line: "No setup fee. No contract. Deposits go straight to your own Stripe."
 - Buttons go to \`/signup?plan=crew&interval=month\` (carried into Checkout after signup).

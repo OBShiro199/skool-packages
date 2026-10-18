@@ -184,7 +184,7 @@ One 560px card that morphs height between 5 steps (width never changes, step lab
 3. **Check your prices:** the template's main rates in a compact form (e.g. "Per bedroom £18", "Minimum charge
    £60") with a live PriceRange preview on the right for a sample job. "You can change everything later."
 4. **When can customers book?** Working days as day chips, start and end time selects, "What can they book?"
-   AnswerCards: A free survey, The job, Both, Nothing yet (just collect quotes).
+   AnswerCards: A free survey, The job, Both, Nothing yet (collect quotes only).
 5. **Go live:** the SnippetBox, the hosted link with Copy, a QR code (SVG, 160px) with "Download PNG", and three
    buttons: "Open my quote page", "Send me a test quote", "Go to my leads". A note: "Deposits and texting are in
    Settings when you are ready."
@@ -243,7 +243,7 @@ One 560px card that morphs height between 5 steps (width never changes, step lab
   round to) with an example line: "A $200 job shows as $180 to $230."
 - **Zones:** ZoneRows; "Everywhere else" row at the bottom with Served / Not served.
 - **Photos and AI:** toggles for photos, required or optional, the prompt text; "When the photo check suggests a
-  survey" AnswerCards: Just tell me, Offer a survey instead of the job, Ignore it; a confidence slider (0.5 to 0.9)
+  survey" AnswerCards: Tell me about it, Offer a survey instead of the job, Ignore it; a confidence slider (0.5 to 0.9)
   shown only for the middle option; "Always survey jobs above" currency input.
 - **Booking:** mode AnswerCards, calendar select, job deposit (None, Fixed, % of the low price) and survey deposit.
   If Stripe is not connected: an inline note with "Connect Stripe" (link to Settings > Payments).
@@ -383,7 +383,7 @@ Reduced motion: every one of these shows the end state instantly.
 | Stepper | Value centred, fixed width | Buttons get \`--hover\` | n/a | Minus disabled at min, plus at max | n/a | Clamped value + "Max 8" note |
 | PriceRange | Numbers in ink | n/a | n/a | "Price on request" in muted | Old numbers at 60% | "We couldn't work out a price. Leave your details." |
 | PhotoTile | Thumbnail, hairline | Remove button visible | Lightbox opens | n/a | 50% + progress bar | Danger edge + Retry |
-| SlotPicker time | White, hairline | \`--hover\` | \`--accent-soft\` + edge | Ghost text, no border | Skeleton block | "That time was just taken" above the grid |
+| SlotPicker time | White, hairline | \`--hover\` | \`--accent-soft\` + edge | Ghost text, no border | Skeleton block | "That time has gone" above the grid |
 | StatusPill | Hue fill | Menu caret visible | Menu open | Read-only for viewers | n/a | n/a |
 | RuleRow | 48px row | Drag handle visible | Drop line in \`--accent-edge\` | n/a | n/a | Danger edge on the bad field |
 | UsageMeter | Accent fill | Tooltip with reset date | n/a | n/a | Skeleton bar | Amber under 20%, coral under 5% |
@@ -438,7 +438,7 @@ Every business colour still reads as Quiet Precision because only the three acce
 | After submit | Your quote is on its way |
 | Photos card | Add photos so {business} can check the details |
 | Checking | Checking your photos |
-| Slot taken | That time was just taken. Pick another. |
+| Slot taken | That time has gone. Pick another. |
 | Deposit button | Pay deposit and book ({amount}) |
 | Booked | Booked. See you {day} at {time}. |
 | Out of area | We don't usually cover {postcode}. Leave your details and {business} will let you know. |

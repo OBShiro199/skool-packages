@@ -137,7 +137,7 @@ If you'd like it live, I'll paste it into your {{site_builder}} site for you in 
 
 Hi {{firstname}}, I saw {{agency}} built {{client_business}}'s site. Nice work.
 
-I recorded 90 seconds of an instant quote calculator running on it (not live, just on my screen): {{loom_link}}
+I recorded 90 seconds of an instant quote calculator running on it (not live, only on my screen): {{loom_link}}
 Customers answer a few questions, see a price, add photos and book a survey. It drops into Wix, WordPress or Squarespace with one snippet.
 
 Agencies use it as a monthly add-on for their trades clients. One plan covers 10 businesses.
@@ -178,7 +178,7 @@ What I found:
 - End of tenancy is usually 1.3x to 1.6x a deep clean
 - Almost nobody shows a price on their website. Customers ring three firms and book whoever answers first
 
-I put it all in a sheet (no business names). Happy to share it if useful, just comment "sheet".` },
+I put it all in a sheet (no business names). Happy to share it if useful: comment "sheet".` },
       { type: 'callout', tone: 'tip', title: 'Numbers must be real', text: 'Only post figures from your own research. Trades owners will check them against their own prices, and one made-up number loses the whole group.' },
     ],
     checklist: [
@@ -295,7 +295,7 @@ No account needed for steps 1 to 3.` },
 4. PostHog: badge_clicked (server side from the landing visit with utm_source widget_badge), referral_signup, referral_credited.` },
       { type: 'steps', items: [
         'Check the badge link on a live widget opens your landing page with the banner.',
-        'Email your first 10 paying customers: "Know another cleaner or gardener who'd use this? You both get a free month."',
+        'Email your first 10 paying customers: "Know another cleaner or gardener who\'d use this? You both get a free month."',
         'Track badge clicks per month in PostHog.',
       ] },
       { type: 'table', head: ['Metric', 'Target', 'Kill rule'], rows: [

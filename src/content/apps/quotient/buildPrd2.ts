@@ -72,7 +72,7 @@ Shared rules for every function (built once in \`supabase/functions/_shared/\`):
   the site visit flag (\`needs_site_visit\` or \`survey_only\` blocks \`job\`).
 - \`POST { action: 'hold', token, kind, starts_at, note? }\`: recompute the slot server-side (it must be in the
   list), compute the deposit (job: pct of \`price_low_cents\` rounded to whole units, or fixed; survey:
-  \`survey_deposit_cents\`), \`rpc('hold_slot')\`. \`slot_taken\` returns 409 "That time was just taken. Pick
+  \`survey_deposit_cents\`), \`rpc('hold_slot')\`. \`slot_taken\` returns 409 "That time has gone. Pick
   another." If a deposit is due and the business has \`charges_enabled\`, create the Checkout Session (11.6) and
   return \`{ checkout_url }\`. If no deposit, or Stripe is not connected, the booking is confirmed: send
   confirmations and return \`{ confirmed: true, manage_url }\`.
@@ -303,12 +303,12 @@ own (it runs on the business's site).
 | AI photo check | Up to 2 per quote. 6 photos at 1280 px is about 9,800 image tokens + 3,000 text in = $0.0013, plus about 800 out (thinking + JSON) = $0.0004 | up to $0.004 |
 | Emails | About 4 Resend sends (copy, owner alert, follow-up, booking) at about $0.001 at Pro rates | $0.004 |
 | Photo storage | 1.2 MB per quote kept up to 180 days, inside Supabase Pro's 100 GB | about $0.0002 |
-| **Total at the cap** | | **about $0.031** |
+| **Total at the cap** | | **about $0.0308** |
 
 Per business: the US/CA toll-free number is about $2.15 a month [verify]. UK alpha senders have no monthly fee,
 and a UK segment costs 5 credits (about $0.056 [verify]), so the credit rule keeps UK cost per credit the same.
-Worst case at every cap: Solo $5.87 (120 quotes + number), Crew $13.00, Agency $52.50 (1,000 quotes + 10
-numbers). After Stripe fees that is 78% to 81% gross margin monthly and 75% to 78% on yearly plans. See the
+Worst case at every cap: Solo $5.85 (120 quotes + number), Crew $12.93, Agency $52.30 (1,000 quotes + 10
+numbers). After Stripe fees that is 79% to 81% gross margin monthly and 75% to 78% on yearly plans. See the
 Costs tab for the full model.
 
 ## 20. Acceptance tests (click through, then run the SQL)
@@ -336,8 +336,8 @@ Run each in a fresh browser profile. "SQL" means Supabase, SQL Editor, New query
    4242 4242 4242 4242. The lead moves to Booked only after the webhook. SQL:
    \`select b.status, d.status, d.amount_cents from bookings b join deposits d on d.booking_id = b.id order by b.created_at desc limit 1;\`
    shows \`confirmed, paid\`. The payment appears in the CONNECTED account's dashboard.
-7. **Double booking.** Open the same slot in two browsers and hold both within a second. One gets "That time was
-   just taken". Leave one Checkout unpaid for 36 minutes: the slot frees and the booking is \`cancelled\`.
+7. **Double booking.** Open the same slot in two browsers and hold both within a second. One gets "That time has
+   gone". Leave one Checkout unpaid for 36 minutes: the slot frees and the booking is \`cancelled\`.
 8. **Follow-ups.** Submit a quote, then
    \`update follow_ups set due_at = now() - interval '1 minute' where lead_id = '<id>' and step_no = 1;\` and call
    \`qt-reminders\` with the cron secret. One SMS (or email) goes out. Call again: nothing more. Book the lead:
