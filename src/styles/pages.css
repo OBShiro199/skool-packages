@@ -174,9 +174,9 @@ a.app-card:hover .app-card-art svg { transform: scale(1.04); }
 .pd.done { background: var(--money); border-color: var(--money); color: #fff; }
 .pd.cur { border-color: var(--signal); color: var(--signal); background: var(--signal-soft); }
 .next-up { display: grid; gap: 2px; padding: 12px 14px; border-left: 2px solid var(--signal); background: var(--bg); }
-.heat { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; max-width: 300px; }
-.heat i { aspect-ratio: 1; background: var(--fill); border: 1px solid var(--line); }
-.heat i.on { background: var(--money); border-color: var(--money); }
+.heat { display: grid; grid-template-columns: repeat(35, minmax(0, 1fr)); gap: 4px; }
+.heat i { aspect-ratio: 1; max-height: 22px; background: #fff; border: 1px solid var(--line); border-radius: 2px; }
+.heat i.on { background: rgba(39, 166, 68, .16); border-color: rgba(39, 166, 68, .45); }
 .mini-ledger { width: 100%; border-collapse: collapse; font-size: 14px; }
 .mini-ledger td { padding: 8px 0; border-bottom: 1px solid var(--line); }
 .mini-ledger td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
@@ -321,7 +321,6 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; background: v
 .continue { grid-template-columns: 380px 1fr; align-items: center; }
 .continue-art { border-right: 0; padding: 16px; }
 .continue-art svg { height: auto; }
-.heat { max-width: 230px; gap: 3px; }
 .rec-card { align-items: center; }
 .rec-card > svg { height: auto; }
 .soon-list { border: 1px solid var(--line); }
@@ -371,7 +370,6 @@ input[type="range"]::-moz-range-thumb { background: var(--primary); }
 .tick.on { background: var(--money); }
 .mini-ledger tr.total td { border-top-color: var(--line-2); }
 .costs-total td { border-top-color: var(--line-2); }
-.heat i.on { background: var(--money); }
 .onb-opt.on .onb-key { background: var(--primary); border-color: var(--primary); }
 .sig-box.signed { border-color: var(--signal); }
 .olly-launcher .olly-avatar { box-shadow: 0 0 0 2px #fff; }

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { ArrowRight, Flame, Sparkles, Target, Trophy } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { useUser } from '../lib/store'
 import { getApp } from '../content/apps'
-import { LEVELS, fmtMinutes, taskStats } from '../lib/progress'
+import { fmtMinutes, taskStats } from '../lib/progress'
 import { useTotals } from '../components/Shell'
 import { AppCard } from '../components/AppCard'
-import { Bar, Ring } from '../components/Ring'
+import { Bar } from '../components/Ring'
 import { PhaseIcon } from '../components/PhaseIcon'
 
 function greeting() {
@@ -16,10 +16,9 @@ function greeting() {
 
 export default function HomePage() {
   const user = useUser()!
-  const { xp, builds, level, streak } = useTotals()
+  const { builds } = useTotals()
   const active = builds.find((b) => b.app.slug === user.activeApp) ?? builds[0]
   const rec = getApp(user.onboarding?.recommended)
-  const goal = Number(user.onboarding?.answers.goal ?? 10000)
 
   const nextTask = active
     ? (() => {
@@ -36,25 +35,14 @@ export default function HomePage() {
     return d.toISOString().slice(0, 10)
   })
   const activeSet = new Set(user.activeDays)
-  const customers = active ? Math.ceil(goal / active.app.price.monthly) : Math.ceil(goal / 49)
 
   return (
     <div className="page">
       <header className="page-head">
         <span className="label">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
         <h1>{greeting()}, {user.profile.name}.</h1>
-        <p>{active ? `${active.app.name} is ${Math.round(active.s.pct * 100)}% built. One step today keeps the streak alive.` : 'Pick a kit and sign your pledge. The first phase takes about an hour.'}</p>
+        <p>{active ? `${active.app.name} is ${Math.round(active.s.pct * 100)}% built.` : 'Pick a kit and sign your pledge. The first phase takes about an hour.'}</p>
       </header>
-
-      <div className="grid cols-4" style={{ marginBottom: 20 }}>
-        <div className="card stat">
-          <span className="label">Level</span>
-          <div className="row"><Ring pct={level.pct} size={44} stroke={4}><Trophy size={15} /></Ring><div><div className="v" style={{ fontSize: 20 }}>{level.name}</div><span className="muted mono" style={{ fontSize: 12 }}>L{level.index + 1} of {LEVELS.length}</span></div></div>
-        </div>
-        <div className="card stat"><span className="label">XP earned</span><div className="v">{xp.toLocaleString()}</div><span className="muted mono" style={{ fontSize: 12 }}>{level.next ? `${level.ceil - xp} XP to ${level.next}` : 'Max level'}</span></div>
-        <div className="card stat"><span className="label">Streak</span><div className="v row" style={{ gap: 8 }}><Flame size={22} color={streak ? 'var(--amber)' : 'var(--muted)'} />{streak} days</div><span className="muted mono" style={{ fontSize: 12 }}>{user.activeDays.length} active days total</span></div>
-        <div className="card stat"><span className="label">MRR target</span><div className="v money">${goal.toLocaleString()}</div><span className="muted mono" style={{ fontSize: 12 }}>≈ {customers} customers{active ? ` at $${active.app.price.monthly}` : ''}</span></div>
-      </div>
 
       {active ? (
         <motion.section className="card continue" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -90,27 +78,13 @@ export default function HomePage() {
         </section>
       ) : null}
 
-      <div className="grid cols-2" style={{ marginTop: 20 }}>
-        <section className="card" style={{ padding: 18 }}>
-          <div className="row between" style={{ marginBottom: 12 }}><span className="label">Activity · last 5 weeks</span><span className="label">{days.filter((d) => activeSet.has(d)).length} days</span></div>
-          <div className="heat">
-            {days.map((d) => <i key={d} title={d} className={activeSet.has(d) ? 'on' : ''} />)}
-          </div>
-          <p className="muted" style={{ fontSize: 13, marginTop: 12 }}>A day counts when you tick at least one item. Founders who tick something 5 days a week finish the build in under a month.</p>
-        </section>
-        <section className="card" style={{ padding: 18 }}>
-          <div className="row" style={{ marginBottom: 12, gap: 8 }}><Target size={15} /><span className="label">Your weekly targets once live</span></div>
-          <table className="mini-ledger">
-            <tbody>
-              <tr><td>Customers needed for ${goal.toLocaleString()} MRR</td><td className="mono">{customers}</td></tr>
-              <tr><td>Trials at 25% trial to paid</td><td className="mono">{customers * 4}</td></tr>
-              <tr><td>Demos at 40% demo to trial</td><td className="mono">{customers * 10}</td></tr>
-              <tr><td>Outreach touches at 3% reply</td><td className="mono">{(customers * 10 * 34).toLocaleString()}</td></tr>
-              <tr className="total"><td>Touches per day over 12 months</td><td className="mono">{Math.ceil((customers * 10 * 34) / 365)}</td></tr>
-            </tbody>
-          </table>
-        </section>
-      </div>
+      <section className="card" style={{ padding: 18, marginTop: 20 }}>
+        <div className="row between" style={{ marginBottom: 12 }}><span className="label">Activity · last 5 weeks</span><span className="label">{days.filter((d) => activeSet.has(d)).length} days</span></div>
+        <div className="heat">
+          {days.map((d) => <i key={d} title={d} className={activeSet.has(d) ? 'on' : ''} />)}
+        </div>
+        <p className="muted" style={{ fontSize: 13, marginTop: 12 }}>A day counts when you tick at least one item. Founders who tick something 5 days a week finish the build in under a month.</p>
+      </section>
 
       {builds.length === 0 && rec && (
         <section style={{ marginTop: 28 }}>
