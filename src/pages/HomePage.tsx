@@ -36,6 +36,7 @@ export default function HomePage() {
     return d.toISOString().slice(0, 10)
   })
   const activeSet = new Set(user.activeDays)
+  const activeCount = days.filter((d) => activeSet.has(d)).length
 
   return (
     <div className="page">
@@ -80,10 +81,11 @@ export default function HomePage() {
       ) : null}
 
       <section className="card" style={{ padding: 18, marginTop: 20 }}>
-        <div className="row between" style={{ marginBottom: 12 }}><span className="label">Activity · last 5 weeks</span><span className="label">{days.filter((d) => activeSet.has(d)).length} days</span></div>
+        <div className="row between" style={{ marginBottom: 12 }}><span className="label">Activity · last 5 weeks</span><span className="label">{activeCount} active {activeCount === 1 ? 'day' : 'days'}</span></div>
         <div className="heat">
-          {days.map((d) => <i key={d} title={d} className={activeSet.has(d) ? 'on' : ''} />)}
+          {days.map((d, i) => <i key={d} title={new Date(d).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })} className={`${activeSet.has(d) ? 'on' : ''} ${i === days.length - 1 ? 'today' : ''}`} />)}
         </div>
+        <div className="heat-axis"><span className="label">5 weeks ago</span><span className="label">Today</span></div>
         <p className="muted" style={{ fontSize: 13, marginTop: 12 }}>A day counts when you tick at least one item. Founders who tick something 5 days a week finish the build in under a month.</p>
       </section>
 
