@@ -5,12 +5,13 @@ import { CATEGORIES, COMING_SOON } from '../content/catalog'
 import type { CategoryId } from '../content/types'
 import { useUser } from '../lib/store'
 import { appStats } from '../lib/progress'
-import { AppCard } from '../components/AppCard'
+import { AppCard, kitEconomics } from '../components/AppCard'
 
 export default function LibraryPage() {
   const user = useUser()!
   const [cat, setCat] = useState<CategoryId | 'all'>('all')
   const [q, setQ] = useState('')
+  const [sort, setSort] = useState<'match' | 'easiest' | 'fastest' | 'profit' | 'price'>('match')
   const needle = q.trim().toLowerCase()
   const matches = (s: string) => !needle || s.toLowerCase().includes(needle)
 
@@ -19,7 +20,15 @@ export default function LibraryPage() {
   const total = APPS.length + COMING_SOON.length
   const rec = user.onboarding?.recommended
   // Your match first, then the rest in catalogue order.
-  const ordered = [...live].sort((a, b) => (b.slug === rec ? 1 : 0) - (a.slug === rec ? 1 : 0))
+  const ordered = [...live].sort((a, b) => {
+    switch (sort) {
+      case 'easiest': return a.difficulty - b.difficulty || a.buildHours - b.buildHours
+      case 'fastest': return a.buildHours - b.buildHours
+      case 'profit': return kitEconomics(b).profit - kitEconomics(a).profit
+      case 'price': return b.price.monthly - a.price.monthly
+      default: return (b.slug === rec ? 1 : 0) - (a.slug === rec ? 1 : 0)
+    }
+  })
 
   return (
     <div className="page">
@@ -41,8 +50,20 @@ export default function LibraryPage() {
 
       <section className="lib-section">
         <div className="row between" style={{ marginBottom: 14 }}>
-          <h2 style={{ fontSize: 20 }}>Ready to build</h2>
-          <span className="label">{live.length} of {total} kits</span>
+          <div className="row" style={{ gap: 12 }}>
+            <h2 style={{ fontSize: 20 }}>Ready to build</h2>
+            <span className="label">{live.length} of {total} kits</span>
+          </div>
+          <label className="row" style={{ gap: 8, fontSize: 14 }}>
+            <span className="muted">Sort by</span>
+            <select className="input sort-select" value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}>
+              <option value="match">Best match for you</option>
+              <option value="easiest">Easiest to build</option>
+              <option value="fastest">Fastest to build</option>
+              <option value="profit">Most profit at 100 customers</option>
+              <option value="price">Highest price</option>
+            </select>
+          </label>
         </div>
         {ordered.length ? (
           <div className="grid cols-3">

@@ -3,7 +3,7 @@ import { buildPhases } from '../phases'
 
 // Every top-level module in this folder that exports an AppDef becomes a kit.
 const modules = import.meta.glob<Record<string, unknown>>('./*.ts', { eager: true })
-const ORDER = ['etcher', 'factorie', 'ethereel', 'conversate', 'outbounder', 'bookwell', 'helpdeck']
+const ORDER = ['etcher', 'factorie', 'ethereel', 'conversate', 'outbounder', 'proposely', 'carousely', 'bookwell', 'helpdeck']
 
 const isApp = (v: unknown): v is AppDef => !!v && typeof v === 'object' && 'slug' in v && 'content' in v
 

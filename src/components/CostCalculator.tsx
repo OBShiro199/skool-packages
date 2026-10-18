@@ -11,7 +11,7 @@ const money = (n: number, dp = 0) =>
   `${n < 0 ? '−' : ''}$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp })}`
 
 /** Fallback model for kits without researched costs yet: core stack only. */
-function fallbackModel(app: AppDef): CostModel {
+export function fallbackModel(app: AppDef): CostModel {
   return {
     usage: { label: 'Usage per customer', unit: 'units', default: 1, min: 0, max: 10, step: 1 },
     plans: [{ id: 'monthly', name: 'Monthly', price: app.price.monthly, interval: 'month', includes: 'Everything' }],
@@ -34,7 +34,7 @@ function lineCost(l: CostLine, customers: number, usage: number) {
   return l.amount * usage * customers
 }
 
-function compute(model: CostModel, customers: number, usage: number, annualShare: number, planId: string) {
+export function compute(model: CostModel, customers: number, usage: number, annualShare: number, planId: string) {
   const monthly = model.plans.filter((p) => p.interval === 'month')
   const annual = model.plans.filter((p) => p.interval === 'year')
   const mPlan = monthly.find((p) => p.id === planId) ?? monthly[0] ?? model.plans[0]

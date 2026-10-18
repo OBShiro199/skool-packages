@@ -424,3 +424,8 @@ input[type="range"]::-moz-range-thumb { background: var(--surface); border: 1.5p
 .next-up { border-left-color: var(--tint-line); }
 .legend-swatch { opacity: .85; }
 .step-list { overflow-anchor: none; }
+.econ { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); background: var(--ok-tint); }
+.econ > div { display: grid; gap: 1px; }
+.econ b { font-size: 15px; font-variant-numeric: tabular-nums; }
+.econ > div:last-child { text-align: right; }
+.sort-select { height: 36px; width: auto; padding: 0 10px; }

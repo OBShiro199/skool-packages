@@ -5,6 +5,7 @@ import type { AppDef } from '../content/types'
 import { CATEGORIES } from '../content/catalog'
 import { AppArt } from './AppArt'
 import { Bar } from './Ring'
+import { compute, fallbackModel } from './CostCalculator'
 
 export function Difficulty({ n }: { n: 1 | 2 | 3 }) {
   return (
@@ -37,6 +38,7 @@ export function AppCard({ app, match, progress, index = 0 }: { app: AppDef; matc
           <div className="row wrap" style={{ gap: 6 }}>
             {app.apis.slice(0, 4).map((a) => <span key={a.name} className="chip">{a.name}</span>)}
           </div>
+          <Economics app={app} />
           <div className="row between" style={{ marginTop: 'auto' }}>
             <Difficulty n={app.difficulty} />
             <span className="label row" style={{ gap: 4 }}><Clock size={12} /> {app.buildHours}h</span>
@@ -62,6 +64,24 @@ export function LockedCard({ name, oneLiner, label }: { name: string; oneLiner: 
         <h3>{name}</h3>
         <p className="muted">{oneLiner}</p>
       </div>
+    </div>
+  )
+}
+
+/** At 100 customers: monthly profit and gross margin, from the kit's cost model. */
+export function kitEconomics(app: AppDef) {
+  const model = app.costs ?? fallbackModel(app)
+  const plan = model.plans.find((p) => p.interval === 'month') ?? model.plans[0]
+  const r = compute(model, 100, model.usage.default, 0, plan.id)
+  return { profit: r.profit, margin: r.margin, perCustomer: r.perCustomer, researched: !!app.costs }
+}
+
+function Economics({ app }: { app: AppDef }) {
+  const e = kitEconomics(app)
+  return (
+    <div className="econ">
+      <div><span className="label">Profit at 100 customers</span><b className="money">${Math.round(e.profit).toLocaleString()}/mo</b></div>
+      <div><span className="label">Margin</span><b>{Math.round(e.margin * 100)}%</b></div>
     </div>
   )
 }
