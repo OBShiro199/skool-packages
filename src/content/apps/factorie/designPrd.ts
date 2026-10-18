@@ -264,7 +264,7 @@ General rules for all charts:
 - Table with StatusPill, kind tag (Scheduled, Recheck, Onboarding), jobs done/total, failed count, duration. Row click opens a Sheet listing failed jobs with engine chip and error message in mono.
 
 ### 6.10 Settings (\`/app/settings\`)
-- Left sub-nav: Brand, Competitors, Engines and schedule, Alerts, Digest, Danger zone. Each section is a card with a Save button that becomes active only when something changed. Unsaved changes prompt on navigation.
+- Tabs across the top of the page (not in the sidebar): Brand, Competitors, Engines and schedule, Alerts, Digest, Danger zone. Each section is a card with a Save button that becomes active only when something changed. Unsaved changes prompt on navigation.
 - **Engines and schedule:** EngineChip toggles in a 2-column grid with "Live web" or "Memory" and checks per month. Frequency segmented control. Day-of-week select. Hour SliderField (0 to 23, value bubble shows "08:00").
 - **Alerts:** SliderField "Alert me when visibility drops by more than" 0 to 30 points (0 shows "Off"). Toggles for "A competitor overtakes me on any engine" and "I lose #1 on a pinned prompt".
 - **Digest:** toggle, hour slider, recipients chips with counter, "Send me a test digest" button (rate limited, 3 per day).
