@@ -8,6 +8,7 @@ import { AppArt } from '../components/AppArt'
 import { Bar } from '../components/Ring'
 import { KitLogo } from '../components/KitLogo'
 import { celebrate } from '../lib/confetti'
+import { BrandMark } from '../components/Brand'
 
 interface Q { id: string; title: string; sub: string; options: { v: string; label: string; hint: string }[] }
 
@@ -107,7 +108,7 @@ export default function OnboardingPage() {
     <div className="onb">
       <header className="onb-top">
         <div className="brand" style={{ padding: 0 }}>
-          <div className="brand-mark">BPA</div>
+          <BrandMark />
           <div><b>BPA Vault</b><small>Onboarding</small></div>
         </div>
         {phase === 'q' && (

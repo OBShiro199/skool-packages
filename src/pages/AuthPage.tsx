@@ -5,6 +5,7 @@ import { ArrowRight, Info, Lock, Mail, User } from 'lucide-react'
 import { useStore, useUser } from '../lib/store'
 import { APPS } from '../content/apps'
 import { AppArt } from '../components/AppArt'
+import { BrandMark } from '../components/Brand'
 
 export default function AuthPage() {
   const [params, setParams] = useSearchParams()
@@ -40,7 +41,7 @@ export default function AuthPage() {
     <div className="auth">
       <div className="auth-left">
         <div className="brand" style={{ padding: 0 }}>
-          <div className="brand-mark">BPA</div>
+          <BrandMark />
           <div><b>BPA Vault</b><small>Build $10K p/m Profitable Apps</small></div>
         </div>
 

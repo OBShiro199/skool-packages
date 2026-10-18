@@ -7,6 +7,7 @@ import { appStats, levelFor } from '../lib/progress'
 import { Bar, Ring } from './Ring'
 import { AskOlly } from './AskOlly'
 import { KitLogo } from './KitLogo'
+import { BrandMark, PoweredBySkool } from './Brand'
 
 export function useTotals() {
   const user = useUser()!
@@ -35,7 +36,7 @@ export default function Shell() {
       <div className={`scrim ${open ? 'open' : ''}`} onClick={() => setOpen(false)} />
       <aside className={`sidebar ${open ? 'open' : ''}`}>
         <div className="brand">
-          <div className="brand-mark">BPA</div>
+          <BrandMark />
           <div><b>BPA Vault</b><small>{user.profile.email}</small></div>
         </div>
 
@@ -87,6 +88,7 @@ export default function Shell() {
           <span className="grow" />
           <span className="chip"><Flame size={12} /> {days}d</span>
           <span className="chip chip-signal">{xp} XP · {level.name}</span>
+          <PoweredBySkool />
         </div>
         <Outlet />
       </div>

@@ -234,3 +234,11 @@ body:has(.course-nav) .toasts { bottom: 78px; }
 .ps-edge.left { left: 0; background: linear-gradient(90deg, #fff 55%, rgba(255,255,255,0)); justify-items: start; padding-left: 10px; }
 .ps-edge.right { right: 0; background: linear-gradient(270deg, #fff 55%, rgba(255,255,255,0)); justify-items: end; padding-right: 10px; }
 .ps-edge:hover { color: var(--ink); }
+
+/* Brand */
+.brand-img { display: block; object-fit: cover; border-radius: 6px; border: 1px solid var(--hairline); background: #fff; padding: 0; }
+.skool-badge { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; margin-left: 4px; border-radius: 6px; border: 1px solid var(--btn-edge); background: #fff; color: var(--muted); font-size: 12px; text-decoration: none; transform: rotate(-3deg); box-shadow: 0 2px 8px rgba(8,9,10,.06); transition: transform .16s var(--ease-out); }
+.skool-badge img { display: block; height: 15px; width: auto; }
+.skool-badge:hover { transform: rotate(0deg) translateY(-1px); color: var(--ink); }
+@media (max-width: 640px) { .skool-badge span { display: none; } }
+.brand-img { width: 36px !important; height: 36px !important; }
