@@ -7,7 +7,7 @@ import { appStats, levelFor } from '../lib/progress'
 import { Bar, Ring } from './Ring'
 import { AskOlly } from './AskOlly'
 import { KitLogo } from './KitLogo'
-import { BrandMark, PoweredBySkool } from './Brand'
+import { BackToSkool, BrandMark, PoweredBySkool } from './Brand'
 
 export function useTotals() {
   const user = useUser()!
@@ -61,6 +61,7 @@ export default function Shell() {
         <NavLink to="/app/about" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><UserRound size={16} /> About You</NavLink>
 
         <div className="side-foot">
+          <BackToSkool />
           <div className="side-card">
             <div className="row">
               <Ring pct={level.pct} size={40} stroke={4}><span className="mono" style={{ fontSize: 11 }}>L{level.index + 1}</span></Ring>

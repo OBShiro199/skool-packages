@@ -3,15 +3,14 @@ import { AnimatePresence, motion } from 'motion/react'
 import { Send, X } from 'lucide-react'
 import { useUser } from '../lib/store'
 import { getApp } from '../content/apps'
+import ollyPhoto from '../assets/olly.webp'
 
 // Cosmetic support chat. Messages are kept in component state only; no backend yet.
-// Drop a square photo at public/olly.jpg and it replaces the initials everywhere.
 
 function Avatar({ size = 44 }: { size?: number }) {
-  const [failed, setFailed] = useState(false)
   return (
     <span className="olly-avatar" style={{ width: size, height: size }}>
-      {failed ? <span className="mono" style={{ fontSize: size * 0.34 }}>OR</span> : <img src="/olly.jpg" alt="Olly Rosewell" onError={() => setFailed(true)} />}
+      <img src={ollyPhoto} alt="Olly Rosewell" />
     </span>
   )
 }

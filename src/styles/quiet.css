@@ -242,3 +242,6 @@ body:has(.course-nav) .toasts { bottom: 78px; }
 .skool-badge:hover { transform: rotate(0deg) translateY(-1px); color: var(--ink); }
 @media (max-width: 640px) { .skool-badge span { display: none; } }
 .brand-img { width: 36px !important; height: 36px !important; }
+.back-skool { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--btn-edge); background: #fff; color: var(--body); font-size: 13px; text-decoration: none; transition: background .12s; }
+.back-skool:hover { background: var(--hover); color: var(--ink); }
+.back-skool img { display: block; height: 15px; width: auto; margin-top: 1px; }
