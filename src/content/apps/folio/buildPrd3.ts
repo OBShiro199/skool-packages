@@ -1,4 +1,4 @@
-// Carousely build PRD, part 3: editor behaviour, onboarding, security model, env vars, working rules.
+// Folio build PRD, part 3: editor behaviour, onboarding, security model, env vars, working rules.
 
 export const buildPrd3 = `
 ## 23. Editor behaviour (\`/app/carousels/[id]\`)
@@ -74,15 +74,15 @@ export const buildPrd3 = `
 | \`NEXT_PUBLIC_SUPABASE_URL\`, \`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY\` | browser and server | .env.local, Vercel env |
 | \`SUPABASE_SECRET_KEY\` | render worker, Stripe webhook | .env.local, Vercel env |
 | \`NEXT_PUBLIC_SITE_URL\` | links, OG tags | .env.local, Vercel env |
-| \`ANTHROPIC_API_KEY\` | crs-generate, crs-rewrite-slide | Supabase secrets |
-| \`FIRECRAWL_API_KEY\` | crs-ingest | Supabase secrets |
-| \`SUPADATA_API_KEY\` | crs-ingest | Supabase secrets |
-| \`DEEPGRAM_API_KEY\` | crs-ingest | Supabase secrets |
+| \`ANTHROPIC_API_KEY\` | fol-generate, fol-rewrite-slide | Supabase secrets |
+| \`FIRECRAWL_API_KEY\` | fol-ingest | Supabase secrets |
+| \`SUPADATA_API_KEY\` | fol-ingest | Supabase secrets |
+| \`DEEPGRAM_API_KEY\` | fol-ingest | Supabase secrets |
 | \`ZERNIO_API_KEY\` | connect, schedule, webhook, analytics, sweeper | Supabase secrets |
-| \`ZERNIO_WEBHOOK_SECRET\` | crs-zernio-webhook | Supabase secrets |
-| \`RENDER_WORKER_URL\` | crs-render-enqueue, crs-sweeper | Supabase secrets |
+| \`ZERNIO_WEBHOOK_SECRET\` | fol-zernio-webhook | Supabase secrets |
+| \`RENDER_WORKER_URL\` | fol-render-enqueue, fol-sweeper | Supabase secrets |
 | \`RENDER_WORKER_SECRET\` | edge functions and \`/api/render/run\` | Supabase secrets and Vercel env |
-| \`CRON_SECRET\` | crs-sweeper, crs-analytics-sync | Supabase secrets (and Vault for pg_cron) |
+| \`CRON_SECRET\` | fol-sweeper, fol-analytics-sync | Supabase secrets (and Vault for pg_cron) |
 | \`APP_URL\` | email links, Zernio redirect | Supabase secrets |
 | \`RESEND_API_KEY\`, \`EMAIL_FROM\` | emails | Supabase secrets and Vercel env |
 | \`STRIPE_*\` | billing (shared kit steps), six price ids from section 16 | .env.local, Vercel env |

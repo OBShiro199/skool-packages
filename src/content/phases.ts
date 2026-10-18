@@ -1,5 +1,6 @@
 // The shared 10-phase playbook. Every app gets these phases; app-specific parts
 // come from app.content. Phase ids are fixed: the UI depends on them.
+import designSystem from './QUIET_PRECISION.md?raw'
 import type { AppDef, ApiDef, Block, ChecklistItem, EdgeFunctionDef, EnvVar, Phase, Task } from './types'
 
 // ---------------------------------------------------------------------------
@@ -90,7 +91,7 @@ function claudeMdTemplate(app: AppDef): string {
 
 ${app.oneLiner}
 Product context: @PRD.md
-UI rules: @DESIGN.md
+UI rules: @DESIGN_SYSTEM.md @DESIGN.md
 Current plan: @PLAN.md and @TASKS.md
 
 ## Stack
@@ -697,6 +698,14 @@ ask me about it. Then show me both files' outline for approval.
         ),
         {
           type: 'doc',
+          id: 'fnd-design-system',
+          title: 'Quiet Precision design system',
+          filename: 'DESIGN_SYSTEM.md',
+          summary: `The base rules every screen follows: white surfaces split by hairlines, one pastel accent, Geist at 13px, 6px boxes, white buttons with a firm edge, and layout that never jumps. ${name}'s DESIGN.md builds on it.`,
+          content: designSystem,
+        },
+        {
+          type: 'doc',
           id: 'fnd-design-prd',
           title: `${name} Design PRD`,
           filename: 'DESIGN.md',
@@ -704,16 +713,18 @@ ask me about it. Then show me both files' outline for approval.
           content: app.content.designPrd,
         },
         steps(
-          `Click **Download .md** above. It saves as \`DESIGN.md\`.`,
-          `Drag it into your \`${slug}\` folder next to PRD.md.`,
+          `Click **Download .md** on both files above. They save as \`DESIGN_SYSTEM.md\` and \`DESIGN.md\`.`,
+          `Drag both into your \`${slug}\` folder next to PRD.md.`,
           `Paste the prompt below into Claude Code (auto mode is fine for this one).`,
         ),
         prompt(
           'fnd-design-prd-prompt',
           'Load the design rules',
           `
-Read @DESIGN.md fully. Then:
-1. Confirm CLAUDE.md imports it (the line "UI rules: @DESIGN.md"). Add it if missing.
+Read @DESIGN_SYSTEM.md and @DESIGN.md fully. DESIGN_SYSTEM.md is the base system;
+DESIGN.md adds ${name}'s accent and screens and wins only where it is more specific.
+Then:
+1. Confirm CLAUDE.md has the line "UI rules: @DESIGN_SYSTEM.md @DESIGN.md". Add it if missing.
 2. Summarise back to me in under 15 lines: the colour tokens with hex values, the
    fonts, the spacing scale, the border radius, and the list of screens it designs.
 3. Add one line to TASKS.md under the scaffold task: "Set up DESIGN.md tokens as
@@ -727,6 +738,7 @@ Do not write any app code yet.
         tip('Optional design skill', `Anthropic publishes a frontend-design plugin. In Claude Code run \`/plugin install frontend-design@claude-plugins-official\` and choose to install it for this project. Claude then follows stricter design rules on every page. If it says the marketplace is unknown, run \`/plugin marketplace add anthropics/claude-plugins-official\` first.`),
       ],
       checklist: [
+        ['Download DESIGN_SYSTEM.md', 'download:fnd-design-system'],
         ['Download DESIGN.md', 'download:fnd-design-prd'],
         `Move DESIGN.md into your ${slug} folder`,
         ['Run the design prompt', 'copy:fnd-design-prd-prompt'],

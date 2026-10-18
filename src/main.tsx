@@ -5,6 +5,7 @@ import App from './App'
 import './styles/global.css'
 import './styles/components.css'
 import './styles/pages.css'
+import './styles/quiet.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

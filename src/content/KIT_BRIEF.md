@@ -1,6 +1,8 @@
 # Kit brief: what every full kit must contain
 
-Read with `types.ts` (the data shape) and `AUTHORING.md` (voice, stack, round-2 rules, sidebar rule).
+Read with `types.ts` (the data shape), `AUTHORING.md` (voice, stack, round-2 rules, sidebar rule) and
+`QUIET_PRECISION.md` (the base design system every app UI is built on). The app spec for each kit is
+in `specs/<slug>.md`.
 `phases.ts` already generates the shared steps (Claude Code install, Supabase account/keys/SQL run,
 Supabase CLI, one task per API from `apis[].envVars`, one task per `edgeFunctions` item, Stripe trial
 checkout + webhook + portal, GitHub, Vercel, Porkbun, generic security sweep, landing page from
@@ -28,9 +30,12 @@ Quality bar: `apps/bookwell.ts`, `apps/helpdeck.ts`.
   data model, state machines, every edge function contract (input, output, errors, retries), LLM
   prompts with JSON schemas, limits per plan, emails (Resend) with triggers, analytics events,
   out of scope, acceptance tests, build milestones. Tell users to save as PRD.md and use `@PRD.md`.
-- `designPrd` 450 to 800 lines: brand feel, tokens light/dark, type, components, every screen incl.
-  auth, onboarding, app shell sidebar, settings, billing, empty/loading/error states, motion, a11y,
-  mobile. No solid black blocks; soft tints.
+- `designPrd` 450 to 800 lines. It builds on QUIET_PRECISION.md (shipped to users as
+  DESIGN_SYSTEM.md): say so at the top, then give the brand accent (pastel, soft fill + edge), and
+  every product screen incl. auth, onboarding, app shell sidebar, settings, billing,
+  empty/loading/error states, with its layout, components and states, all inside the system's rules
+  (white surfaces, hairlines, 6px boxes, 4px pills, 13px app text, white buttons with a firm edge, no
+  filled or black buttons, stability rules). CLAUDE.md lines say `UI rules: @DESIGN_SYSTEM.md @DESIGN.md`.
 - `landingPrd` 350 to 600 lines per AUTHORING round-2 rules, with pricing toggle and a comparison
   table vs named competitors (prices marked [verify] if unconfirmed).
 - `sql` one giant migration that runs cleanly once on a fresh project: extensions, enums, tables,

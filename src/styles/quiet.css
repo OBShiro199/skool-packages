@@ -1,0 +1,123 @@
+/* =====================================================================
+   Quiet Precision (see src/content/QUIET_PRECISION.md). Loaded last, so
+   these tokens and component rules win over the earlier stylesheets.
+   ===================================================================== */
+:root, :root[data-theme="dark"], :root[data-theme="light"] {
+  --bg: #ffffff; --surface: #ffffff; --row-hover: #fafafb; --fill: #f5f5f6;
+  --line: #e6e6e9; --divider: #efeff1; --line-2: #dcdde0;
+  --ink: #08090a; --ink-2: #3c4149; --muted: #62666d; --faint: #8a8f98; --ghost: #b4b8bf;
+  --signal: #5f86e0; --signal-soft: #f1f5fd; --tint: #f1f5fd; --tint-hover: #e9effc; --tint-line: #c4d4f5; --tint-ink: #3d63c4;
+  --money: #27a644; --money-soft: rgba(39,166,68,.08); --ok-tint: rgba(39,166,68,.07); --ok-line: rgba(39,166,68,.35); --ok-ink: #1d7f34;
+  --loss: #eb5757; --amber: #d18b0f; --violet: #7a5cd6;
+  --term-bg: #fafafb; --term-ink: #3c4149;
+  --primary: #08090a; --primary-hover: #08090a;
+  --r-box: 6px; --r-pill: 4px; --r-check: 2px;
+  --shadow-float: 0 4px 16px rgba(8,9,10,.08), 0 0 0 1px rgba(8,9,10,.04);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1); --ease-morph: cubic-bezier(0.2, 0, 0, 1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #ffffff; --surface: #ffffff; --fill: #f5f5f6; --line: #e6e6e9; --line-2: #dcdde0;
+  --ink: #08090a; --ink-2: #3c4149; --muted: #62666d; --signal: #5f86e0; --signal-soft: #f1f5fd;
+  --tint: #f1f5fd; --tint-line: #c4d4f5; --tint-ink: #3d63c4; --money: #27a644; --loss: #eb5757; color-scheme: light;
+} }
+
+body { font-size: 14px; line-height: 1.5; letter-spacing: -0.014em; color: var(--ink-2); }
+h1, h2, h3, h4 { font-weight: 500; color: var(--ink); }
+.label { font-size: 13px; font-weight: 400; color: var(--faint); }
+b, strong { font-weight: 600; }
+
+/* Shape */
+.btn, .input, .card, .nav-link, .modal, .step, .task, .blk-code, .blk-term, .blk-doc, .blk-steps, .blk-table,
+.blk-callout, .blk-mistakes, .blk-ascii pre, .checklist, .check, .side-card, .rail-item, .locked-panel, .next-phase,
+.phase-icon, .dl-list, .dl-hero, .dl-icon, .app-card, .soon-list, .faq, .support-tile, .doc-item, .pledge, .sig-box,
+.pledge-card, .pledge-sig, .onb-opt, .onb-steps, .rec-card, .costs-controls, .costs-chart, .econ, .zip-box, .toast,
+.olly-panel, .olly-launcher, .olly-msg, .olly-input textarea, .preview-note, .phase-done, .chart-tip, .stat, .lib-search .input,
+.task-idx, .onb-key, .detail-stats, .roadmap, .roadmap-icon, .stack-list, .blk-doc-icon, .dl-pre, .doc-ex, .auth-quote,
+.auth-tile, .skool-note, .auth-error, .continue, .next-up, .phase-score, .phase-tabs, .matcher-tile, .build-art { border-radius: var(--r-box); }
+.chip, .pill, code, .step-badge, .sort-select { border-radius: var(--r-pill); }
+.tick { border-radius: var(--r-check); }
+.blk-code, .blk-term, .blk-table, .blk-steps, .dl-list, .faq, .soon-list, .roadmap, .app-card, .modal, .olly-panel { overflow: hidden; }
+.brand-mark { border-radius: var(--r-box); }
+
+/* Buttons: white with an edge. Primary = firmer edge, never a fill. */
+.btn { height: 36px; padding: 0 14px; font-size: 13px; font-weight: 500; color: var(--ink); background: #fff; border: 1px solid var(--line-2);
+  transition: background .12s, border-color .12s, transform .1s var(--ease); box-shadow: 0 1px 0 rgba(8,9,10,.03); }
+.btn:hover { background: var(--fill); border-color: var(--line-2); }
+.btn:active { transform: scale(.98); }
+.btn-sm { height: 32px; padding: 0 10px; font-size: 13px; }
+.btn-lg { height: 46px; padding: 0 18px; font-size: 14px; }
+.btn-primary, .btn-signal { background: #fff; color: var(--ink); border-color: #8a8f98; }
+.btn-primary:hover, .btn-signal:hover { background: var(--fill); border-color: var(--ink-2); }
+.btn-ghost { background: transparent; border-color: transparent; box-shadow: none; }
+.btn-ghost:hover { background: var(--fill); }
+.blk-term-head .btn, .blk-term-head .btn.btn-signal { background: #fff; color: var(--ink); border-color: var(--line-2); }
+
+/* Inputs: darker edge + 3px ink halo on focus */
+.input { height: 36px; font-size: 13px; border: 1px solid var(--line-2); background: #fff; }
+.input:focus { border-color: var(--ink-2); box-shadow: 0 0 0 3px rgba(8,9,10,.06); }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+
+/* Chips and pills: pastel tag style */
+.chip { height: 22px; font-size: 12px; color: var(--ink-2); border: 1px solid var(--line); background: #fff; }
+.chip-signal { color: var(--tint-ink); background: var(--tint); border-color: var(--tint-line); }
+.chip-money { color: var(--ok-ink); background: var(--ok-tint); border-color: var(--ok-line); }
+.pill { height: 32px; font-size: 13px; background: #fff; border: 1px solid var(--line-2); color: var(--ink-2); }
+.pill.on { background: var(--tint); color: var(--tint-ink); border-color: var(--tint-line); }
+
+/* Shell */
+:root { --sidebar: 240px; }
+.sidebar { background: #fff; padding: 12px 10px; gap: 2px; }
+.brand { padding: 4px 8px 14px; }
+.brand-mark { background: var(--tint); color: var(--tint-ink); border: 1px solid var(--tint-line); }
+.nav-group { padding: 12px 10px 4px; height: 28px; display: flex; align-items: flex-end; }
+.nav-link { height: 32px; font-size: 13px; color: var(--ink-2); border: 0; padding: 0 10px; }
+.nav-link.active { background: var(--fill); color: var(--ink); border: 0; }
+.nav-link.active::before { display: none; }
+.nav-link.active svg { color: var(--signal); }
+.nav-link.cta { background: #fff; color: var(--ink); border: 1px solid #8a8f98; margin-bottom: 6px; }
+.nav-link.cta:hover { background: var(--fill); }
+.side-card { background: #fff; }
+.topbar { height: 48px; background: rgba(255,255,255,.92); }
+.journey-rail { top: 48px; height: calc(100vh - 48px); }
+.phase-tabs { top: 48px; }
+
+/* Overlays float with one shadow */
+.modal { box-shadow: var(--shadow-float); border-color: var(--line); max-width: 520px; }
+.modal.wide { max-width: 920px; }
+.modal-scrim { align-items: start; padding-top: 10vh; background: rgba(8,9,10,.18); }
+.toasts { left: 16px; right: auto; bottom: 16px; }
+.toast { background: #fff; color: var(--ink); border: 1px solid var(--line); box-shadow: var(--shadow-float); font-size: 13px; }
+.olly-launcher, .olly-panel, .phase-done, .chart-tip { box-shadow: var(--shadow-float); }
+
+/* Content blocks: white, hairlines, no grey slabs */
+.blk-code pre, .blk-term pre, .prose pre, .dl-pre, .blk-ascii pre { background: #fafafb; }
+.blk-term { background: #fff; color: var(--ink-2); border: 1px solid var(--line); }
+.blk-term-head { border-bottom: 1px solid var(--line); background: #fff; }
+.blk-term .caret { color: var(--signal); }
+.blk-callout { background: #fff; }
+.blk-steps li { font-size: 14px; }
+.blk-p { font-size: 14.5px; color: var(--ink-2); }
+.blk-table th { background: #fafafb; font-size: 12.5px; }
+.blk-table td { border-bottom-color: var(--divider); }
+.dl-row, .soon-row { border-bottom-color: var(--divider); }
+.dl-hero { background: #fff; border-color: var(--line); }
+.econ { background: #fff; }
+
+/* Journey */
+.step.current { border-color: var(--tint-line); box-shadow: 0 0 0 3px var(--signal-soft); }
+.step-title b { font-weight: 500; font-size: 15px; }
+.rail-item { height: auto; }
+.rail-item.active { background: var(--fill); }
+.rail-text b { font-weight: 500; font-size: 13px; }
+.phase-intro h1 { font-weight: 500; letter-spacing: -0.035em; }
+.page-head h1 { font-weight: 500; letter-spacing: -0.035em; }
+
+/* Progress bars: blue, with the morph curve */
+.bar { height: 6px; border-radius: 999px; border: 0; background: var(--fill); }
+.bar > i { background: var(--signal); border-radius: 999px; transition: width .4s var(--ease-morph); }
+.bar.money > i { background: var(--money); }
+.bar.lg { height: 8px; }
+
+/* Stat tiles and numbers */
+.stat .v { font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }

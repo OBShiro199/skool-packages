@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react'
 import { ArrowRight, Check, Code2, FileText, Globe, Mail, MessageSquare, Pause, Play, Send } from 'lucide-react'
-import { EASE, Reveal, TypingDots, track } from './shared'
+import { EASE, MORPH, Reveal, TypingDots, track } from './shared'
 
 /* ---------------- Section 6: Live demo ---------------- */
 
@@ -143,7 +143,7 @@ export function LiveDemo() {
                     <span><Globe size={14} aria-hidden="true" /> {domain}</span>
                     <strong>{pages} pages read</strong>
                   </div>
-                  <div className="hd-progress-bar"><motion.i animate={{ scaleX: stepDone / 4 }} transition={{ duration: 0.4, ease: EASE }} /></div>
+                  <div className="hd-progress-bar"><motion.i animate={{ scaleX: stepDone / 4 }} transition={{ duration: 0.4, ease: MORPH }} /></div>
                   <ul>
                     {STEPS.map((s, i) => (
                       <li key={s} className={i < stepDone ? 'done' : i === stepDone ? 'now' : ''}>
@@ -302,7 +302,7 @@ export function ProductVideo() {
                 <div className="hd-player-main" aria-hidden="true">
                   <AnimatePresence mode="wait">
                     <motion.div key={`${ch}-${tick}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} className="hd-scene-wrap">
-                      {(playing || reduce || userPaused) && <Scene i={ch} />}
+                      <Scene i={ch} />
                     </motion.div>
                   </AnimatePresence>
                 </div>
@@ -324,7 +324,7 @@ export function ProductVideo() {
                     <motion.i
                       key={`${i}-${ch}-${tick}-${playing}`}
                       initial={{ scaleX: i < ch ? 1 : 0 }}
-                      animate={{ scaleX: i < ch ? 1 : i === ch && playing ? 1 : i === ch ? 0.5 : 0 }}
+                      animate={{ scaleX: i < ch ? 1 : i === ch && playing ? 1 : i === ch ? 0.08 : 0 }}
                       transition={{ duration: i === ch && playing ? CH_MS / 1000 : 0, ease: 'linear' }}
                     />
                   </span>

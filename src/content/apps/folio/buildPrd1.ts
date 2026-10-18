@@ -1,13 +1,13 @@
-// Carousely build PRD, part 1: problem, users, architecture, decisions, routes, data, state, slide schema, prompts.
+// Folio build PRD, part 1: problem, users, architecture, decisions, routes, data, state, slide schema, prompts.
 
-export const buildPrd1 = `# Carousely: build PRD
+export const buildPrd1 = `# Folio: build PRD
 
 Save this file as \`PRD.md\` in the root of your project folder. In Claude Code, refer to it as \`@PRD.md\`
-("Read @PRD.md section 12.2 and build crs-generate"). Keep \`@DESIGN.md\` and \`@LANDING.md\` next to it.
+("Read @PRD.md section 12.2 and build fol-generate"). Keep \`@DESIGN.md\` and \`@LANDING.md\` next to it.
 Every section number below is stable, so prompts in the kit can point at them.
 
 ## 0. One paragraph summary
-Carousely turns a blog post, a YouTube video, a rough idea or a voice note into a LinkedIn and Instagram
+Folio turns a blog post, a YouTube video, a rough idea or a voice note into a LinkedIn and Instagram
 carousel in your own brand: a hook slide, 6 to 9 body slides and a call-to-action slide. You set your
 brand kit once (logo, colours, fonts, headshot, handle). Claude (\`claude-sonnet-5-5\`) writes the slides as
 structured JSON with a layout per slide. Eight React templates draw them. You edit any slide, ask AI to
@@ -48,7 +48,7 @@ Time to first exported carousel after signup must be under 5 minutes, including 
 5. As a founder I download a PDF I can upload to LinkedIn myself, and PNGs for Instagram.
 6. As a founder I schedule the PDF to my LinkedIn profile for Tuesday 08:30 in my timezone.
 ### Coach (Pro plan)
-7. As a coach I paste a YouTube URL and Carousely uses the transcript, even for a 40 minute video.
+7. As a coach I paste a YouTube URL and Folio uses the transcript, even for a 40 minute video.
 8. As a coach I record a 2 minute voice note on my phone and get a carousel from it.
 9. As a coach I see which of last month's carousels got the most impressions.
 ### Agency (Agency plan)
@@ -73,15 +73,15 @@ Time to first exported carousel after signup must be under 5 minutes, including 
            |
  +---------+-------------------------------------------------------------+
  | Supabase Edge Functions (Deno)                                        |
- |  crs-ingest ----> Firecrawl (blog) / Supadata (YouTube) / Deepgram     |
- |  crs-generate --> Claude claude-haiku-5-5 (condense long text)         |
+ |  fol-ingest ----> Firecrawl (blog) / Supadata (YouTube) / Deepgram     |
+ |  fol-generate --> Claude claude-haiku-5-5 (condense long text)         |
  |                   Claude claude-sonnet-5-5 (slides JSON)               |
- |  crs-rewrite-slide --> Claude claude-sonnet-5-5                        |
- |  crs-render-enqueue --(signed POST)--> Vercel /api/render/run          |
- |  crs-zernio-connect / crs-schedule-post --> Zernio API                 |
- |  crs-zernio-webhook <-- Zernio (post published / failed)              |
- |  crs-analytics-sync (cron) --> Zernio analytics                        |
- |  crs-sweeper (cron) retries stuck jobs, prunes old renders             |
+ |  fol-rewrite-slide --> Claude claude-sonnet-5-5                        |
+ |  fol-render-enqueue --(signed POST)--> Vercel /api/render/run          |
+ |  fol-zernio-connect / fol-schedule-post --> Zernio API                 |
+ |  fol-zernio-webhook <-- Zernio (post published / failed)              |
+ |  fol-analytics-sync (cron) --> Zernio analytics                        |
+ |  fol-sweeper (cron) retries stuck jobs, prunes old renders             |
  +-----------------------------------------------------------------------+
            |
            v
@@ -100,7 +100,7 @@ Time to first exported carousel after signup must be under 5 minutes, including 
 - **One Postgres, one job table.** Every slow thing (scrape, transcript, generate, render, publish) is a row
   in \`public.jobs\` with a status, attempts, \`run_after\` for backoff and an idempotency key. Edge functions
   return 202 within a second and finish the work in the background with \`EdgeRuntime.waitUntil()\`.
-  \`crs-sweeper\` picks up anything that died. No Redis, no queue service, nothing extra to pay for.
+  \`fol-sweeper\` picks up anything that died. No Redis, no queue service, nothing extra to pay for.
 - **Rendering on Vercel, not in Supabase.** The renderer needs the same React template components as the
   editor, plus fonts and a native PNG encoder. Those already live in the Next.js repo, so rendering runs in
   a Next.js route handler on the Node runtime. Supabase only queues it.
@@ -115,7 +115,7 @@ Time to first exported carousel after signup must be under 5 minutes, including 
      the per-account maths in the Costs tab. At about 2,000 accounts, ask Zernio for a custom price.
   3. Supabase Realtime connections: one per open tab. Pro includes 500 concurrent [verify on
      supabase.com/pricing]. Fix: subscribe only on the create and editor pages, unsubscribe on leave.
-  4. Storage: about 7 MB per render. Fix: \`crs-sweeper\` keeps the latest 3 renders per carousel.
+  4. Storage: about 7 MB per render. Fix: \`fol-sweeper\` keeps the latest 3 renders per carousel.
 
 ## 6. Researched decisions (checked Oct 2026)
 
@@ -151,7 +151,7 @@ paying for generated transcription.
 
 ### 6.3 Voice notes: Deepgram Nova-3 (chosen)
 - Browser records with MediaRecorder (webm/opus, or mp4 on Safari), uploads to the private
-  \`voice-notes\` bucket, and \`crs-ingest\` sends Deepgram a signed URL.
+  \`voice-notes\` bucket, and \`fol-ingest\` sends Deepgram a signed URL.
 - Pre-recorded Nova-3 is about $0.0043 per minute pay as you go, with $200 free credit at signup
   (checked Oct 2026 [verify on deepgram.com/pricing]). A 3 minute note costs about $0.013.
 - Cap voice notes at 10 minutes and 25 MB. Count minutes in \`usage_ledger\`.
@@ -171,7 +171,8 @@ paying for generated transcription.
   approved partners [verify], so without partner status every user reconnects every two months.
 **Decision:** v1 posts through **Zernio** (zernio.com), a posting API that already has the LinkedIn
 (profile and page) and Instagram approvals. You call one REST API with a Bearer key. It handles OAuth,
-token refresh, PDF document posts and analytics. Pricing (checked Oct 2026 [verify]): first 2 connected
+token refresh, PDF document posts (media type \`document\` plus \`documentTitle\`) and analytics (endpoints checked
+against Zernio's official Node SDK, \`@zernio/node\` 0.2.1214, Oct 2026). Pricing (checked Oct 2026 [verify]): first 2 connected
 accounts free, then about $6 per account per month for accounts up to 10, $3 for 11 to 100 and $1 for
 101 to 2,000, with analytics as an add-on [verify]. Alternatives: Ayrshare (from about $149/month for one
 profile, $299 for 10 [verify]) and Buffer (API access for new apps is limited [verify]). Both work behind
@@ -182,7 +183,8 @@ direct posting to save the per-account fee.
 ### 6.5 Instagram
 - Instagram carousels are image posts on professional accounts (Business or Creator) through the Instagram
   Content Publishing API, which needs Meta App Review and business verification. Zernio covers this.
-- Each image must be at a public URL when published. We pass signed Storage URLs valid for 7 days.
+- Each image must be at a public URL when published. We copy the PNGs into Zernio's media store with
+  \`POST /v1/media/presign\` at schedule time, so our own bucket stays private.
 - Instagram limits API-published posts per account per 24 hours (100 in the June 2026 docs, older docs say 50
   [verify]). A carousel counts as one post.
 - Instagram allows up to 20 images per carousel [verify]. Our maximum is 11 slides, so we are fine.
@@ -199,7 +201,7 @@ and refund the usage. Include the server-side fallback (\`betas: ['server-side-f
 
 ## 7. Routes and pages
 ### 7.1 App shell sidebar (one level, 8 items)
-Top group (logo "Carousely" at the very top, brand switcher under it):
+Top group (logo "Folio" at the very top, brand switcher under it):
 1. **Create** (\`/app/create\`)
 2. **Library** (\`/app/library\`)
 3. **Calendar** (\`/app/calendar\`)

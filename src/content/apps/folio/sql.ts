@@ -1,12 +1,12 @@
-// Carousely single migration, pasted into the Supabase SQL editor and run once on a fresh project.
+// Folio single migration, pasted into the Supabase SQL editor and run once on a fresh project.
 
 export const sql = `-- =====================================================================
--- Carousely: full database migration (0001_carousely.sql)
+-- Folio: full database migration (0001_folio.sql)
 -- Paste this whole file into Supabase > SQL Editor > New query > Run.
 -- Run it ONCE on a fresh project. Order: extensions, enums, tables,
 -- helper functions, triggers, RLS policies, storage, realtime, seed data.
 --
--- ELI5: Carousely is multi-tenant. One database holds every customer.
+-- ELI5: Folio is multi-tenant. One database holds every customer.
 -- Each row carries a workspace_id (whose stuff it is), and Row Level
 -- Security (RLS) asks "is the person asking a member of that workspace?"
 -- on every read and write. If not, Postgres acts as if the row is not there.
@@ -1086,13 +1086,13 @@ create policy "brands update editor" on public.brands for update to authenticate
 create policy "brands delete admin" on public.brands for delete to authenticated
   using (public.has_workspace_role(workspace_id, 'admin'));
 
--- sources: created by crs-ingest only; members read; editors delete
+-- sources: created by fol-ingest only; members read; editors delete
 create policy "sources select member" on public.sources for select to authenticated
   using (public.is_workspace_member(workspace_id));
 create policy "sources delete editor" on public.sources for delete to authenticated
   using (public.has_workspace_role(workspace_id, 'editor'));
 
--- carousels: created by crs-generate or duplicate_carousel(); editors edit title, caption, archive
+-- carousels: created by fol-generate or duplicate_carousel(); editors edit title, caption, archive
 create policy "carousels select member" on public.carousels for select to authenticated
   using (public.is_workspace_member(workspace_id));
 create policy "carousels update editor" on public.carousels for update to authenticated

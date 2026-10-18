@@ -13,6 +13,22 @@ All tokens, fonts and components come from \`DESIGN.md\`. Every word of copy bel
 - Visitor: a founder or agency owner who has tried cold email, knows the words "domain", "warm-up" and "sequence", and is tired of gluing 4 tools together.
 - One promise, repeated: describe your buyer, get personalised emails going out from a safe domain this week.
 
+Page outline, top to bottom:
+
+1. Sticky nav
+2. Hero with the animated lead card
+3. Logo strip
+4. Problem (3 cards)
+5. Product demo video
+6. Six feature rows + inbox capacity mini-calculator
+7. How it works (3 steps)
+8. Comparison table vs Instantly, Smartlead, Apollo, lemlist
+9. Testimonials slot ("We sell Outbounder with Outbounder" until you have quotes)
+10. Pricing with monthly/annual toggle
+11. FAQ (12)
+12. Final CTA
+13. Footer
+
 ## 1. Sticky nav
 
 - Height 64px, \`--surface\` at 85% opacity with \`backdrop-blur-md\`, bottom border \`--border\` appears only after 8px of scroll.
@@ -296,7 +312,7 @@ Reduced motion (\`prefers-reduced-motion: reduce\`): no translate or scale, opac
 
 Set up a PostHog funnel: \`landing_viewed -> pricing_cta_clicked or hero_cta_clicked -> signed_up -> trial_started\`. Break it down by \`from_outbounder_email\` to see how well your own cold email converts.
 
-## 19a. Hero copy variants to test
+## 19. Hero copy variants to test
 
 Run one test at a time with PostHog feature flags, 50/50, until each variant has 300 visitors. Keep the winner on trial starts, not clicks.
 
@@ -306,7 +322,7 @@ Run one test at a time with PostHog feature flags, 50/50, until each variant has
 | B | 100 personalised cold emails, written and sent this week. | Tell Outbounder who you sell to. |
 | C | Stop gluing four cold email tools together. | Leads, verification, AI first lines and safe inboxes in one place. |
 
-## 19b. Build order for Claude Code
+## 20. Build order for Claude Code
 
 Paste these one at a time, check the screenshot, then move on:
 
@@ -317,10 +333,27 @@ Paste these one at a time, check the screenshot, then move on:
 5. "Build pricing with the monthly/annual toggle, the FAQ with JSON-LD, the final CTA and the footer (sections 10 to 13)."
 6. "Add SEO meta, the OG image, the analytics events from section 18 and the mobile sticky CTA. Run Lighthouse and show me the scores."
 
-## 19. Performance budget
+## 21. Performance budget
 
 - LCP under 2.0 s on 4G, CLS under 0.05, total JS under 170 KB gzipped on the landing route.
 - Fonts: Inter and Inter Tight via \`next/font\` with \`display: swap\`, only the weights used.
 - Video loads only when the section is near the viewport (\`preload="none"\` + poster).
 - Lighthouse target: 95+ on Performance, Accessibility, Best Practices and SEO.
+
+## 22. Companion pages that share this design
+
+### 22.1 \`/vs/[competitor]\` template
+- H1: "Outbounder vs {{Competitor}}". Sub: a two-line honest verdict, e.g. "Instantly sends more volume for less if you already have leads and warmed inboxes. Outbounder is for founders who want leads, first lines and safe sending in one place."
+- The comparison table from section 8 with only two columns.
+- Two equal cards: "Choose {{Competitor}} if..." (3 bullets) and "Choose Outbounder if..." (3 bullets). Same visual weight.
+- "Switching takes 20 minutes": 3 steps (export your leads CSV, buy a new outreach domain, import and review).
+- FAQ (4 items) and "Prices checked {{date}}" at the bottom.
+- SEO title: "Outbounder vs {{Competitor}}: honest comparison ({{year}})".
+
+### 22.2 \`/open\` (public numbers)
+- The proof that you sell Outbounder with Outbounder. One page, updated live from your own account through a server route with the secret key (aggregates only, never names or emails).
+- Four StatCards: cold emails sent by the Outbounder team this month, reply rate, interested replies, trials started from cold email.
+- One line chart: sends and replies per week since launch.
+- A short paragraph [edit]: "This is our own outbound, run inside the product you are looking at. The same rules apply to us: 20 a day per new inbox, plain text, unsubscribe on every email."
+- Event: \`open_page_viewed\`.
 `

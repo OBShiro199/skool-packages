@@ -1,6 +1,6 @@
-// Proposely landing page PRD (LANDING.md).
+// Signet landing page PRD (LANDING.md).
 
-export const landingPrd = `# Proposely: landing page PRD
+export const landingPrd = `# Signet: landing page PRD
 
 Save this file as \`LANDING.md\` in your project root. In Claude Code, say:
 "Build the landing page exactly as described in @LANDING.md, using the tokens in @DESIGN.md."
@@ -54,7 +54,7 @@ No solid black or dark full-width blocks. Contrast comes from Fraunces headings 
 
 - 64px high, \`--bg\` at 85% opacity with \`backdrop-filter: blur(10px)\`, 1px \`--line\` bottom border once the
   page scrolls past 8px.
-- Left: logo mark (amber envelope with a small waveform inside) + wordmark "Proposely".
+- Left: logo mark (amber envelope with a small waveform inside) + wordmark "Signet".
 - Centre (desktop): How it works, Features, Pricing, Compare, FAQ (anchor links, smooth scroll, offset 72px).
 - Right: "Log in" (ghost), "Start free trial" (primary).
 - Mobile: logo + "Start free trial" (small) + menu button opening a Sheet with the anchor links.
@@ -64,7 +64,7 @@ No solid black or dark full-width blocks. Contrast comes from Fraunces headings 
 
 - Eyebrow chip: "For agencies, freelancers and consultants"
 - H1: "Your sales call, turned into a signed proposal by this afternoon."
-- Subhead: "Upload the recording. Proposely pulls out the client's goals, pains and budget, writes a branded
+- Subhead: "Upload the recording. Signet pulls out the client's goals, pains and budget, writes a branded
   proposal priced from your own rate card, and tells you the moment they open, sign and pay the deposit."
 - Primary button: "Start free trial"  (goes to \`/signup\`)
 - Secondary button: "Watch the 60 second demo" (scrolls to section 6 and plays the video)
@@ -122,7 +122,7 @@ Alternate image left and right on desktop. Each section: eyebrow, H3-sized H2 (u
 ### 7.1 Reads the call so you do not have to
 - Eyebrow: "Call to brief"
 - Heading: "Every goal, pain and budget hint, with the client's own words."
-- Body: "Proposely transcribes the call, tells the speakers apart and pulls out what matters. Fix anything
+- Body: "Signet transcribes the call, tells the speakers apart and pulls out what matters. Fix anything
   it got wrong before a single word of the proposal is written."
 - Bullets: "Upload MP3, M4A, MP4 or record in the browser" / "Import Zoom and Google Meet recordings" /
   "Open questions flagged so you can ask before you send"
@@ -193,7 +193,7 @@ Parallax on visuals of 12px max over the section height (desktop only, off for r
 - Table (horizontal scroll on mobile with the first column sticky). Prices are entry plans, per user per
   month, checked Oct 2026 from comparison sites; confirm on each vendor's pricing page before launch.
 
-| | Proposely | PandaDoc | Proposify | Qwilr | Better Proposals |
+| | Signet | PandaDoc | Proposify | Qwilr | Better Proposals |
 |---|---|---|---|---|---|
 | Starting price | $49/month (1 seat) | $19/user/mo annual [verify] | $19/user/mo annual, $29 monthly [verify] | $35/user/mo annual [verify] | $13 to $19/user/mo [verify] |
 | Drafts the proposal from a call recording | Yes | No | No | No | No |
@@ -205,10 +205,10 @@ Parallax on visuals of 12px max over the section height (desktop only, off for r
 | Deposit to your own Stripe account | Yes | Yes (payments add-on) [verify] | Yes [verify] | Yes [verify] | Yes [verify] |
 | Automatic follow-up after 3 days | Yes | Reminders [verify] | Reminders [verify] | [verify] | Reminders [verify] |
 
-- Under the table: "Proposely is cheaper for small teams because you pay per workspace, not per seat.
+- Under the table: "Signet is cheaper for small teams because you pay per workspace, not per seat.
   Studio covers 3 people for $99."
-- Motion: rows fade in with 40ms stagger. The Proposely column has a \`--brand-soft\` tint and a "You are
-  here" style top chip "Proposely".
+- Motion: rows fade in with 40ms stagger. The Signet column has a \`--brand-soft\` tint and a "You are
+  here" style top chip "Signet".
 
 ## 10. Testimonials slot
 
@@ -239,7 +239,7 @@ Parallax on visuals of 12px max over the section height (desktop only, off for r
 | Call minutes | 600 a month | 1,500 a month | 3,000 a month |
 | AI rewrites | 100 a month | 250 a month | 500 a month |
 | Zoom and Meet import | | Yes | Yes |
-| Remove "Sent with Proposely" | | Yes | Yes |
+| Remove "Sent with Signet" | | Yes | Yes |
 | Per-person analytics | | Yes | Yes |
 | Button | Start free trial | Start free trial | Start free trial |
 
@@ -257,16 +257,16 @@ Parallax on visuals of 12px max over the section height (desktop only, off for r
 
 Accordion, one open at a time, first closed. Each answer 1 to 3 sentences.
 
-1. **Do I need to record my calls?** "Yes, Proposely works from a recording. Use Zoom or Google Meet cloud
-   recording, a phone voice memo, or the recorder built into Proposely. Always tell the other people on the
+1. **Do I need to record my calls?** "Yes, Signet works from a recording. Use Zoom or Google Meet cloud
+   recording, a phone voice memo, or the recorder built into Signet. Always tell the other people on the
    call that you are recording."
 2. **Which meeting tools work?** "Any. If you can get an audio or video file, you can upload it. Zoom and
    Google Meet recordings can also be imported directly on Studio and Agency."
 3. **Will it make up prices?** "No. It only prices with the services and rules in your catalogue, and the
-   totals are calculated by Proposely, not the AI."
+   totals are calculated by Signet, not the AI."
 4. **How accurate is the transcript?** "Very good on clear audio, and it separates speakers. You review the
    brief before anything is drafted, so you can fix any detail it misheard."
-5. **Where does the deposit money go?** "Straight into your own Stripe account. Proposely never holds your
+5. **Where does the deposit money go?** "Straight into your own Stripe account. Signet never holds your
    money and takes no cut. Stripe charges its normal card fee."
 6. **Is the e-signature legally binding?** "Typed and drawn e-signatures with a timestamp, IP address and a
    fingerprint of the signed content are widely accepted for service agreements. If your industry needs a
@@ -298,7 +298,7 @@ Accordion, one open at a time, first closed. Each answer 1 to 3 sentences.
 - Four columns (stack on mobile): Product (Features, Pricing, Compare, Changelog), Resources
   (Documentation, Proposal templates, Discovery call checklist), Company (About, Contact), Legal (Privacy,
   Terms).
-- Bottom row: "Proposely" wordmark, "Made for people who sell their time.", copyright year.
+- Bottom row: "Signet" wordmark, "Made for people who sell their time.", copyright year.
 - Background \`--band\`, text \`--ink-soft\`.
 
 ## 15. Responsive notes
@@ -312,10 +312,10 @@ Accordion, one open at a time, first closed. Each answer 1 to 3 sentences.
 
 ## 16. SEO
 
-- Title: "Proposely: proposals from your sales call, signed and paid"
-- Meta description: "Upload a discovery call. Proposely writes a branded proposal priced from your rate
+- Title: "Signet: proposals from your sales call, signed and paid"
+- Meta description: "Upload a discovery call. Signet writes a branded proposal priced from your rate
   card, tracks every view, and collects the signature and deposit. 7 day free trial."
-- Canonical \`https://yourdomain.com/\`. \`robots.ts\` allow all, \`sitemap.ts\` with \`/\`, \`/pricing\`, \`/compare/*\`.
+- Canonical \`https://signet.app/\`. \`robots.ts\` allow all, \`sitemap.ts\` with \`/\`, \`/pricing\`, \`/compare/*\`.
 - JSON-LD: SoftwareApplication (name, applicationCategory BusinessApplication, offers with the three
   monthly prices) and FAQPage.
 - H1 used once. Every image has alt text describing the product state ("Proposal editor showing an exec

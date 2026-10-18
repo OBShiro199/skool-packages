@@ -1,4 +1,4 @@
-// Small block and task builders for the Carousely kit, so the content files stay readable.
+// Small block and task builders for the Folio kit, so the content files stay readable.
 import type { Block, ChecklistItem, Task } from '../../types'
 
 type CodeLang = Extract<Block, { type: 'code' }>['lang']

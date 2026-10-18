@@ -1,24 +1,11 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { BookOpen, Copy, Flame, Home, LifeBuoy, LogOut, Menu, Moon, Sun, UserRound } from 'lucide-react'
+import { BookOpen, Copy, Flame, Home, LifeBuoy, LogOut, Menu, UserRound } from 'lucide-react'
 import { streak, useStore, useUser } from '../lib/store'
 import { getApp } from '../content/apps'
 import { appStats, levelFor } from '../lib/progress'
 import { Bar, Ring } from './Ring'
 import { AskOlly } from './AskOlly'
-
-function useTheme() {
-  const [theme, setTheme] = useState<'light' | 'dark' | null>(() => {
-    try { return (localStorage.getItem('bpa-theme') as 'light' | 'dark' | null) ?? null } catch { return null }
-  })
-  useEffect(() => {
-    if (theme) document.documentElement.setAttribute('data-theme', theme)
-    else document.documentElement.removeAttribute('data-theme')
-    try { if (theme) localStorage.setItem('bpa-theme', theme) } catch { /* ignore */ }
-  }, [theme])
-  const isDark = theme ? theme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
-  return { isDark, toggle: () => setTheme(isDark ? 'light' : 'dark') }
-}
 
 export function useTotals() {
   const user = useUser()!
@@ -40,7 +27,6 @@ export default function Shell() {
   const { xp, builds, level, streak: days } = useTotals()
   const [open, setOpen] = useState(false)
   const loc = useLocation()
-  const theme = useTheme()
   useEffect(() => { setOpen(false); window.scrollTo(0, 0) }, [loc.pathname])
 
   return (
@@ -87,7 +73,6 @@ export default function Shell() {
             </div>
           </div>
           <div className="row">
-            <button className="btn btn-sm btn-ghost" onClick={theme.toggle} aria-label="Toggle theme">{theme.isDark ? <Sun size={15} /> : <Moon size={15} />}</button>
             <span style={{ flex: 1 }} />
             <button className="btn btn-sm btn-ghost" onClick={signOut}><LogOut size={15} /> Sign out</button>
           </div>

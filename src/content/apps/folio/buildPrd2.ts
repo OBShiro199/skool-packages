@@ -1,4 +1,4 @@
-// Carousely build PRD, part 2: function contracts, rendering, scheduling, analytics, limits, emails, tests, milestones.
+// Folio build PRD, part 2: function contracts, rendering, scheduling, analytics, limits, emails, tests, milestones.
 
 export const buildPrd2 = `
 ## 12. Edge function contracts
@@ -19,7 +19,7 @@ Shared rules for every function (put them in \`supabase/functions/_shared/\`):
   captions or signed URLs.
 - Errors return \`{ code, message }\`. \`message\` is safe to show in the UI.
 
-### 12.1 crs-ingest (browser)
+### 12.1 fol-ingest (browser)
 Input: \`{ workspace_id, brand_id, kind: 'blog_url'|'youtube_url'|'idea'|'voice_note', url?, idea?, audio_path?, idempotency_key }\`.
 Output 202: \`{ source_id, job_id }\`. The browser watches the job row over Realtime.
 Steps: validate (URL must be https, public hostname, not an IP literal, not localhost, max 2,048 chars;
@@ -38,7 +38,7 @@ set source \`ready\`, job \`succeeded\`.
 Errors: \`url_blocked\` 400, \`no_transcript\` 422 ("This video has no captions and is over 30 minutes"),
 \`too_short\` 422 (under 120 words), \`provider_down\` (job retried by sweeper).
 
-### 12.2 crs-generate (browser)
+### 12.2 fol-generate (browser)
 Input: \`{ workspace_id, source_id, brand_id, body_slides?: 6..9 (default 7), angle?: string(200), format?: 'portrait'|'square', idempotency_key }\`.
 Output 202: \`{ carousel_id, job_id }\`.
 Steps: source must be \`ready\` and in the same workspace. \`try_consume_usage(..., 'carousel', 1, key)\`.
@@ -49,13 +49,13 @@ validate, trim or repair, insert slides at positions 0..n-1 inside one transacti
 from the real token usage.
 Errors: \`refused\`, \`invalid_output\` (after one repair), \`limit_reached\`. Final failure refunds the carousel credit.
 
-### 12.3 crs-rewrite-slide (browser, synchronous)
+### 12.3 fol-rewrite-slide (browser, synchronous)
 Input: \`{ workspace_id, slide_id, preset?: string, instruction?: string(300), idempotency_key }\`.
 Output 200: \`{ slide: { id, layout, content, warnings }, revision_id, note }\`.
 Steps: role at least \`editor\`. Consume \`rewrite\` 1. Save the old version to \`slide_revisions\` first, call
 11.4 with a 25 s timeout, validate, update the slide. On failure refund and return 502 \`ai_failed\`.
 
-### 12.4 crs-render-enqueue (browser)
+### 12.4 fol-render-enqueue (browser)
 Input: \`{ workspace_id, carousel_id, idempotency_key }\`. Output 202 \`{ render_id, job_id, reused: boolean }\`.
 Steps: load slides and brand, compute \`content_hash = sha256(JSON of slides + brand colours + fonts + logo/headshot paths + format)\`.
 If a \`done\` render with that hash exists for this carousel: return it with \`reused: true\` and no charge.
@@ -73,42 +73,52 @@ download logo and headshot from Storage into data URLs, render each slide (secti
 \`succeeded\`, progress updates every slide (\`progress = round(i / total * 100)\`). On error: job back to
 \`queued\` with backoff or \`failed\` and a refund.
 
-### 12.6 crs-zernio-connect (browser)
+### 12.6 fol-zernio-connect (browser)
 Input: \`{ workspace_id, brand_id, action: 'start'|'sync'|'disconnect', platform?: 'linkedin'|'linkedin_page'|'instagram', social_account_id? }\`.
 - start: role \`admin\`. Check the plan's \`social_accounts\` limit. If the brand has no \`zernio_profile_id\`,
-  create a Zernio profile named "{workspace short id} {brand name}" [verify endpoint \`POST /v1/profiles\`] and
-  save it. Return \`{ url }\` from Zernio's connect endpoint for that platform with a redirect back to
-  \`{APP_URL}/app/brand/{brand_id}/accounts?connected=1\` [verify: \`GET /v1/connect/{platform}\`].
-- sync: \`GET https://zernio.com/api/v1/accounts?profileId=...\`, upsert \`social_accounts\`.
-- disconnect: delete the Zernio account [verify], mark ours \`disconnected\`.
+  create a Zernio profile (\`POST https://zernio.com/api/v1/profiles\` with \`{ name: "{workspace short id} {brand name}" }\`)
+  and save its id. Then \`GET /v1/connect/{platform}?profileId=...&redirect_url={APP_URL}/app/brand/{brand_id}/accounts?connected=1\`
+  (platform is \`linkedin\` for both profile and page, \`instagram\` for Instagram) and return \`{ url: authUrl }\`.
+  For company pages Zernio shows its own organisation picker after LinkedIn login.
+- sync: \`GET /v1/accounts?profileId=...\`, upsert \`social_accounts\` (personal vs organisation decides
+  \`linkedin\` or \`linkedin_page\`).
+- disconnect: \`DELETE /v1/accounts/{accountId}\`, mark ours \`disconnected\`.
 
-### 12.7 crs-schedule-post (browser)
+### 12.7 fol-schedule-post (browser)
 Input: \`{ workspace_id, action: 'schedule'|'reschedule'|'cancel'|'retry', carousel_id?, render_id?, social_account_id?, caption?, scheduled_for?, publish_now?, scheduled_post_id?, idempotency_key }\`.
 - schedule: render must be \`done\` and belong to the carousel; account must be \`connected\` and in the same
   workspace and brand; caption 1 to 3,000 chars for LinkedIn, 1 to 2,200 for Instagram; \`scheduled_for\` at
-  least 5 minutes ahead and at most 90 days. Insert \`scheduled_posts\` (\`draft\`). Media: LinkedIn gets the PDF,
-  Instagram gets the PNGs, as signed URLs valid 7 days (if Zernio copies media on create this is enough;
-  otherwise upload through its media endpoint [verify]). Call \`POST https://zernio.com/api/v1/posts\` with
-  \`{ content: caption, platforms: [{ platform, accountId }], mediaItems, scheduledFor | publishNow }\`. Save
-  \`zernio_post_id\`, status \`scheduled\`, carousel \`scheduled\`.
-- reschedule: update the Zernio post time [verify \`PATCH /v1/posts/{id}\`], update ours.
-- cancel: delete the Zernio post, status \`canceled\`.
+  least 5 minutes ahead and at most 90 days. Insert \`scheduled_posts\` (\`draft\`). Media: Zernio needs public
+  HTTPS URLs, so copy our private files into Zernio's media store: for each file call
+  \`POST /v1/media/presign\` with \`{ filename, contentType, size }\`, PUT the bytes to \`uploadUrl\` (expires in
+  1 hour), keep \`publicUrl\`. LinkedIn gets one item \`{ type: 'document', url, title }\` (the PDF), Instagram
+  gets the PNGs as \`{ type: 'image', url, altText }\`. Then \`POST /v1/posts\` with
+  \`{ content: caption, mediaItems, platforms: [{ platform, accountId, platformSpecificData }], scheduledFor, timezone }\`
+  or \`publishNow: true\`. LinkedIn \`platformSpecificData\`: \`{ documentTitle: carousel.title }\` (required by
+  LinkedIn for document posts) plus \`organizationUrn\` for pages. Save \`zernio_post_id\`, status \`scheduled\`,
+  carousel \`scheduled\`.
+- reschedule: \`PUT /v1/posts/{postId}\` with the new \`scheduledFor\`, update ours.
+- cancel: \`DELETE /v1/posts/{postId}\`, status \`canceled\`.
 - retry: only from \`failed\`, re-runs schedule with \`publish_now: true\`.
 
-### 12.8 crs-zernio-webhook (public, verify_jwt off)
-Verify the signature header with \`ZERNIO_WEBHOOK_SECRET\` (HMAC SHA-256 of the raw body) [verify the header
-name and scheme in Zernio's webhook docs]. Insert the event id into \`provider_events\`; if it exists, return
-200 and stop. Treat the event as a poke: fetch \`GET /v1/posts/{id}\` and update our row from that response.
+### 12.8 fol-zernio-webhook (public, verify_jwt off)
+Zernio sends \`X-Zernio-Event\` (e.g. \`post.published\`), \`X-Zernio-Event-Id\` (stable across retries) and
+\`X-Zernio-Signature\` (HMAC SHA-256 with the webhook secret). Compute the HMAC of the raw body with
+\`ZERNIO_WEBHOOK_SECRET\` and compare in constant time [verify hex vs base64 encoding with Zernio's "Send test"
+button]. Insert \`X-Zernio-Event-Id\` into \`provider_events\`; if it exists, return 200 and stop. Handle
+\`post.published\`, \`post.failed\`, \`post.partial\`, \`post.cancelled\` and \`account.disconnected\`; ignore the rest.
+Treat the event as a poke: fetch \`GET /v1/posts/{postId}\` and update our row from that response.
 This means even a forged event can never set a wrong status. On \`published\`: set \`platform_post_url\`,
 \`published_at\`, carousel \`published\`, send "post published" email (once). On \`failed\`: save the error,
 send "post failed" email with a Retry link. Return 200 within 2 seconds.
 
-### 12.9 crs-analytics-sync (pg_cron every 6 hours, \`x-cron-secret\`)
+### 12.9 fol-analytics-sync (pg_cron every 6 hours, \`x-cron-secret\`)
 For published posts from the last 30 days in workspaces whose plan has \`analytics = true\`: fetch metrics
-from Zernio analytics [verify endpoint and add-on], upsert \`post_metrics\` for today. 20 posts per request
+with \`GET /v1/analytics?postId={zernio_post_id}\` (needs Zernio's Analytics add-on; a 202 means "sync pending",
+try next run), upsert \`post_metrics\` for today. 20 posts per request
 batch, stop at 300 posts per run, back off on 429.
 
-### 12.10 crs-sweeper (pg_cron every 2 minutes, \`x-cron-secret\`)
+### 12.10 fol-sweeper (pg_cron every 2 minutes, \`x-cron-secret\`)
 1. Jobs \`running\` with \`locked_at\` older than 5 minutes: back to \`queued\` with backoff, or \`failed\` + refund.
 2. Queued ingest and generate jobs with \`run_after <= now()\` and older than 1 minute: re-run them.
 3. Queued render jobs: POST the render worker once.
@@ -165,7 +175,7 @@ Performance budget: under 600 ms per slide, under 8 s for 11 slides plus PDF on 
 | Team seats | 1 | 2 | 5 | 1 |
 | Analytics | No | Yes | Yes | No |
 | Custom font upload | No | Yes | Yes | No |
-| "Made with Carousely" footer | Removable | Off | Off | Always on |
+| "Made with Folio" footer | Removable | Off | Off | Always on |
 - Periods are calendar months in UTC. \`usage_ledger.period_start\` is the first of the month.
 - \`try_consume_usage\` takes a per-workspace advisory lock so 30 parallel requests cannot overspend.
 - The sidebar meter and every action button show what is left: "Generate (12 left this month)". At 80% the
@@ -254,7 +264,7 @@ select status, scheduled_for, zernio_post_id, platform_post_url from public.sche
 insert into public.usage_ledger (workspace_id, metric, quantity, idempotency_key, period_start)
 values ('<workspace id>', 'carousel', 5, 'test-cap-' || gen_random_uuid(), date_trunc('month', now())::date);
 \`\`\`
-   The Generate button is disabled with "Upgrade to keep creating". Calling crs-generate returns 402.
+   The Generate button is disabled with "Upgrade to keep creating". Calling fol-generate returns 402.
 10. **Isolation.** Second user in another workspace cannot see the first user's carousels, slides, renders or
     brand assets (security task runs this with curl).
 
@@ -262,8 +272,8 @@ values ('<workspace id>', 'carousel', 5, 'test-cap-' || gen_random_uuid(), date_
 1. **M1 (2h):** auth, workspace trigger, app shell with sidebar, onboarding skeleton, SQL migration.
 2. **M2 (3h):** brand kit page with uploads, colour pickers, fonts, live preview.
 3. **M3 (3h):** the 8 slide templates and \`/templates\` gallery, Satori-safe.
-4. **M4 (3h):** crs-ingest (blog, YouTube, idea, voice) with job progress over Realtime.
-5. **M5 (3h):** crs-generate with structured output, validation, repair, metering.
+4. **M4 (3h):** fol-ingest (blog, YouTube, idea, voice) with job progress over Realtime.
+5. **M5 (3h):** fol-generate with structured output, validation, repair, metering.
 6. **M6 (3h):** editor: slide rail, inline editing, AI rewrite with undo, drag reorder, layout switcher.
 7. **M7 (2h):** render worker, PNG + PDF export, content hash reuse.
 8. **M8 (2h):** Zernio connect, schedule dialog, calendar, webhook, sweeper.

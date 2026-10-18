@@ -1,6 +1,6 @@
-// Carousely landing page PRD: every section top to bottom with copy, motion, SEO and events.
+// Folio landing page PRD: every section top to bottom with copy, motion, SEO and events.
 
-export const landingPrd = `# Carousely: landing page PRD
+export const landingPrd = `# Folio: landing page PRD
 
 Save this file as \`LANDING.md\` in your project root. In Claude Code, say:
 "Build the landing page exactly as described in @LANDING.md, using the tokens in @DESIGN.md."
@@ -52,7 +52,7 @@ Use @DESIGN.md tokens. The landing page adds:
 
 ## 2. Sticky nav
 - 64px tall. Background \`--bg\` at 85% with \`backdrop-filter: blur(12px)\`. Bottom border appears after 8px scroll.
-- Left: logo (stacked cards mark in \`--brand\`) + "Carousely".
+- Left: logo (stacked cards mark in \`--brand\`) + "Folio".
 - Centre (desktop): **How it works**, **Templates**, **Pricing**, **FAQ** (smooth scroll; Templates goes to \`/templates\`).
 - Right: **Log in** text link, **Start free trial** primary.
 - Mobile: logo, small **Start free trial** (40px), menu button opening a full-width Sheet with links and Log in.
@@ -62,7 +62,7 @@ Use @DESIGN.md tokens. The landing page adds:
 ### 3.1 Copy
 - Eyebrow pill: **For founders, coaches and agencies who post on LinkedIn**
 - H1: **Your best ideas, as carousels, in your brand.**
-- Subhead: **Paste a blog post, a YouTube video, a rough idea or a voice note. Carousely writes the hook, the
+- Subhead: **Paste a blog post, a YouTube video, a rough idea or a voice note. Folio writes the hook, the
   slides and the call to action, designs them in your colours and fonts, and schedules the PDF to LinkedIn.**
 - Primary: **Start free trial**
 - Secondary: **See it make one** (scrolls to the demo, section 6)
@@ -133,7 +133,7 @@ body, 3 ticks.
 ### 7.1 Four ways in
 - Eyebrow: **Any source**
 - H3: **Blog post, YouTube video, idea or voice note.**
-- Body: **Paste a link and Carousely reads the article or pulls the video transcript. Got a thought on a walk?
+- Body: **Paste a link and Folio reads the article or pulls the video transcript. Got a thought on a walk?
   Record a voice note on your phone and turn it into slides when you get back.**
 - Ticks: **Blog and article URLs** · **YouTube videos and Shorts** · **Voice notes up to 10 minutes**
 - Visual: the 4 source tabs with the voice recorder active and a live waveform. Motion: waveform bars animate
@@ -142,7 +142,7 @@ body, 3 ticks.
 ### 7.2 Your brand, every time
 - Eyebrow: **Brand kit**
 - H3: **Set your look once. Every slide follows it.**
-- Body: **Logo, colours, fonts, headshot and handle. Carousely checks your colours are readable and puts your face
+- Body: **Logo, colours, fonts, headshot and handle. Folio checks your colours are readable and puts your face
   and handle on every slide so people know who made it.**
 - Ticks: **12 fonts or your own** · **Contrast checked** · **Several brands for agencies**
 - Visual: the same slide shown in 3 brand kits, cross-fading every 2.5s.
@@ -185,10 +185,10 @@ body, 3 ticks.
 
 ## 9. Comparison table
 - H2: **The carousel tool that does the whole job.**
-- Subhead: **Most tools design slides or schedule posts. Carousely writes, designs, exports and schedules in one place.**
-- Columns: **Carousely**, **Taplio**, **Contentdrips**, **PostNitro**, **aiCarousels**, **Canva**.
+- Subhead: **Most tools design slides or schedule posts. Folio writes, designs, exports and schedules in one place.**
+- Columns: **Folio**, **Taplio**, **Contentdrips**, **PostNitro**, **aiCarousels**, **Canva**.
 
-| | Carousely | Taplio | Contentdrips | PostNitro | aiCarousels | Canva |
+| | Folio | Taplio | Contentdrips | PostNitro | aiCarousels | Canva |
 |---|---|---|---|---|---|---|
 | Blog URL to carousel | Yes | [verify] | Yes [verify] | Yes [verify] | Yes [verify] | No |
 | YouTube video to carousel | Yes | [verify] | [verify] | [verify] | [verify] | No |
@@ -203,15 +203,15 @@ body, 3 ticks.
 - Before publishing, check every [verify] cell on each competitor's live pricing and feature pages and add a
   footnote: **Prices and features checked [Month Year]. Tell us if something changed.**
 - Never claim a competitor lacks a feature unless their site shows it. If unsure, write "Limited" or remove the row.
-- Mobile: horizontal scroll, first column sticky, Carousely column on \`--brand-soft\`, "Swipe to compare" hint
+- Mobile: horizontal scroll, first column sticky, Folio column on \`--brand-soft\`, "Swipe to compare" hint
   fades after first scroll.
-- Motion: Carousely column header glows once in view (reduced motion: none).
+- Motion: Folio column header glows once in view (reduced motion: none).
 
 ## 10. Testimonials slot
-- H2: **People who post more since Carousely**
+- H2: **People who post more since Folio**
 - 3 cards: photo (56px circle), quote, name, role, and a result line in bold (e.g. **From 1 to 3 carousels a week**).
 - Hidden behind \`SHOW_TESTIMONIALS=false\` until you have real quotes. Never publish invented quotes.
-  Ask your first 10 users: "What changed in your first two weeks with Carousely?"
+  Ask your first 10 users: "What changed in your first two weeks with Folio?"
 - Motion: stagger in. Mobile: swipeable with dots.
 
 ## 11. Pricing
@@ -222,7 +222,7 @@ body, 3 ticks.
 - **$39/month** or **$390/year**
 - Line: **For one person posting a few times a week.**
 - Includes: **15 carousels a month · 100 AI slide rewrites · 60 exports (PDF + PNGs) · 30 voice minutes ·
-  1 brand kit · 1 connected account · Remove the Carousely mark**
+  1 brand kit · 1 connected account · Remove the Folio mark**
 - Button: **Start free trial**
 
 **Pro** (badge **Most popular**)
@@ -283,16 +283,16 @@ body, 3 ticks.
   - **Use cases**: For founders, For coaches, For agencies, Blog to carousel, YouTube to carousel
   - **Resources**: Documentation, Free hook generator, Compare (Taplio, Contentdrips, PostNitro alternatives)
   - **Company**: About, Contact, Privacy, Terms
-- Bottom row: logo, **© 2026 Carousely**, **Made for people who post every week.**
+- Bottom row: logo, **© 2026 Folio**, **Made for people who post every week.**
 - Use-case pages (\`/for/founders\`, \`/for/coaches\`, \`/for/agencies\`) reuse this page with a swapped H1, hero
   slides and FAQ. Build after launch.
 
 ## 15. SEO
-- Title (max 60 chars): **Carousely: LinkedIn and Instagram carousel generator**
+- Title (max 60 chars): **Folio: LinkedIn and Instagram carousel generator**
 - Meta description (max 155): **Turn blog posts, YouTube videos, ideas and voice notes into on-brand LinkedIn and Instagram carousels. Edit, export PDF and schedule. 7 days free.**
-- Canonical \`https://carousely.app/\` (swap for your domain). One H1. H2 per section.
+- Canonical \`https://getfolio.app/\` (swap for your domain). One H1. H2 per section.
 - JSON-LD: \`SoftwareApplication\` (applicationCategory "BusinessApplication", offers for the 3 plans in USD) and \`FAQPage\`.
-- Alt text example: "Five Carousely carousel slides fanned out: hook, list, stat, step and call to action".
+- Alt text example: "Five Folio carousel slides fanned out: hook, list, stat, step and call to action".
 - \`sitemap.ts\`, \`robots.ts\`, \`/llms.txt\` listing product, pricing, templates and docs pages.
 
 ### 15.1 OG image
@@ -347,7 +347,7 @@ body, 3 ticks.
 ## 21. Hero demo route (\`/api/demo/hook\`)
 - POST \`{ url, turnstileToken }\`. Verify Turnstile server side, then rate limit by IP (3 per day) and globally
   (300 per day) using a \`demo_requests\` table written with the secret key.
-- Same URL checks as crs-ingest (https, public hostname). Firecrawl scrape with a 15 s timeout.
+- Same URL checks as fol-ingest (https, public hostname). Firecrawl scrape with a 15 s timeout.
 - \`claude-haiku-5-5\` with the hook-only schema \`{ kicker, headline, subline }\` and the same prompt-injection
   guard as PRD 11.1. Returns JSON, the browser renders it with the hook template and the Violet preset.
 - On any failure show "Could not read that page. Start a free trial to try any source."

@@ -2,7 +2,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion, useInView, useReducedMotion } from 'motion/react'
 import { ArrowRight, MessageSquare } from 'lucide-react'
 
-export const EASE = [0.2, 0.7, 0.1, 1] as const
+/** Quiet Precision curves: out for reveals, morph for UI changes. */
+export const EASE = [0.16, 1, 0.3, 1] as const
+export const MORPH = [0.2, 0, 0, 1] as const
 
 /** Stand-in for the real analytics helper described in the PRD (section 17). */
 export function track(name: string, props: Record<string, unknown> = {}) {
@@ -26,10 +28,10 @@ export function Reveal({
   return (
     <Tag
       className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+      initial={reduce ? { opacity: 1 } : { opacity: 0, y: 8 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: reduce ? 0.2 : 0.6, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{ duration: reduce ? 0 : 0.36, delay: reduce ? 0 : Math.min(delay, 0.27), ease: EASE }}
     >
       {children}
     </Tag>

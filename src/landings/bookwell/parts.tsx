@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode, type MouseEvent } from 'react'
 import { motion, useInView, useReducedMotion } from 'motion/react'
 
-export const EASE = [0.2, 0.7, 0.1, 1] as const
+/** Quiet Precision curves: out for reveals, morph for things that change size or value. */
+export const EASE = [0.16, 1, 0.3, 1] as const
+export const MORPH = [0.2, 0, 0, 1] as const
 
 /** Tiny analytics helper (DataFast/PostHog in a real build). Here it only emits a DOM event. */
 export function track(name: string, props: Record<string, unknown> = {}) {
@@ -15,10 +17,10 @@ export function Reveal({ children, delay = 0, className, as = 'div' }: { childre
   return (
     <Comp
       className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: reduce ? 0.01 : 0.52, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{ duration: reduce ? 0.01 : 0.36, delay: reduce ? 0 : delay, ease: EASE }}
     >
       {children}
     </Comp>

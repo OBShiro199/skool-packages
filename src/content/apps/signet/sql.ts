@@ -1,7 +1,7 @@
-// Proposely single migration, pasted into the Supabase SQL editor once on a fresh project.
+// Signet single migration, pasted into the Supabase SQL editor once on a fresh project.
 
 export const sql = `-- =====================================================================
--- Proposely: full database migration
+-- Signet: full database migration
 -- Paste this whole file into Supabase > SQL Editor > New query > Run.
 -- Run it ONCE on a fresh project. Order: extensions, enums, tables,
 -- helper functions, triggers, RLS policies, views, storage, realtime.
@@ -864,7 +864,7 @@ begin
        or new.storage_path is distinct from old.storage_path
        or new.workspace_id is distinct from old.workspace_id
        or new.error is distinct from old.error then
-      raise exception 'these call fields are set by Proposely';
+      raise exception 'these call fields are set by Signet';
     end if;
   end if;
   return new;
@@ -887,7 +887,7 @@ begin
        or new.first_viewed_at is distinct from old.first_viewed_at
        or new.deposit_cents is distinct from old.deposit_cents
        or new.selected_option is distinct from old.selected_option then
-      raise exception 'these proposal fields are set by Proposely';
+      raise exception 'these proposal fields are set by Signet';
     end if;
     if new.status is distinct from old.status
        and not (new.status = 'lost' or (old.status = 'lost' and new.status = 'draft')) then
@@ -922,7 +922,7 @@ declare
   v_status public.proposal_status;
 begin
   select status into v_status from public.proposals where id = v_pid;
-  if v_status in ('signed', 'paid') and current_setting('proposely.allow_delete', true) is distinct from 'on' then
+  if v_status in ('signed', 'paid') and current_setting('signet.allow_delete', true) is distinct from 'on' then
     raise exception 'signed proposals cannot be changed';
   end if;
   if v_status in ('sent', 'viewed') then
@@ -938,14 +938,14 @@ create trigger pricing_options_lock before insert or update or delete on public.
 
 -- Signatures and sent versions can never be edited. Deleting is only
 -- possible when you deliberately switch it on for account deletion:
---   set proposely.allow_delete = 'on'; delete from public.workspaces where id = '...';
+--   set signet.allow_delete = 'on'; delete from public.workspaces where id = '...';
 create or replace function public.block_evidence_changes()
 returns trigger language plpgsql set search_path = '' as $$
 begin
   if tg_op = 'UPDATE' then
     raise exception '% are immutable', tg_table_name;
   end if;
-  if tg_op = 'DELETE' and current_setting('proposely.allow_delete', true) is distinct from 'on' then
+  if tg_op = 'DELETE' and current_setting('signet.allow_delete', true) is distinct from 'on' then
     raise exception '% are immutable', tg_table_name;
   end if;
   return old;
@@ -1026,7 +1026,7 @@ alter table public.plan_prices enable row level security;
 alter table public.workspace_limit_overrides enable row level security;
 
 -- Belt and braces: anonymous visitors get no table access at all.
--- The public share page goes through the pr-public-proposal edge function.
+-- The public share page goes through the sg-public-proposal edge function.
 revoke all on all tables in schema public from anon;
 
 -- Profiles: yourself, and teammates' names for "created by" columns.
@@ -1303,8 +1303,8 @@ alter publication supabase_realtime add table public.proposals;
 -- $fn$;
 -- revoke execute on function public.invoke_edge(text) from public, anon, authenticated;
 --
--- select cron.schedule('pr-draft-worker', '* * * * *',    $$ select public.invoke_edge('pr-draft-worker') $$);
--- select cron.schedule('pr-reminders',    '*/15 * * * *', $$ select public.invoke_edge('pr-reminders') $$);
+-- select cron.schedule('sg-draft-worker', '* * * * *',    $$ select public.invoke_edge('sg-draft-worker') $$);
+-- select cron.schedule('sg-reminders',    '*/15 * * * *', $$ select public.invoke_edge('sg-reminders') $$);
 --
 -- Check it ran: select * from cron.job_run_details order by start_time desc limit 20;
 `

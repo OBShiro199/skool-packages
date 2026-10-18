@@ -1,6 +1,6 @@
-// Proposely build PRD (PRD.md), part 1: product, architecture, routes, data model, state machines.
+// Signet build PRD (PRD.md), part 1: product, architecture, routes, data model, state machines.
 
-export const buildPrd1 = `# Proposely: build PRD
+export const buildPrd1 = `# Signet: build PRD
 
 Version 1.0. Download this file, save it as \`PRD.md\` in the root of your project folder, and reference it
 in Claude Code with \`@PRD.md\`. Claude Code reads it before every task. Where this file and your instinct
@@ -74,11 +74,11 @@ Everything in v1 serves that sentence. If a feature does not shorten call-to-sig
    pricing options (good/better/best), terms and next steps.
 9. As an owner, I edit any section in a block editor, and click "Rewrite" on one section with an
    instruction ("shorter", "more confident", "mention the Shopify migration").
-10. As an owner, I send a share link by email from Proposely or copy it into my own email.
+10. As an owner, I send a share link by email from Signet or copy it into my own email.
 11. As an owner, I see when the client opened it, how long they spent on each section, and which pricing
     option they looked at longest.
 12. As an owner, I get an email the first time it is viewed, when it is signed and when the deposit is paid.
-13. As an owner, I do not have to chase: if it is unsigned 3 days after the first send, Proposely sends a
+13. As an owner, I do not have to chase: if it is unsigned 3 days after the first send, Signet sends a
     polite follow-up to the client (I can turn this off per proposal).
 14. As an owner, I invite my team. Members can create and edit proposals. Only owners and admins can change
     billing, brand kit and pricing rules.
@@ -99,9 +99,9 @@ Everything in v1 serves that sentence. If a feature does not shorten call-to-sig
 | Transcription | AssemblyAI Universal-3.5 Pro, async with webhook, speaker labels on | $0.21/hr + $0.02/hr diarisation (checked Oct 2026 [verify]) is cheaper than Deepgram Nova-3 batch with diarisation ($0.0043 to $0.0077/min + $0.002/min, sources conflict [verify]). Takes a signed URL, so no file proxying | Webhook storms after a big import. Fix: the webhook only flips a row and returns 200; the worker does the heavy work |
 | AI model | \`claude-opus-5-5\` for extraction, drafting and rewrites ($4 in / $20 out per MTok) | One model, one prompt cache namespace, best writing quality. Structured outputs keep JSON valid | Cost per proposal creeps up with long calls. Fix: cap call length per plan, cache the system prompt and catalogue, meter every call |
 | Long jobs | Job rows + pg_cron worker every minute, not a long HTTP request | Transcribe + extract + draft takes 2 to 8 minutes. Edge functions and browsers time out | One worker run handles 5 jobs. At 1,000 customers with bursts, raise the batch and add a second schedule offset by 30 s |
-| Public page | Next.js page that reads ONLY through the \`pr-public-proposal\` edge function | The anon key never touches proposal tables. Tokens are hashed in the DB | Edge function cold starts on first open. Fix: 60 s cache on the rendered version by version id |
+| Public page | Next.js page that reads ONLY through the \`sg-public-proposal\` edge function | The anon key never touches proposal tables. Tokens are hashed in the DB | Edge function cold starts on first open. Fix: 60 s cache on the rendered version by version id |
 | E-signature | Typed + drawn signature, timestamp, IP, user agent, SHA-256 of the exact signed content | Simple, cheap, tamper-evident. Hash is emailed to both sides so a copy lives outside our DB | If a customer needs qualified e-signatures (EU eIDAS QES), they need a dedicated provider. Out of scope |
-| Deposits | Stripe Connect Standard, direct charges, Checkout on the user's own account | Money goes straight to the agency. Proposely is not in the flow of funds and pays no Connect fees | Some users have no Stripe account. Fix: Standard onboarding via Account Links creates one |
+| Deposits | Stripe Connect Standard, direct charges, Checkout on the user's own account | Money goes straight to the agency. Signet is not in the flow of funds and pays no Connect fees | Some users have no Stripe account. Fix: Standard onboarding via Account Links creates one |
 | Multi-user | Workspaces, members with roles, RLS through \`is_workspace_member()\` | Agencies share proposals and templates | Seat limits are enforced in the invite function and the accept function, not only in the UI |
 | Billing owner | The workspace owner's subscription decides access for the whole workspace | One card per agency | Ownership transfer needs a support action in v1 |
 
@@ -121,9 +121,9 @@ Everything in v1 serves that sentence. If a feature does not shorten call-to-sig
    |  Supabase                                                                             |
    |  Postgres + RLS (workspace_id)  |  Storage: call-audio, brand-assets, signatures      |
    |  Edge functions:                                                                      |
-   |   pr-start-transcription  pr-assemblyai-webhook  pr-draft-worker  pr-rewrite-section   |
-   |   pr-public-proposal  pr-sign-proposal  pr-deposit-checkout  pr-connect-webhook        |
-   |   pr-reminders  pr-import-recording                                                    |
+   |   sg-start-transcription  sg-assemblyai-webhook  sg-draft-worker  sg-rewrite-section   |
+   |   sg-public-proposal  sg-sign-proposal  sg-deposit-checkout  sg-connect-webhook        |
+   |   sg-reminders  sg-import-recording                                                    |
    |  pg_cron: worker every minute, reminders every 15 minutes                              |
    +------+-------------------+------------------+------------------+---------------------+
           |                   |                  |                  |
@@ -138,22 +138,22 @@ Everything in v1 serves that sentence. If a feature does not shorten call-to-sig
 
 Flow of one proposal:
 1. Browser uploads audio to Storage \`call-audio/<workspace_id>/<call_id>.<ext>\` (resumable).
-2. Browser calls \`pr-start-transcription\`. It checks plan limits, makes a 6 hour signed URL, sends it to
+2. Browser calls \`sg-start-transcription\`. It checks plan limits, makes a 6 hour signed URL, sends it to
    AssemblyAI with a webhook URL and a secret header, sets \`calls.status = 'transcribing'\`.
-3. AssemblyAI calls \`pr-assemblyai-webhook\`. It checks the secret header, then enqueues a
+3. AssemblyAI calls \`sg-assemblyai-webhook\`. It checks the secret header, then enqueues a
    \`jobs\` row (\`kind = 'fetch_transcript'\`) and returns 200 in under a second.
-4. \`pr-draft-worker\` (pg_cron, every minute) claims jobs with \`for update skip locked\`:
+4. \`sg-draft-worker\` (pg_cron, every minute) claims jobs with \`for update skip locked\`:
    fetch_transcript, then extract (Claude call 1), then wait for the user to confirm the brief
    (or auto-continue if they ticked "Draft straight away"), then draft (Claude call 2).
-5. The user edits in the block editor. Rewrite calls \`pr-rewrite-section\` (Claude call 3, per section).
+5. The user edits in the block editor. Rewrite calls \`sg-rewrite-section\` (Claude call 3, per section).
 6. "Send" freezes a \`proposal_versions\` row (immutable snapshot + content hash) and creates a share link.
-7. The client opens \`/p/<token>\`. The page calls \`pr-public-proposal\`, which hashes the token, looks it up,
+7. The client opens \`/p/<token>\`. The page calls \`sg-public-proposal\`, which hashes the token, looks it up,
    returns only the frozen version, and records a view. Section timings arrive as beacons.
-8. The client signs. \`pr-sign-proposal\` recomputes the hash of the version they saw, stores the signature,
+8. The client signs. \`sg-sign-proposal\` recomputes the hash of the version they saw, stores the signature,
    locks the proposal, emails both sides, and returns a Checkout URL if a deposit is due.
-9. Stripe sends \`checkout.session.completed\` from the connected account to \`pr-connect-webhook\`.
+9. Stripe sends \`checkout.session.completed\` from the connected account to \`sg-connect-webhook\`.
    The deposit is marked paid. Resend emails go out.
-10. \`pr-reminders\` (every 15 minutes) sends the 3-day follow-up and the owner's daily digest.
+10. \`sg-reminders\` (every 15 minutes) sends the 3-day follow-up and the owner's daily digest.
 
 ## 7. Routes and pages
 
@@ -261,7 +261,7 @@ uploading --> queued --> transcribing --> transcribed --> extracting --> brief_r
       +------------+------------+----------------+--------------+--------------------------+--> failed
 \`\`\`
 - \`uploading\`: row created before upload starts, so a refresh can resume.
-- \`queued\`: upload finished, \`pr-start-transcription\` accepted it.
+- \`queued\`: upload finished, \`sg-start-transcription\` accepted it.
 - \`transcribing\`: AssemblyAI has it. If no webhook after 45 minutes, the worker polls
   \`GET /v2/transcript/{id}\` once and either continues or marks failed.
 - \`transcribed\`, \`extracting\`, \`brief_ready\`: Claude extraction done, waiting for the user to confirm
@@ -274,12 +274,15 @@ uploading --> queued --> transcribing --> transcribed --> extracting --> brief_r
 ### 9.2 Proposal
 \`\`\`
 draft --> sent --> viewed --> signed --> paid
-  ^         |         |          \\
-  |         v         v           +--> (no deposit due) stays signed, counts as won
-  +---- (edit after send creates a new version, status back to draft until re-sent)
+                                  \\
+                                   +--> (no deposit due) stays signed, counts as won
 any of draft/sent/viewed --> lost (manual) | expired (share link expiry passed)
+lost --> draft (owner reopens it)
 \`\`\`
 - \`sent\`: a version is frozen and a share link exists. \`first_sent_at\` set once.
+- Editing after sending sets \`has_unsent_changes = true\`. The client keeps seeing the sent version (and
+  can still sign it) until the user clicks "Send update", which freezes version N+1 and points the share
+  link at it.
 - \`viewed\`: first view recorded. \`first_viewed_at\` set once. Owner email sent once.
 - \`signed\`: signature stored. Proposal sections and options are locked by a trigger.
 - \`paid\`: deposit confirmed by the Connect webhook, never by the success URL.
@@ -314,7 +317,7 @@ A job stuck in \`running\` for more than 10 minutes is released back to \`queued
 | Blank and template proposals | Unlimited | Unlimited | Unlimited |
 | Templates | 5 | Unlimited | Unlimited |
 | Brand kit | Logo + 1 colour | Full | Full |
-| "Sent with Proposely" footer on share page | Yes | Removable | Removable |
+| "Sent with Signet" footer on share page | Yes | Removable | Removable |
 | Zoom and Google Meet import | No | Yes | Yes |
 | Analytics per team member | No | Yes | Yes |
 | Meeting bot (later milestone) | No | No | 600 bot minutes/month |
@@ -323,9 +326,9 @@ A job stuck in \`running\` for more than 10 minutes is released back to \`queued
   During the trial the chosen plan's limits apply, but drafts from a call are capped at 3 so a trial cannot
   cost more than about $1.
 - Limits are counted per workspace per calendar month (UTC) from \`usage_ledger\`.
-- Enforcement is server-side in every edge function that spends money: \`pr-start-transcription\`
-  (minutes and per-call length), \`pr-draft-worker\` (drafts), \`pr-rewrite-section\` (rewrites),
-  \`pr-invite-member\` logic in the invite server action (seats).
+- Enforcement is server-side in every edge function that spends money: \`sg-start-transcription\`
+  (minutes and per-call length), \`sg-draft-worker\` (drafts), \`sg-rewrite-section\` (rewrites), and the
+  \`create_invite\` and \`accept_invite\` database functions (seats).
 - The UI shows meters on \`/app/billing\` and a small meter in the editor ("7 of 100 rewrites used").
   At 80% the meter turns amber and the owner gets one email. At 100% the button is disabled with
   "You have used all 100 rewrites this month. Upgrade or wait until 1 Nov."
@@ -401,8 +404,8 @@ authorization: <ASSEMBLYAI_API_KEY>
   "speaker_labels": true,
   "language_detection": true,
   "keyterms_prompt": ["<client company>", "<user's service names>"],
-  "webhook_url": "https://<ref>.supabase.co/functions/v1/pr-assemblyai-webhook",
-  "webhook_auth_header_name": "x-proposely-webhook",
+  "webhook_url": "https://<ref>.supabase.co/functions/v1/sg-assemblyai-webhook",
+  "webhook_auth_header_name": "x-signet-webhook",
   "webhook_auth_header_value": "<ASSEMBLYAI_WEBHOOK_SECRET>"
 }
 \`\`\`
@@ -415,7 +418,7 @@ full transcript with \`GET /v2/transcript/{id}\` (the \`utterances\` array has \
   the merchant of record. Stripe handles their onboarding and their disputes.
 - **Direct charges:** the Checkout Session is created on the connected account (\`Stripe-Account: acct_...\`
   header, \`stripeAccount\` option in the Node SDK). The charge, the fee and any refund belong to the agency.
-  Proposely sets no \`application_fee_amount\` in v1, so it takes no cut and pays no Connect fees. Stripe
+  Signet sets no \`application_fee_amount\` in v1, so it takes no cut and pays no Connect fees. Stripe
   charges the agency its normal card fee.
 - Connect an existing account: Stripe's OAuth for Standard accounts
   (\`https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_...&scope=read_write\`, then
@@ -424,7 +427,7 @@ full transcript with \`GET /v2/transcript/{id}\` (the \`utterances\` array has \
   platforms to Accounts v2 controller settings; check the Connect docs for the current recommended way to
   create Standard-style accounts before building [verify].
 - Connected-account events reach a separate webhook endpoint (Workbench, Webhooks, "Events on connected
-  accounts") with its own \`whsec_\` secret. That endpoint is \`pr-connect-webhook\`.
+  accounts") with its own \`whsec_\` secret. That endpoint is \`sg-connect-webhook\`.
 
 ## 12. Security model
 
@@ -432,12 +435,12 @@ full transcript with \`GET /v2/transcript/{id}\` (the \`utterances\` array has \
    \`public.is_workspace_member(ws)\` and \`public.has_workspace_role(ws, roles[])\`, both
    \`security definer\` with \`set search_path = ''\`.
 2. **Public pages never touch tables.** The anon role has zero grants on proposal tables. The share page
-   calls \`pr-public-proposal\`, which uses the secret key and returns only the frozen version snapshot,
+   calls \`sg-public-proposal\`, which uses the secret key and returns only the frozen version snapshot,
    the brand kit, and the signature status.
 3. **Share tokens are unguessable.** 32 random bytes (\`crypto.getRandomValues\`), base64url (43
    characters, 256 bits). Only \`sha256(token)\` is stored in \`share_links.token_hash\`. A database leak does
    not leak working links. Links can be revoked and can expire (default 60 days).
-4. **Brute force guard.** \`pr-public-proposal\` rate limits by IP hash: 30 requests per minute, and 20
+4. **Brute force guard.** \`sg-public-proposal\` rate limits by IP hash: 30 requests per minute, and 20
    unknown-token lookups per hour per IP returns 429. Unknown and revoked tokens return the same 404.
 5. **Tamper-evident signatures.** On Send, the snapshot is serialised with a canonical JSON function
    (sorted keys, no whitespace) and hashed with SHA-256 into \`proposal_versions.content_hash\`. On signing,
