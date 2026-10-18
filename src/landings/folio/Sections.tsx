@@ -229,7 +229,7 @@ export function Demo() {
     <section className="fo-sec" id="demo" aria-labelledby="fo-demo-h">
       <div className="fo-sec-head fo-center">
         <h2 id="fo-demo-h" className="fo-h2">From link to scheduled post in under 3 minutes.</h2>
-        <p className="fo-body fo-intro">This is a real recording. No cuts except the waiting.</p>
+        <p className="fo-body fo-intro">One carousel from a blog link to a scheduled post, start to finish.</p>
       </div>
       <Reveal>
         <div ref={ref} className="fo-demo" role="img" aria-label={`Folio making a carousel. Now showing: ${CAPTIONS[step]}`}>
