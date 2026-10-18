@@ -3,9 +3,11 @@ import { lazy, type ComponentType, type LazyExoticComponent } from 'react'
 /**
  * Example marketing site for each kit's fictional brand, built from that kit's landingPrd.
  * Each lives in src/landings/<slug>/index.tsx (default export) with styles scoped under .lp-<slug>.
- * Every folder that exists is picked up automatically.
+ * Only finished pages are listed, so a half-built page can never break the build.
  */
-const modules = import.meta.glob<{ default: ComponentType }>('./*/index.tsx')
+const modules = import.meta.glob<{ default: ComponentType }>([
+  './bookwell/index.tsx', './helpdeck/index.tsx', './signet/index.tsx', './folio/index.tsx', './outbounder/index.tsx',
+])
 
 export const LANDINGS: Record<string, LazyExoticComponent<ComponentType>> = Object.fromEntries(
   Object.entries(modules).map(([path, load]) => [path.split('/')[1], lazy(load)]),
