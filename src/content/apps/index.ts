@@ -1,8 +1,12 @@
 import type { AppDef, Phase } from '../types'
 import { buildPhases } from '../phases'
 
-// Every top-level module in this folder that exports an AppDef becomes a kit.
-const modules = import.meta.glob<Record<string, unknown>>('./*.ts', { eager: true })
+// Only published kits are bundled, so a half-written kit in this folder can never break the build.
+// To publish a kit: add its file here AND its slug to PUBLISHED below.
+const modules = import.meta.glob<Record<string, unknown>>(
+  ['./bookwell.ts', './helpdeck.ts', './signet.ts', './outbounder.ts', './folio.ts'],
+  { eager: true },
+)
 const ORDER = ['etcher', 'factorie', 'ethereel', 'conversate', 'outbounder', 'signet', 'folio', 'bookwell', 'helpdeck']
 
 /**
