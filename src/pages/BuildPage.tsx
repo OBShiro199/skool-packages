@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowRight, Calculator, Check, Lock, Package, Trophy } from 'lucide-react'
+import { ArrowRight, Calculator, Check, FolderDown, Lock, Trophy } from 'lucide-react'
 import { getApp, getPhases } from '../content/apps'
 import type { Task } from '../content/types'
 import { useStore, useUser } from '../lib/store'
@@ -12,6 +12,7 @@ import { TaskCard, type StepState } from '../components/TaskCard'
 import { TriggerContext } from '../components/Blocks'
 import { DownloadCodeModal } from '../components/DownloadCodeModal'
 import { CostCalculator } from '../components/CostCalculator'
+import { DownloadsPanel } from '../components/DownloadsPanel'
 import { toast } from '../components/Toasts'
 import { burst, celebrate } from '../lib/confetti'
 import { LOCK_PROGRESSION } from '../lib/flags'
@@ -57,6 +58,8 @@ export default function BuildPage() {
   const unlockedUpTo = stats ? stats.currentPhase : 0
   const requested = params.get('tab')
   const showCosts = requested === 'costs'
+  const showDownloads = requested === 'downloads'
+  const showExtra = showCosts || showDownloads
   const reqIndex = phases.findIndex((p) => p.id === requested)
   const phaseIndex = reqIndex >= 0 ? reqIndex : unlockedUpTo
   const phase = phases[phaseIndex]
@@ -76,7 +79,7 @@ export default function BuildPage() {
   }, [phase, checked, phaseLocked])
   const currentTask = phase?.tasks[stepStates.indexOf('current')]
 
-  useEffect(() => { if (app) { setLastTab(app.slug, showCosts ? 'costs' : phase.id); setActive(app.slug) } }, [app, phase?.id, showCosts]) // eslint-disable-line
+  useEffect(() => { if (app) { setLastTab(app.slug, showExtra ? requested! : phase.id); setActive(app.slug) } }, [app, phase?.id, showExtra]) // eslint-disable-line
   // Open the current step whenever the phase changes.
   useEffect(() => { setOpenTask(currentTask?.id ?? null) }, [phase?.id]) // eslint-disable-line
 
@@ -148,7 +151,7 @@ export default function BuildPage() {
             {phases.map((p, i) => {
               const s = stats.perPhase[i]
               const locked = LOCK_PROGRESSION && i > unlockedUpTo
-              const active = !showCosts && i === phaseIndex
+              const active = !showExtra && i === phaseIndex
               const state = s.complete ? 'done' : locked ? 'locked' : i === unlockedUpTo ? 'current' : 'todo'
               return (
                 <li key={p.id}>
@@ -168,16 +171,25 @@ export default function BuildPage() {
               <span className="rail-dot plain"><Calculator size={13} /></span>
               <span className="rail-text"><b>Costs & running</b><span>Calculator</span></span>
             </button>
-            <button className="rail-item" onClick={() => setZipOpen(true)}>
-              <span className="rail-dot plain"><Package size={13} /></span>
-              <span className="rail-text"><b>Download all code</b><span>Starter pack .zip</span></span>
+            <button className={`rail-item ${showDownloads ? 'active' : ''}`} onClick={() => goTab('downloads')}>
+              <span className="rail-dot plain"><FolderDown size={13} /></span>
+              <span className="rail-text"><b>Downloadables</b><span>PRDs, SQL, prompts, zip</span></span>
             </button>
           </div>
         </aside>
 
         <main className="journey-main">
           <AnimatePresence mode="wait">
-            {showCosts ? (
+            {showDownloads ? (
+              <motion.section key="downloads" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <header className="phase-intro">
+                  <span className="label">Downloadables</span>
+                  <h1>Every {app.name} file, ready to download</h1>
+                  <p className="muted">The PRDs, the database, every prompt, the env template and the marketing scripts. Each one is also inside the step that uses it.</p>
+                </header>
+                <DownloadsPanel app={app} onZip={() => setZipOpen(true)} />
+              </motion.section>
+            ) : showCosts ? (
               <motion.section key="costs" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 <header className="phase-intro">
                   <span className="label">Costs & running</span>

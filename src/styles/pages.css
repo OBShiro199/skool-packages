@@ -429,3 +429,22 @@ input[type="range"]::-moz-range-thumb { background: var(--surface); border: 1.5p
 .econ b { font-size: 15px; font-variant-numeric: tabular-nums; }
 .econ > div:last-child { text-align: right; }
 .sort-select { height: 36px; width: auto; padding: 0 10px; }
+
+/* Floating pill over example landing pages */
+.lp-back { position: fixed; left: 16px; bottom: 16px; z-index: 1000; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border: 1px solid #E6E9F0; color: #111827; font: 500 13px Geist, sans-serif; box-shadow: 0 6px 20px rgba(17,24,39,.12); }
+.lp-back:hover { text-decoration: none; border-color: #3F68D1; }
+/* Downloadables */
+.dl { display: grid; gap: 16px; }
+.dl-hero { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 18px 20px; border: 1px solid var(--tint-line); background: var(--tint); }
+.dl-hero b { font-size: 16px; }
+.dl-hero p { font-size: 14px; max-width: 60ch; margin-top: 2px; }
+.dl-list { border: 1px solid var(--line); }
+.dl-row { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.dl-row:last-child { border-bottom: 0; }
+.dl-icon { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--line); color: var(--ink-2); }
+.dl-text { display: grid; gap: 3px; min-width: 0; }
+.dl-text p { font-size: 13.5px; }
+.dl-text code { font-size: 12px; }
+.dl-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.dl-pre { font-family: var(--code); font-size: 12px; line-height: 1.5; background: var(--fill); border: 1px solid var(--line); padding: 12px; overflow: auto; max-height: 70vh; margin: 0; }
+@media (max-width: 720px) { .dl-row { grid-template-columns: 36px 1fr; } .dl-actions { grid-column: 1 / -1; justify-content: flex-start; } }

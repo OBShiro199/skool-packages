@@ -1,4 +1,23 @@
-export function downloadBlob(blob: Blob, filename: string) {
+// Inside the claude.ai artifact viewer a plain <a download> is blocked; the page asks the
+// viewer to save through the `downloads` capability instead. Elsewhere we use a normal link.
+type DownloadsNs = { save: (r: { filename: string; data: Blob }) => Promise<unknown> }
+const ALLOWED = /\.(gif|png|jpe?g|webp|mp4|webm|mov|txt|json|md|docx|pptx|epub|csv|ttf|html|svg|pdf|xlsx|zip)$/i
+let viewerDownloads: Promise<DownloadsNs | null> | null = null
+function getViewerDownloads(): Promise<DownloadsNs | null> {
+  const c = (window as unknown as { claude?: { use?: (n: string) => Promise<unknown> } }).claude
+  if (!c?.use) return Promise.resolve(null)
+  viewerDownloads ??= c.use('downloads').then((ns) => (ns as DownloadsNs) ?? null).catch(() => null)
+  return viewerDownloads
+}
+
+export async function downloadBlob(blob: Blob, filename: string) {
+  const viewer = await getViewerDownloads()
+  if (viewer) {
+    // .sql and .env.example are not on the viewer's allowlist: save them as text.
+    const name = ALLOWED.test(filename) ? filename : `${filename}.txt`
+    try { await viewer.save({ filename: name, data: blob }) } catch { /* declined or unavailable */ }
+    return
+  }
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -47,7 +66,7 @@ export async function downloadPdf(title: string, markdown: string, filename: str
       y += size * 1.38
     }
   }
-  doc.save(filename)
+  await downloadBlob(doc.output('blob'), filename)
 }
 
 export async function copyText(text: string): Promise<boolean> {

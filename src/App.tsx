@@ -12,6 +12,7 @@ import BuildPage from './pages/BuildPage'
 import DocsPage from './pages/DocsPage'
 import SupportPage from './pages/SupportPage'
 import AboutPage from './pages/AboutPage'
+import LandingPreviewPage from './pages/LandingPreviewPage'
 
 function RequireAuth({ children, onboarded = true }: { children: ReactNode; onboarded?: boolean }) {
   const user = useUser()
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="support" element={<SupportPage />} />
           <Route path="about" element={<AboutPage />} />
         </Route>
+        <Route path="/landing/:slug" element={<LandingPreviewPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Toasts />
