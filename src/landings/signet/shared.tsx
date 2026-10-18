@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { motion, useInView, useReducedMotion } from 'motion/react'
 import { Check } from 'lucide-react'
 
@@ -167,7 +167,7 @@ export function Waveform({ bars = 28, live = true, className = '' }: { bars?: nu
   const heights = Array.from({ length: bars }, (_, i) => 0.25 + Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.6)) * 0.75)
   return (
     <span className={`sg-wave ${live ? 'is-live' : ''} ${className}`} aria-hidden="true">
-      {heights.map((h, i) => <i key={i} style={{ transform: `scaleY(${h.toFixed(2)})`, animationDelay: `${(i % 7) * 90}ms` }} />)}
+      {heights.map((h, i) => <i key={i} style={{ '--h': h.toFixed(2), animationDelay: `${(i % 7) * 90}ms` } as CSSProperties} />)}
     </span>
   )
 }
