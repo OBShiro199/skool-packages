@@ -6,7 +6,7 @@ import { lazy, type ComponentType, type LazyExoticComponent } from 'react'
  * Only finished pages are listed, so a half-built page can never break the build.
  */
 const modules = import.meta.glob<{ default: ComponentType }>([
-  './bookwell/index.tsx', './helpdeck/index.tsx', './signet/index.tsx', './folio/index.tsx', './outbounder/index.tsx', './factorie/index.tsx', './etcher/index.tsx', './conversate/index.tsx', './ethereel/index.tsx',
+  './bookwell/index.tsx', './helpdeck/index.tsx', './signet/index.tsx', './folio/index.tsx', './outbounder/index.tsx', './factorie/index.tsx', './etcher/index.tsx', './conversate/index.tsx', './ethereel/index.tsx', './echo/index.tsx', './tally/index.tsx',
 ])
 
 export const LANDINGS: Record<string, LazyExoticComponent<ComponentType>> = Object.fromEntries(

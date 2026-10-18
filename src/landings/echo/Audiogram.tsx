@@ -44,7 +44,7 @@ export function Audiogram({ variant = 'Bars', label, compact = false }: { varian
           {variant === 'Line' ? (
             <svg viewBox="0 0 200 60" preserveAspectRatio="none">
               <path
-                className="ec-ag-line"
+                className="ec-ag-path"
                 d={'M0 30 ' + heights.map((h, i) => `L${(i / (heights.length - 1)) * 200} ${30 + (i % 2 ? 1 : -1) * h * 22}`).join(' ')}
               />
             </svg>
