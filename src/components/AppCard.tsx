@@ -3,7 +3,7 @@ import { motion } from 'motion/react'
 import { Clock, Lock } from 'lucide-react'
 import type { AppDef } from '../content/types'
 import { CATEGORIES } from '../content/catalog'
-import { AppArt } from './AppArt'
+import { KitPreview } from './KitPreview'
 import { Bar } from './Ring'
 import { compute, fallbackModel } from './CostCalculator'
 
@@ -22,7 +22,7 @@ export function AppCard({ app, match, progress, index = 0 }: { app: AppDef; matc
     <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05, duration: 0.35 }}>
       <Link to={`/app/library/${app.slug}`} className="app-card">
         <div className="app-card-art">
-          <AppArt app={app} />
+          <KitPreview app={app} />
           <div className="app-card-badges">
             {match && <span className="chip chip-signal">Your match</span>}
             {app.status === 'full' ? <span className="chip chip-money">Full playbook</span> : <span className="chip">Preview</span>}

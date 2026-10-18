@@ -208,3 +208,10 @@ body:has(.course-nav) .toasts { bottom: 78px; }
 .commit-form .agree { font-size: 13px; }
 
 .xp-tag { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border-radius: 4px; border: 1px solid var(--tint-line); background: var(--tint); color: var(--tint-ink); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* Kit logos and hero previews */
+.kit-logo { display: inline-grid; place-items: center; flex: none; }
+.kit-logo svg { width: 100%; height: 100%; display: block; }
+.kit-logo-fallback { border-radius: 5px; border: 1px solid var(--tint-line); background: var(--tint); color: var(--tint-ink); font-weight: 600; }
+.kit-preview { position: relative; width: 100%; aspect-ratio: 1200 / 750; overflow: hidden; background: #fff; }
+.kit-preview-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; overflow: hidden; }
