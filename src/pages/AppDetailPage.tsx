@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { ArrowLeft, ArrowRight, Check, Clock, ExternalLink, Lock, Sparkles } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Clock, ExternalLink, Lock } from 'lucide-react'
 import { getApp, getPhases } from '../content/apps'
 import { CATEGORIES, CORE_STACK } from '../content/catalog'
 import { useUser } from '../lib/store'
@@ -37,7 +37,7 @@ export default function AppDetailPage() {
           <div className="row wrap" style={{ gap: 6 }}>
             <span className="chip">{cat?.label}</span>
             {app.status === 'full' ? <span className="chip chip-money">Full playbook</span> : <span className="chip">Preview playbook</span>}
-            {user.onboarding?.recommended === app.slug && <span className="chip chip-signal"><Sparkles size={11} /> Your match</span>}
+            {user.onboarding?.recommended === app.slug && <span className="chip chip-signal">Your match</span>}
           </div>
           <h1 className="detail-title">{app.name}</h1>
           <p className="detail-tag">{app.tagline}</p>

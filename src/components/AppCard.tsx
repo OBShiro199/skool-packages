@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { Clock, Lock, Sparkles } from 'lucide-react'
+import { Clock, Lock } from 'lucide-react'
 import type { AppDef } from '../content/types'
 import { CATEGORIES } from '../content/catalog'
 import { AppArt } from './AppArt'
@@ -24,7 +24,7 @@ export function AppCard({ app, match, progress, index = 0 }: { app: AppDef; matc
         <div className="app-card-art">
           <AppArt app={app} />
           <div className="app-card-badges">
-            {match && <span className="chip chip-signal"><Sparkles size={11} /> Your match</span>}
+            {match && <span className="chip chip-signal">Your match</span>}
             {app.status === 'full' ? <span className="chip chip-money">Full playbook</span> : <span className="chip">Preview</span>}
           </div>
         </div>

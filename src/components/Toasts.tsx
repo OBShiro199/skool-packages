@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { AnimatePresence, motion } from 'motion/react'
-import { Check, Sparkles } from 'lucide-react'
+import { Check } from 'lucide-react'
 
 interface Toast { id: number; text: string; xp?: number }
 const useToasts = create<{ list: Toast[]; push: (t: Omit<Toast, 'id'>) => void }>((set, get) => ({
@@ -28,7 +28,7 @@ export function Toasts() {
             exit={{ opacity: 0, x: 40 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           >
-            {t.xp ? <Sparkles size={16} /> : <Check size={16} />}
+            <Check size={16} />
             <span style={{ flex: 1 }}>{t.text}</span>
             {t.xp ? <span className="xp">+{t.xp} XP</span> : null}
           </motion.div>

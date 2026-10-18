@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowLeft, ArrowRight, Calculator, Check, Clock, FolderDown, Lock, Sparkles, Trophy } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Calculator, Check, Clock, FolderDown, Lock, Trophy } from 'lucide-react'
 import { getApp, getPhases } from '../content/apps'
 import type { Task } from '../content/types'
 import { useStore, useUser } from '../lib/store'
@@ -17,6 +17,7 @@ import { toast } from '../components/Toasts'
 import { burst, celebrate } from '../lib/confetti'
 import { LOCK_PROGRESSION } from '../lib/flags'
 
+const RISE = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.36, ease: [0.16, 1, 0.3, 1] as const } } }
 const EASE = [0.16, 1, 0.3, 1] as const
 
 /**
@@ -95,6 +96,10 @@ export default function BuildPage() {
     if (si > 0) go(pi, si - 1, -1)
     else if (pi > 0) go(pi - 1, phases[pi - 1].tasks.length - 1, -1)
   }
+  const nextRef = useRef(next)
+  nextRef.current = next
+  const taskIdRef = useRef(task?.id)
+  taskIdRef.current = task?.id
   const firstUnfinished = (i: number) => Math.max(0, phases[i].tasks.findIndex((t) => !taskStats(t, checked).complete))
 
   const onToggle = useCallback((itemId: string, value?: boolean) => {
@@ -111,7 +116,13 @@ export default function BuildPage() {
       toast(ref.task.title, ref.task.xp)
       burst({ x: 0.5, y: 0.9 })
     }
-    if (!wasPhase && phaseStats(ph, after).complete) setTimeout(() => { celebrate(); setPhaseDone(ph.id) }, 400)
+    const phaseJustDone = !wasPhase && phaseStats(ph, after).complete
+    if (phaseJustDone) setTimeout(() => { celebrate(); setPhaseDone(ph.id) }, 400)
+    // Finishing a step moves on by itself, unless it also finished the phase (the banner takes over then).
+    else if (!wasTask && taskStats(ref.task, after).complete) {
+      const doneId = ref.task.id
+      setTimeout(() => { if (taskIdRef.current === doneId) nextRef.current() }, 1100)
+    }
   }, [app, allItems, phases, toggle]) // eslint-disable-line
 
   const fire = useCallback((trigger: string) => {
@@ -205,8 +216,8 @@ export default function BuildPage() {
               <motion.main key={task.id} className="course-main"
                 initial={{ opacity: 0, x: dir * 56 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -56 }}
                 transition={{ duration: 0.32, ease: EASE }}>
-                <header className="step-intro">
-                  <div className="step-top">
+                <motion.header className="step-intro" initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.05 } } }}>
+                  <motion.div variants={RISE} className="step-top">
                     <div className="row wrap" style={{ gap: 10 }}>
                       <span className="phase-pill"><PhaseIcon icon={phase.icon} size={13} /> Phase {pi + 1} · {phase.label}</span>
                       <span className="label">Step {si + 1} of {phase.tasks.length}</span>
@@ -219,31 +230,37 @@ export default function BuildPage() {
                         {lockedNext && <Lock size={12} />} Next <ArrowRight size={14} />
                       </button>
                     </div>
-                  </div>
-                  <h1>{task.title}</h1>
-                  <p className="muted">{task.outcome}</p>
-                  <div className="row wrap" style={{ gap: 16 }}>
+                  </motion.div>
+                  <motion.h1 variants={RISE}>{task.title}</motion.h1>
+                  <motion.p variants={RISE} className="muted">{task.outcome}</motion.p>
+                  <motion.div variants={RISE} className="row wrap" style={{ gap: 16 }}>
                     <span className="meta"><Clock size={13} /> {fmtMinutes(task.minutes)}</span>
-                    <span className="meta"><Sparkles size={13} /> {task.xp} XP</span>
+                    <span className="xp-tag">+{task.xp} XP</span>
                     <span className="meta money" style={{ visibility: ts.complete ? 'visible' : 'hidden' }}><Check size={13} /> Done</span>
-                  </div>
-                  <div className="step-dots" aria-label={`Steps in ${phase.label}`}>
+                  </motion.div>
+                  <motion.div variants={RISE} className="step-dots" aria-label={`Steps in ${phase.label}`}>
                     {phase.tasks.map((t, i) => (
                       <button key={t.id} title={`${i + 1}. ${t.title}`} aria-label={`Step ${i + 1}: ${t.title}`} aria-current={i === si ? 'step' : undefined}
                         className={`sd ${i === si ? 'active' : ''} ${taskStats(t, checked).complete ? 'done' : ''}`} onClick={() => go(pi, i)} />
                     ))}
-                  </div>
-                </header>
+                  </motion.div>
+                </motion.header>
 
                 {app.status === 'preview' && si === 0 && ['foundations', 'backend', 'outbound', 'inbound', 'paid'].includes(phase.id) && (
                   <p className="preview-note">Preview kit: the {app.name}-specific parts of this phase are shorter than the flagship kits.</p>
                 )}
 
                 <div className="step-content">
-                  {task.blocks.map((b, i) => <BlockView key={i} b={b} />)}
+                  {task.blocks.map((b, i) => (
+                    <motion.div key={i} className="step-block" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.36, ease: EASE, delay: 0.12 + Math.min(i * 0.05, 0.4) }}>
+                      <BlockView b={b} />
+                    </motion.div>
+                  ))}
                 </div>
 
-                <section className={`step-check ${ts.complete ? 'complete' : ''}`}>
+                <motion.section className={`step-check ${ts.complete ? 'complete' : ''}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.36, ease: EASE, delay: 0.16 + Math.min(task.blocks.length * 0.05, 0.4) }}>
                   <div className="row between">
                     <b>{ts.complete ? 'Step complete' : 'Tick these off to finish this step'}</b>
                     <span className="muted">{ts.done} of {ts.total}</span>
@@ -263,7 +280,7 @@ export default function BuildPage() {
                       )
                     })}
                   </div>
-                </section>
+                </motion.section>
               </motion.main>
             )}
           </AnimatePresence>

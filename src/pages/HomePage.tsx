@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { useUser } from '../lib/store'
 import { getApp } from '../content/apps'
 import { fmtMinutes, taskStats } from '../lib/progress'
@@ -69,7 +69,7 @@ export default function HomePage() {
       ) : rec ? (
         <section className="card continue">
           <div className="continue-body">
-            <span className="label" style={{ color: 'var(--signal)' }}><Sparkles size={12} style={{ verticalAlign: -1 }} /> Your match from onboarding</span>
+            <span className="label" style={{ color: 'var(--signal)' }}>Your match from onboarding</span>
             <h2>{rec.name}</h2>
             <p className="muted">{rec.oneLiner}</p>
             <p style={{ fontSize: 14 }}>{rec.whyItSells}</p>

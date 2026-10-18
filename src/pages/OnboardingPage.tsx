@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { useStore, useUser } from '../lib/store'
 import { APPS, getApp } from '../content/apps'
 import { AppArt } from '../components/AppArt'
@@ -176,7 +176,7 @@ export default function OnboardingPage() {
 
           {phase === 'result' && rec && (
             <motion.section key="result" className="onb-card" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}>
-              <span className="label" style={{ color: 'var(--money)' }}><Sparkles size={12} style={{ verticalAlign: -1 }} /> Your match</span>
+              <span className="label" style={{ color: 'var(--money)' }}>Your match</span>
               <h1 className="onb-h1">Build <span className="hl">{rec.name}</span>.</h1>
               <div className="rec-card">
                 <div className="rec-body">

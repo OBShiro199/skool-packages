@@ -30,7 +30,7 @@ export function CommitModal({ app, open, onClose, onDone }: { app: AppDef; open:
     <>
       <Modal open={open} onClose={onClose} title={`Commit to ${app.name}`} icon={<PenLine size={16} />}
         footer={<><button className="btn" onClick={onClose}>Not yet</button><button className="btn btn-primary" disabled={!ready} onClick={sign}>Sign and unlock <ArrowRight size={15} /></button></>}>
-        <div className="stack" style={{ gap: 18 }}>
+        <div className="stack commit-form" style={{ gap: 14 }}>
           <div className="pledge">
             <span className="label">The founder pledge</span>
             <p>
@@ -46,7 +46,7 @@ export function CommitModal({ app, open, onClose, onDone }: { app: AppDef; open:
           </div>
 
           <div>
-            <div className="row between" style={{ marginBottom: 6 }}>
+            <div className="row between" style={{ marginBottom: 4 }}>
               <span className="label">Sign here</span>
               <button className="btn btn-sm btn-ghost" onClick={() => pad.current?.clear()}><Eraser size={14} /> Clear</button>
             </div>

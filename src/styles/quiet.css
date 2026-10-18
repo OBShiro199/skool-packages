@@ -195,3 +195,16 @@ body:has(.course-nav) .toasts { bottom: 78px; }
 .step-top-nav .btn { min-width: 104px; justify-content: center; }
 .step-top-nav .btn.cn-ready { border-color: var(--tint-line); background: var(--tint); color: var(--tint-ink); }
 .cn-btn:disabled, .step-top-nav .btn:disabled { cursor: not-allowed; }
+
+/* Compact pledge dialog */
+.pledge { padding: 14px 16px; gap: 6px; font-size: 13px; line-height: 1.5; }
+.pledge ul { gap: 2px; padding-left: 18px; }
+.sig-box { height: 112px; }
+.sig-line { bottom: 26px; }
+.sig-x { bottom: 20px; font-size: 18px; }
+.sig-hint { font-size: 13px; }
+.commit-form { gap: 14px !important; }
+.commit-form .field span { font-size: 13px; }
+.commit-form .agree { font-size: 13px; }
+
+.xp-tag { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border-radius: 4px; border: 1px solid var(--tint-line); background: var(--tint); color: var(--tint-ink); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
