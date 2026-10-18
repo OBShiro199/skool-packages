@@ -65,3 +65,8 @@ They open Claude Code in a blank folder and follow these steps. Spoon-feed them.
   Resend tiers, Twilio per-minute, etc.), plus the usage driver. Stripe fees are computed by the UI
   (2.9% + $0.30 per charge + 0.7% Billing), do not add them as a line. If the user did not give a
   price, compute unit cost per customer from the API costs and set a price with 75%+ gross margin.
+- App shell (every kit): simple left sidebar. Top group: logo + core pages. Bottom group, always in
+  this order: Documentation, Help, Billing, Settings. One level, no nested menus, about 8 items max.
+  Both designPrd (app shell section) and buildPrd (routes) must specify it.
+- If WebFetch fails (DNS), research with WebSearch using official pricing/docs pages and mark
+  anything unconfirmed as [verify].

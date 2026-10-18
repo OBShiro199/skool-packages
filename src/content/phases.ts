@@ -986,10 +986,13 @@ Run npm run build and show me the output.
 Build the logged-in app shell for ${name} under app/(app)/ following @DESIGN.md
 and the pages list in @PLAN.md.
 
-1. app/(app)/layout.tsx: left sidebar (collapses to a bottom sheet menu under
-   768px) with the ${name} logo, nav items for every logged-in page in PLAN.md,
-   and at the bottom "Billing" and "Settings". Top bar with page title and an
-   avatar dropdown: "Settings", "Billing", "Log out".
+1. app/(app)/layout.tsx: a simple left sidebar (collapses to a menu button under
+   768px). Top group: the ${name} logo, then nav items for every core logged-in
+   page in PLAN.md. Bottom group, always in this order: "Documentation" (/docs),
+   "Help" (/help), "Billing" (/billing), "Settings" (/settings). The active item
+   is highlighted. Top bar with page title and an avatar dropdown: "Settings",
+   "Billing", "Log out".
+   Keep it simple: one level of nav, no nested menus, at most 8 items in total.
 2. app/(app)/app/page.tsx at /app: the dashboard. Show a first-run checklist card
    (3 items from the PRD activation path), and an empty state with an icon, one
    sentence and a primary button that starts the core ${name} action.
@@ -997,9 +1000,13 @@ and the pages list in @PLAN.md.
    "coming soon").
 4. app/(app)/settings/page.tsx with sections Profile, Email, Password, Delete
    account (buttons can be disabled for now).
-5. app/(app)/billing/page.tsx with a card "Plan: ${name} $${price.monthly}/month" and a
+5. app/(app)/help/page.tsx: a contact form (subject, message) that will email you
+   via Resend later, plus 5 FAQ items from the PRD. app/(app)/docs/page.tsx: a
+   simple searchable list of how-to articles for ${name} users (write 6 short
+   articles from the PRD's main flows as MDX or a TS array).
+6. app/(app)/billing/page.tsx with a card "Plan: ${name} $${price.monthly}/month" and a
    disabled "Manage billing" button. We wire it in the Payments phase.
-6. Loading skeletons (loading.tsx) and an error boundary (error.tsx) for the group.
+7. Loading skeletons (loading.tsx) and an error boundary (error.tsx) for the group.
 
 No auth checks yet; we add them when Supabase is connected.
 Run npm run build and show me the output.

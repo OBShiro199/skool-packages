@@ -116,14 +116,18 @@ All of these numbers live in one SQL function, \`public.plan_limits(uid)\` (see 
 | \`/app/competitors\` | App | Paid | Share of voice and head-to-head |
 | \`/app/sources\` | App | Paid | Cited domains and URLs |
 | \`/app/recommendations\` | App | Paid | Content gaps and page briefs |
-| \`/app/runs\` | App | Paid | Check run history with status and cost |
+| \`/app/runs\` | App | Paid | Check run history with status and cost (opened from the run status chip in the top bar, not in the sidebar) |
 | \`/app/settings\` | App | Paid | Brand, engines, frequency, alerts, digest |
-| \`/app/settings/billing\` | App | Paid | Plan, usage meters, portal button |
+| \`/app/docs\` | App | Signed in | Documentation: how scores work, engines, prompt writing tips (MDX pages in \`content/docs/\`) |
+| \`/app/help\` | App | Signed in | Help: FAQ, contact form (sends to your inbox via Resend), status of the last run |
+| \`/app/billing\` | App | Signed in | Plan, usage meters, portal button |
 | \`/paywall\` | App | Signed in, no access | Choose plan, start trial |
 | \`/api/stripe/checkout\` | Route handler | Signed in | Creates Checkout session |
 | \`/api/stripe/webhook\` | Route handler | Stripe | Writes subscriptions |
 | \`/api/stripe/portal\` | Route handler | Signed in | Opens Customer Portal |
 | \`/api/export/[brandId]\` | Route handler | Paid (Starter+) | CSV export of results |
+
+**Sidebar (one level, no nested menus, 9 items):** top group = logo, then Overview (\`/app\`), Prompts, Competitors, Sources, Recommendations. Bottom group, always in this order: Documentation (\`/app/docs\`), Help (\`/app/help\`), Billing (\`/app/billing\`), Settings (\`/app/settings\`). Runs, the prompt drilldown and settings sub-sections are reached from inside those pages, never as extra sidebar items.
 
 Every \`/app\` page is a server component that calls \`supabase.auth.getClaims()\`, redirects to \`/login\` with no claims, and to \`/paywall\` when \`has_active_access\` is false. A brand switcher in the top bar sets the current brand (cookie \`fac_brand\`, validated against the user's brands on every request).
 
