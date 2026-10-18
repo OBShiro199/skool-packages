@@ -175,9 +175,9 @@ create table public.brand_kits (
   workspace_id uuid primary key references public.workspaces (id) on delete cascade,
   logo_path text,
   cover_path text,
-  primary_hex text not null default '#B45309' check (primary_hex ~ '^#[0-9A-Fa-f]{6}$'),
-  accent_hex text not null default '#FDE7C7' check (accent_hex ~ '^#[0-9A-Fa-f]{6}$'),
-  font_pair text not null default 'inter-fraunces',
+  primary_hex text not null default '#7f72d9' check (primary_hex ~ '^#[0-9A-Fa-f]{6}$'),
+  accent_hex text not null default '#f4f2fd' check (accent_hex ~ '^#[0-9A-Fa-f]{6}$'),
+  font_pair text not null default 'geist',  -- reserved; v1 renders Geist only
   sender_name text not null default '',
   footer_text text not null default '',
   voice_notes text not null default '' check (char_length(voice_notes) <= 2000),

@@ -15,6 +15,21 @@ All functions live in \`supabase/functions/<name>/index.ts\` and share helpers i
 | \`send-digest\` | Cron secret | \`{ user_id? }\` (test one user) | \`{ ok, sent, skipped }\` | Resend |
 | \`recheck\` | User JWT | \`{ prompt_id }\` or \`{ brand_id, scope: 'all' }\` | \`{ ok, run_id, jobs }\` | none directly |
 | \`generate-recommendations\` | User JWT or cron secret | \`{ brand_id }\` or \`{}\` (cron: all due brands) | \`{ ok, created }\` | Firecrawl (refresh 5 pages max), Claude Sonnet |
+| \`free-audit\` | None (public) for submit; cron secret for \`{ drain: true }\` | \`{ email, website, brand_name, category, company_fax, rendered_at }\` | \`{ ok, token }\` | Claude Sonnet (5 prompts), OpenRouter (15 checks), Claude Haiku |
+
+### A.1 Errors and retries per function
+
+| Function | Most likely failures | Retry rule | What the user sees |
+| --- | --- | --- | --- |
+| \`scrape-site\` | Site blocks bots (403), map returns 0 links, Firecrawl 429/5xx, timeout | Firecrawl calls: 2 retries with 2s, 6s backoff. Whole function: no retry; the user can click "Try again" (counts toward 3 per day) | Onboarding step 2 opens with empty fields and the amber note. Never a dead end |
+| \`generate-prompts\` | Claude 529/overloaded, schema mismatch, fewer than 20 valid after filters | SDK retries 2 times on 429/5xx. On fewer than 15 valid prompts, one more call asking for the missing intents only | "We wrote 17 prompts. Add a few of your own or regenerate" |
+| \`run-checks\` | Overlapping invocations, wall-time limit, kill switch on | None needed: claim is \`skip locked\` and every step is idempotent, next minute picks up | Run status chip keeps counting |
+| \`check-prompt\` | 429/5xx/timeout from OpenRouter, 402 out of credits, 400 bad slug, Claude parse failure | Job back to \`queued\` with \`30s x 2^attempts\` + up to 10s jitter, max 3 attempts. 402 and 401 stop the drain. Parse failure twice: save regex-only | Partial run banner with the count that worked |
+| \`score-day\` | No results that day, divide by zero | None: SQL returns nulls, the next hourly run fills in | Cards show a dash and "No checks yet today" |
+| \`send-digest\` | Resend 429/5xx, bad recipient address | Resend call: 2 retries. The \`email_log\` row is deleted on final failure so the next hourly run retries once more | Nothing (they get it an hour later) |
+| \`recheck\` | Cooldown, daily limit, budget | No retry: returns 429/402 with \`retry_in_s\` or \`resets_at\` | "Rechecks reset at midnight (2 left today)" |
+| \`generate-recommendations\` | Claude invents a URL or id, no data yet | Invalid items dropped; if 0 left, one retry with "use only these ids" restated | "Recommendations appear after your first full week" |
+| \`free-audit\` | Abuse, any engine failing | Each engine check retried once; audit completes with what worked | "2 of 3 engines answered" on the result page |
 
 Common rules:
 - Every function logs exactly one summary line at the end: \`{ fn, user_id?, brand_id?, ms, cost_usd, outcome }\`. Never log API keys, page markdown or full answers.
@@ -71,6 +86,7 @@ Each \`/app\` page reads with the user's session (RLS applies) through views cre
 | Visibility drop alert | Slider | 0 (off) to 30 points, step 1, default 5 | \`brands.alert_visibility_drop\` | |
 | Competitor overtakes alert | Toggle | on/off, default on | \`brands.alert_competitor_overtake\` | |
 | Lost #1 on pinned prompt | Toggle | on/off, default on | \`brands.alert_lost_top\` | |
+| Email me alerts | Toggle | on/off, default on | \`brands.alerts_email\` | Off still shows the banner in the app |
 | Digest | Toggle + hour slider | 0 to 23, default 8 | \`profiles.digest_enabled\`, \`digest_hour\` | |
 | Digest recipients | Email chips | Starter 1, Growth 5 | \`profiles.digest_recipients text[]\` | Each extra recipient gets a confirm email first [v1.1]; v1 sends to listed emails directly |
 | Timezone | Combobox | IANA zones | \`profiles.timezone\` | Default from browser |
@@ -95,6 +111,7 @@ Estimated monthly cost line under engines (for transparency, shown only to the u
 | \`APP_URL\` | Same as NEXT_PUBLIC_SITE_URL | Supabase secrets | No |
 | \`CRON_SECRET\` | You make it: \`openssl rand -hex 32\` | Supabase secrets and Supabase Vault | Yes |
 | \`DIGEST_SIGNING_SECRET\` | You make it: \`openssl rand -hex 32\` | Supabase secrets | Yes |
+| \`FOUNDER_EMAIL\` | Your own inbox for admin alerts (engine disabled, top up OpenRouter) | Supabase secrets | No |
 | Stripe variables | See the Payments phase | .env.local, Vercel env | Mixed |
 
 \`SUPABASE_URL\` and \`SUPABASE_SERVICE_ROLE_KEY\` exist in edge functions by default. Factorie's admin client prefers \`SUPABASE_SECRET_KEY\` if you set it as a secret, else falls back to \`SUPABASE_SERVICE_ROLE_KEY\`.

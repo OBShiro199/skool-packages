@@ -27,13 +27,12 @@ The current alternatives:
 | Option | Price (checked Oct 2026) | Problem |
 | --- | --- | --- |
 | Checking by hand | Free, 3 to 5 hours a week | Nobody keeps doing it. No history, no trend |
-| Searchable | From about $100/mo (Starter, 50 prompts, ChatGPT only per its docs) up to $400+ [verify] | Engines beyond the base set are add-ons |
-| Profound | Starter around $99/mo, real plans are enterprise sales [verify] | Built for big brands and sales calls |
-| Otterly.ai | Lite $29 (15 prompts), Standard $189 (100 prompts), Premium $489 | Claude and Gemini are paid add-ons |
-| Peec AI | About EUR 89 (50 prompts, 3 models) [pricing changed Aug 2026, verify] | Pick 3 models only on entry plan |
-| AthenaHQ | Self-serve $295/mo | Expensive for a small team |
+| Searchable | Pro about $125/mo (100 prompts per model), Scale about $400, Enterprise about $999 [verify] | Base plans cover ChatGPT, Google AI Overviews and Perplexity; Gemini, Claude, DeepSeek and Copilot are $25 to $100 add-ons each [verify] |
+| Profound | Self-serve price no longer published; older Starter was $99 for ChatGPT only, enterprise contracts quoted at $30k+ a year [verify] | Built for big brands and sales calls |
+| Otterly.ai | Lite $29 (15 prompts), Standard $189 (100 prompts), Premium $489 (400 prompts) | Extra engines are paid add-ons |
+| Peec AI | Starter about EUR 85 / $95 (50 prompts), Pro about EUR 205 (150 prompts) [verify] | Entry plan covers a few models; more models are add-ons |
 
-Factorie wins on: 5 engines on the entry plan (7 on Growth), raw answers you can read with your brand highlighted, every cited source counted, and a weekly list of pages to write that would change the answer.
+Factorie wins on: 5 engines included on the entry plan (all 6 on Growth, no add-ons), raw answers you can read with your brand highlighted, every cited source counted, a daily email digest, and a weekly list of pages to write that would change the answer.
 
 ## 2. Ideal customer
 
@@ -61,17 +60,19 @@ The aha moment: the user sees their first visibility score with the real ChatGPT
 | --- | --- | --- | --- |
 | Price | Free, card required | $99/mo or $990/yr | $199/mo or $1,990/yr |
 | Brands | 1 | 1 | 3 |
-| Tracked prompts (all brands) | 25 | 25 | 75 |
-| Engines | Starter set | 5: ChatGPT, Perplexity, Gemini, Claude, DeepSeek | All 7: adds Grok and Meta Llama |
-| Check frequency | Weekly + 1 full run on day 1 | Weekly | Weekly, plus daily for up to 10 pinned prompts |
-| Competitors per brand | 5 | 5 | 20 |
-| On-demand rechecks | 3 per day | 5 per day | 20 per day |
+| Tracked prompts (all brands) | 25 | 25 | 60 |
+| Engines | Starter set | 5: ChatGPT, Perplexity, Gemini, Claude, DeepSeek | All 6: adds Grok |
+| Check frequency | Weekly + 1 full run on day 1 | Weekly | Weekly for all, plus daily for up to 10 pinned prompts |
+| Competitors per brand | 5 | 5 | 50 |
+| On-demand rechecks | 3 per day | 5 per day | 10 per day |
 | Recommendations refresh | Once | Weekly | Weekly + on demand (1 per day) |
-| Daily digest email | Yes | Yes | Yes, up to 5 recipients |
+| Daily digest email | Yes | Yes, 1 recipient | Yes, up to 5 recipients |
 | CSV export | No | Yes | Yes |
-| Monthly AI spend cap (hard stop) | $4 | $10 | $45 |
+| Monthly AI spend cap (hard stop) | $4 | $15 | $40 |
 
-Why Growth is not "unlimited": a daily check of one prompt on all 7 engines costs about $1.98 a month in API fees (section 15). Unlimited daily prompts would wipe out the margin. The cap keeps gross margin above 75%.
+**Why the spec's "Unlimited" plan became "Growth" (read this before you change it).** The original idea was an "Unlimited" plan at $199 with unlimited prompts, all engines, daily checks and unlimited competitors. The maths does not work: one prompt checked daily on all 6 engines costs about $1.95 a month in API fees (section 15). 100 daily prompts would cost $195 a month, so an unlimited customer would lose you money. To keep gross margin at 75% or more at the plan's cap, Growth has 60 prompts checked weekly, up to 10 of them pinned for daily checks, 50 competitors per brand (competitors cost almost nothing, so this is effectively unlimited) and a $40 monthly spend cap. At that cap the margin is about 76% after Stripe fees. If you want to sell "unlimited" to agencies later, add a third plan at $499 with a $110 cap.
+
+Annual prices are 10 times monthly (2 months free).
 
 All of these numbers live in one SQL function, \`public.plan_limits(uid)\` (see the migration). Edge functions call it before doing anything that costs money. The UI reads it to show "18 of 25 prompts used". Nothing in the browser decides limits.
 
@@ -106,8 +107,9 @@ All of these numbers live in one SQL function, \`public.plan_limits(uid)\` (see 
 | --- | --- | --- | --- |
 | \`/\` | Marketing | Public | Landing page (see LANDING.md) |
 | \`/pricing\` | Marketing | Public | Plans with monthly/annual toggle |
-| \`/vs/[competitor]\` | Marketing | Public | Comparison pages (searchable, profound, otterly, peec, athenahq) |
-| \`/audit\` | Marketing | Public | Free AI visibility audit request form (lead magnet) |
+| \`/vs/[competitor]\` | Marketing | Public | Comparison pages (searchable, profound, otterly, peec) |
+| \`/audit\` | Marketing | Public | Free AI visibility audit request form (lead magnet, section 9b) |
+| \`/audit/[token]\` | Marketing | Public, unguessable token | The audit result page: 5 prompts x 3 engines, score, competitors named, "Start free trial" |
 | \`/login\`, \`/signup\`, \`/forgot\`, \`/reset\` | Auth | Public | Supabase Auth |
 | \`/onboarding\` | App | Signed in | 6-step wizard (section 7) |
 | \`/app\` | App | Paid or trialing | Overview dashboard |
@@ -116,7 +118,7 @@ All of these numbers live in one SQL function, \`public.plan_limits(uid)\` (see 
 | \`/app/competitors\` | App | Paid | Share of voice and head-to-head |
 | \`/app/sources\` | App | Paid | Cited domains and URLs |
 | \`/app/recommendations\` | App | Paid | Content gaps and page briefs |
-| \`/app/runs\` | App | Paid | Check run history with status and cost (opened from the run status chip in the top bar, not in the sidebar) |
+| \`/app/runs\` | App | Paid | Check run history with status and cost (opened from the run status chip in the page toolbar, not in the sidebar) |
 | \`/app/settings\` | App | Paid | Brand, engines, frequency, alerts, digest |
 | \`/app/docs\` | App | Signed in | Documentation: how scores work, engines, prompt writing tips (MDX pages in \`content/docs/\`) |
 | \`/app/help\` | App | Signed in | Help: FAQ, contact form (sends to your inbox via Resend), status of the last run |
@@ -129,7 +131,7 @@ All of these numbers live in one SQL function, \`public.plan_limits(uid)\` (see 
 
 **Sidebar (one level, no nested menus, 9 items):** top group = logo, then Overview (\`/app\`), Prompts, Competitors, Sources, Recommendations. Bottom group, always in this order: Documentation (\`/app/docs\`), Help (\`/app/help\`), Billing (\`/app/billing\`), Settings (\`/app/settings\`). Runs, the prompt drilldown and settings sub-sections are reached from inside those pages, never as extra sidebar items.
 
-Every \`/app\` page is a server component that calls \`supabase.auth.getClaims()\`, redirects to \`/login\` with no claims, and to \`/paywall\` when \`has_active_access\` is false. A brand switcher in the top bar sets the current brand (cookie \`fac_brand\`, validated against the user's brands on every request).
+Every \`/app\` page is a server component that calls \`supabase.auth.getClaims()\`, redirects to \`/login\` with no claims, and to \`/paywall\` when \`has_active_access\` is false. There is no top bar (DESIGN.md). A brand switcher at the top of the sidebar, under the logo, sets the current brand (cookie \`fac_brand\`, validated against the user's brands on every request). The run status chip lives at the right end of each page's 48px toolbar.
 
 ## 7. Onboarding wizard (the first 15 minutes)
 
@@ -165,10 +167,43 @@ If the scrape fails (site blocks bots, timeout), step 2 opens with empty fields 
 | \`subscriptions\` | Paying user | status, plan, price_id, trial_end, current_period_end | Stripe webhook only |
 | \`stripe_events\` | Stripe event id | for idempotency | Stripe webhook only |
 | \`app_settings\` | Global switch | key, value jsonb (global daily spend cap, kill switch) | Admin only |
+| \`plans\` | Plan | id ('trial','starter','growth'), every limit in section 4 | Seeded; read by \`plan_limits(uid)\` |
+| \`audits\` | Free audit request (lead magnet) | email, domain, brand_name, category, status, token, results jsonb, score, ip_hash | \`free-audit\` edge function only; no browser access |
 
 Every table has RLS on. Every user-owned table carries \`user_id\` so policies stay one line: \`(select auth.uid()) = user_id\`. Results, scores, ledger and logs have a SELECT policy only: the browser can read its own rows but can never insert or edit a result. Only edge functions with the secret key write them.
 
 ## 9. The check pipeline
+
+### 9.0 Whole system
+
+\`\`\`
+ Browser (Next.js on Vercel)                         Supabase
+ +-----------------------------+      RLS reads      +-----------------------------------+
+ | /onboarding  /app/*         | ------------------> | Postgres: brands, tracked_prompts, |
+ | publishable key + session   | <-- Realtime ------ | check_runs, check_results,         |
+ +--------------+--------------+                     | daily_scores, usage_ledger ...     |
+                | user JWT                           |                                   |
+                v                                    |  pg_cron --pg_net + x-cron-secret-+--+
+ +------------------------------+                    +-----------------------------------+  |
+ | Edge functions (Deno)        | <------------------------------------------------------+  |
+ |  scrape-site ---------------------> Firecrawl /v2/map + /v2/scrape                      |
+ |  generate-prompts ----------------> Anthropic (claude-sonnet-5-5)                       |
+ |  run-checks -> check-prompt ------> OpenRouter /chat/completions (6 engines)            |
+ |                 check-prompt -----> Anthropic (claude-haiku-5-5, parse pass 2)          |
+ |  score-day (SQL only)                                                                   |
+ |  generate-recommendations --------> Anthropic (claude-sonnet-5-5)                       |
+ |  send-digest ---------------------> Resend                                              |
+ |  recheck, free-audit                                                                    |
+ +------------------------------+                                                         |
+ Stripe --webhook--> /api/stripe/webhook (Next.js route) --> public.subscriptions          |
+\`\`\`
+
+**The trade-off we made.** Everything runs inside Supabase: Postgres is the job queue (\`check_results\` rows), pg_cron is the clock, and edge functions are the workers. No Redis, no queue service, no Trigger.dev. That is one bill, one dashboard and one place to debug. It comfortably handles 1,000 customers (about 600,000 engine checks a month, roughly 14 jobs a minute on average).
+
+**What breaks first at scale, and the fix.**
+1. **Drain throughput.** At about 1,500 customers, Monday mornings (most weekly runs) queue more jobs than 40 a minute drains. Fix: raise the batch to 80 and concurrency to 16, and spread \`next_check_at\` across all 7 days at signup (already done with the random offset).
+2. **Table size.** \`check_results\` grows by about 540 rows (about 2 MB) per Starter customer per month. At 1,000 customers that is 2 GB a month. Fix: the nightly \`trim_old_answers()\` job (section 9.8) keeps raw answers for 180 days, then keeps only the parsed fields; add a Supabase compute add-on when the dashboard shows CPU above 70%.
+3. **Provider rate limits.** One engine slowing down holds jobs in \`calling\`. Fix: the per-engine in-flight cap (3) and the 60 second timeout already contain it; raise the cap per engine in the \`engines\` table when OpenRouter's dashboard shows headroom.
 
 ### 9.1 ELI5
 
@@ -248,6 +283,39 @@ Idempotency rules:
 5. **Recheck limits:** per user per day from \`plan_limits.rechecks_per_day\`, plus a 10-minute cooldown per prompt (section 13).
 6. **OpenRouter key limit:** the key you create gets a credit limit in the OpenRouter dashboard (start at $20). Even if every guard above fails, the key stops at that number and returns 402.
 
+### 9.7 The schedules (pg_cron + pg_net)
+
+pg_cron is a timer inside Postgres. pg_net lets Postgres make an HTTP call. Together they poke edge functions on a schedule. The project URL and \`CRON_SECRET\` are stored in Supabase Vault (encrypted) and read with \`vault.decrypted_secrets\` inside each job, so the secret never sits in plain text in \`cron.job\`.
+
+| Job name | Schedule (UTC) | Calls | Body |
+| --- | --- | --- | --- |
+| \`fac-run-checks\` | \`* * * * *\` (every minute) | \`run-checks\` | \`{}\` |
+| \`fac-release-stuck\` | \`*/5 * * * *\` | SQL \`select public.release_stuck_jobs()\` | none |
+| \`fac-score-day\` | \`15 * * * *\` (hourly) | \`score-day\` | \`{}\` (scores every brand with results in the last 2 hours) |
+| \`fac-send-digest\` | \`5 * * * *\` (hourly) | \`send-digest\` | \`{}\` |
+| \`fac-recommendations\` | \`30 3 * * *\` (daily) | \`generate-recommendations\` | \`{}\` (brands whose weekly refresh is due) |
+| \`fac-trim\` | \`0 4 * * *\` (daily) | SQL \`select public.trim_old_answers()\` | none |
+
+pg_net is fire-and-forget: it does not retry a failed HTTP call. That is fine here because every job is idempotent and runs again a minute (or an hour) later. Responses land in \`net._http_response\` for 6 hours, which is where you look when a schedule seems dead.
+
+### 9.8 Data retention
+
+- \`check_results.answer_text\` and \`annotations\` are kept 180 days. \`trim_old_answers()\` then sets them to null and keeps every parsed column, so charts and history still work.
+- \`site_pages.markdown\` is replaced on every rescrape (one row per URL per brand).
+- \`usage_ledger\`, \`email_log\` and \`stripe_events\` are kept forever (small rows, needed for audits of your bill).
+- Deleting a brand cascades to everything under it. Deleting the auth user cascades to everything.
+
+## 9b. Free AI visibility audit (lead magnet)
+
+Public page \`/audit\`: a form with work email, website, brand name and category ("What do you sell, in 3 to 6 words?"). On submit, the browser posts to the \`free-audit\` edge function (no login).
+
+1. Validate with zod. Reject free email domains (gmail.com, outlook.com, yahoo.com, icloud.com, proton.me). Reject the request if the hidden honeypot field \`company_fax\` is filled (bots fill every field) or if the form was submitted less than 3 seconds after it rendered (the page sends \`rendered_at\`).
+2. Rate limits: 1 audit per domain per 30 days, 3 per IP hash per day, 40 per day across the whole app (\`app_settings.audit_daily_cap\`). Over a limit returns 429 with a friendly message.
+3. Insert an \`audits\` row (status \`queued\`, random 32-character token) and return \`{ token }\` straight away. The page redirects to \`/audit/[token]\`, which polls every 3 seconds.
+4. The same function, called again by pg_cron (\`fac-run-checks\` also calls \`free-audit\` with \`{ drain: true }\`), picks queued audits, writes 5 prompts with one Claude Sonnet call (same PROMPTGEN rules, 5 instead of 20), asks Perplexity, ChatGPT and DeepSeek each prompt (15 checks, about $0.11 all in), runs the same parser, and stores \`results\` jsonb and a 0 to 100 \`score\`.
+5. The result page shows the score, each engine's verdict per prompt (mentioned, position), the competitors named most, and "Track all 25 prompts every week: start your free trial". Resend emails the link once (\`email_log\` kind \`audit\`).
+6. Cost guard: audits write \`usage_ledger\` rows with \`user_id\` null and \`operation = 'audit'\`; the global daily cap includes them.
+
 ## 10. Engines and the exact OpenRouter request
 
 All engine calls go to one endpoint:
@@ -266,13 +334,14 @@ The prompt is sent exactly as a buyer would type it. **No system prompt** for en
 
 | key | Label in UI | openrouter_model (Oct 2026) | web_mode | How web results are added | Est. cost per check | Plans |
 | --- | --- | --- | --- | --- | --- | --- |
-| \`chatgpt\` | ChatGPT | \`openai/gpt-5-mini\` | native | \`plugins: [{ id: "web", engine: "native" }]\` ($10 per 1,000 searches) | $0.012 | Starter, Growth |
-| \`perplexity\` | Perplexity | \`perplexity/sonar\` | builtin | Sonar searches by itself; returns citations. $1/$1 per M tokens + about $5 per 1,000 requests | $0.006 | Starter, Growth |
-| \`gemini\` | Gemini | \`google/gemini-2.5-flash\` | exa | \`plugins: [{ id: "web", engine: "exa", max_results: 3 }]\` ($4 per 1,000 results) | $0.015 | Starter, Growth |
-| \`claude\` | Claude | \`anthropic/claude-haiku-5.5\` [verify slug] | native | \`plugins: [{ id: "web", engine: "native" }]\` | $0.011 | Starter, Growth |
+| \`chatgpt\` | ChatGPT | \`openai/gpt-5-mini\` ($0.25/$2 per M) | native | \`plugins: [{ id: "web", engine: "native" }]\` (OpenAI search, about $10 per 1,000 searches) | $0.012 | Starter, Growth |
+| \`perplexity\` | Perplexity | \`perplexity/sonar\` ($1/$1 per M) | builtin | Sonar searches by itself and returns citations. Plus about $5 per 1,000 requests (low search context) | $0.006 | Starter, Growth |
+| \`gemini\` | Gemini | \`google/gemini-2.5-flash\` ($0.30/$2.50 per M) [verify: swap for the newest Flash slug if this one is retired] | exa | \`plugins: [{ id: "web", engine: "exa", max_results: 3 }]\` (about $4 per 1,000 results [verify]) | $0.015 | Starter, Growth |
+| \`claude\` | Claude | \`anthropic/claude-haiku-5.5\` ($0.10/$0.50 per M) [verify slug] | native | \`plugins: [{ id: "web", engine: "native" }]\` (Anthropic search, about $10 per 1,000 searches) | $0.011 | Starter, Growth |
 | \`deepseek\` | DeepSeek | \`deepseek/deepseek-v4.1-flash\` [verify] | none | No web. Measures what the model remembers from training | $0.001 | Starter, Growth |
-| \`grok\` | Grok | \`x-ai/grok-4.3\` [verify] | native | \`plugins: [{ id: "web", engine: "native" }]\` | $0.015 | Growth |
-| \`llama\` | Meta Llama | \`meta-llama/llama-4-maverick\` [verify] | none | No web. Memory only | $0.001 | Growth |
+| \`grok\` | Grok | \`x-ai/grok-4.1-fast\` ($0.20/$0.50 per M) [verify] | native | \`plugins: [{ id: "web", engine: "native" }]\` (xAI search, passed through at xAI's rate [verify]) | $0.015 | Growth |
+
+Model slugs change every few months. Before you run the SQL, check each one: open \`https://openrouter.ai/<slug>\` (for example \`https://openrouter.ai/openai/gpt-5-mini\`). If it 404s, search openrouter.ai/models for the newest model from that company and put that slug in the seed. Factorie never hard-codes a slug in code: it is a row in \`engines\`, so a swap is one SQL update.
 
 ELI5: some engines search the web before answering (like ChatGPT with search on). Others answer from memory. Both matter: memory shows what the model learned about you during training; web shows what it finds today. The UI labels each engine "Live web" or "Memory".
 
@@ -304,7 +373,7 @@ Live web, Exa (gemini):
 }
 \`\`\`
 
-Builtin search (perplexity) and memory engines (deepseek, llama):
+Builtin search (perplexity) and memory engines (deepseek):
 \`\`\`json
 {
   "model": "perplexity/sonar",

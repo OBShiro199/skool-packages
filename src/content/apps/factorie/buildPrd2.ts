@@ -38,7 +38,7 @@ Mentions are weighted by position so being listed first counts more than being l
 
 ### 12.4 All engines
 
-- \`VS(all)\` = weighted mean of \`VS(e)\` using \`engines.weight\` for engines that have results that day. Default weights: chatgpt 0.30, gemini 0.20, perplexity 0.15, claude 0.12, grok 0.08, deepseek 0.08, llama 0.07. Weights are renormalised to sum to 1 over the engines present.
+- \`VS(all)\` = weighted mean of \`VS(e)\` using \`engines.weight\` for engines that have results that day. Default weights: chatgpt 0.32, gemini 0.22, perplexity 0.16, claude 0.12, grok 0.09, deepseek 0.09. Weights are renormalised to sum to 1 over the engines present.
 - \`MR(all)\`, \`AP(all)\`, \`SE(all)\`: computed over all answers on all engines (unweighted).
 - \`SOV(all)\`: sum the W values over all engines first, then divide.
 
@@ -171,14 +171,18 @@ No extra model call. The digest takes the open recommendation with the highest p
 | Engine check, live web native (chatgpt) | gpt-5-mini $0.25/$2 per M + $10 per 1,000 searches | 2,500 in, 800 out | about $0.012 |
 | Engine check, Perplexity | sonar $1/$1 per M + about $5 per 1,000 requests | 200 in, 800 out | about $0.006 |
 | Engine check, Exa web (gemini) | gemini-2.5-flash $0.30/$2.50 per M + 3 results x $0.004 | 2,500 in, 800 out | about $0.015 |
-| Engine check, memory (deepseek, llama) | about $0.15/$0.60 per M | 200 in, 900 out | about $0.001 |
+| Engine check, memory (deepseek) | about $0.15/$0.60 per M [verify] | 200 in, 900 out | about $0.001 |
+| Engine check, live web native (claude) | claude-haiku-5.5 $0.10/$0.50 per M + about $10 per 1,000 searches | 3,000 in, 800 out | about $0.011 |
+| Engine check, live web native (grok, Growth) | grok-4.1-fast $0.20/$0.50 per M + xAI search [verify] | 3,000 in, 800 out | about $0.015 (budgeted high) |
 | Parse pass 2 | claude-haiku-5-5 $0.10/$0.50 per M | 1,800 in, 250 out | about $0.0003 |
 | Brand summary | claude-sonnet-5-5 $2/$10 per M | 9,000 in, 800 out | about $0.026 |
 | Prompt generation | claude-sonnet-5-5 | 1,500 in, 2,000 out | about $0.023 |
 | Recommendations | claude-sonnet-5-5 | 12,000 in, 3,500 out | about $0.06 |
 | Onboarding scrape | Firecrawl map (1 credit) + up to 12 scrapes (1 credit each) | | 13 credits, about $0.07 |
 
-One full round of one prompt on the 5 Starter engines is about $0.046 plus OpenRouter's fee on credit purchases (about 5.5%). Weekly for a month (4.33 runs) that is about $0.21 per prompt. 25 prompts: about $5.30 a month. A Growth customer with 65 weekly prompts and 10 daily pinned prompts on all 7 engines (about $0.066 per round) costs about $38 a month.
+One full round of one prompt on the 5 Starter engines is $0.012 + $0.006 + $0.015 + $0.011 + $0.001 = $0.045, plus 5 parses ($0.0015), plus OpenRouter's 5.5% fee on credit purchases: about **$0.049**. Weekly for a month (4.33 runs) that is about $0.21 per prompt. 25 prompts: about **$5.30 a month**. Add up to 5 rechecks a day (worst case about $7.35 a month) and weekly recommendations ($0.26) and a Starter customer can never cost more than the $15 cap, which keeps margin at 81% or more after Stripe fees.
+
+A Growth round on all 6 engines is about **$0.065**. 50 weekly prompts ($14.10) + 10 daily pinned prompts ($19.50) = about **$33.60 a month**, leaving room under the $40 cap for rechecks and recommendations. At the cap, margin is about 76%.
 
 Every paid call writes a \`usage_ledger\` row: \`vendor\` ('openrouter','anthropic','firecrawl','resend'), \`operation\` ('engine_check','parse','brand_summary','prompt_gen','recommendations','scrape','map'), \`units\` (tokens or credits), \`cost_usd\`, \`ref\` (job id or request id).
 
@@ -200,6 +204,24 @@ Body sections (React Email or plain HTML table layout, 600px wide, inline styles
 
 Send with Resend \`POST https://api.resend.com/emails\`, header \`Idempotency-Key: digest-{user_id}-{local_date}\`. Insert \`email_log\` first with a unique index on \`(user_id, kind, day)\`; if the insert conflicts, skip (already sent).
 
+## 16b. Every other email (Resend)
+
+All emails go through one helper, \`_shared/email.ts\` \`sendEmail({ userId, kind, day, to, subject, html })\`, which inserts \`email_log\` first (unique on \`user_id, kind, day\`) and passes \`Idempotency-Key: {kind}-{user_id}-{day}\` to Resend. Plain HTML, 600px, inline styles, the same look as the digest. From: \`EMAIL_FROM\`.
+
+| Kind | Trigger | Sent by | Subject | Body (one job each) |
+| --- | --- | --- | --- | --- |
+| \`welcome\` | First \`subscriptions\` row reaches \`trialing\` | Stripe webhook route | Your first AI visibility check is running | What happens next, link to \`/app\`, how to reply for help |
+| \`first_run\` | First run for a brand reaches \`complete\` or \`partial\` | \`run-checks\` (finish step) | {Brand} scored {VS} on AI visibility | Score, the engine where you are strongest and weakest, one prompt you are losing, "See the answers" |
+| \`trial_ending\` | Stripe \`customer.subscription.trial_will_end\` (3 days before) | Stripe webhook route | Your Factorie trial ends on {date} | What they tracked, their score change since day 1, "Keep tracking" (portal link) |
+| \`budget_paused\` | Brand set to \`paused_budget\` | \`run-checks\` or \`check-prompt\` | Checks paused until {date} | Plain reason (monthly check budget used), resume date, "Upgrade to Growth" |
+| \`alert\` | An alert rule fires (section 12.5) and \`brands.alerts_email\` is on | \`score-day\` | {Competitor} passed you on {Engine} | The one change, the prompts it happened on, link to the drilldown. Max 1 alert email per brand per day |
+| \`engine_paused\` | An engine is auto-disabled (400 mentioning the model) | \`check-prompt\` | (to you, the founder) Engine {key} disabled | The error body and the SQL to swap the slug |
+| \`openrouter_topup\` | 402 from OpenRouter | \`check-prompt\` | (to you) Top up OpenRouter | Balance link, how many jobs were skipped |
+| \`audit\` | Free audit finishes | \`free-audit\` | Your AI visibility audit for {domain} | Score, top 3 competitors named, link to \`/audit/[token]\`, "Start free trial" |
+| \`digest\` | Section 16 | \`send-digest\` | Section 16 | Section 16 |
+
+Founder emails go to \`FOUNDER_EMAIL\` (a Supabase secret). Every customer email has a footer with the physical address line and a one-click unsubscribe link for non-essential kinds (digest, alert).
+
 ## 17. Limits enforced server-side (summary)
 
 | Limit | Where enforced |
@@ -216,6 +238,8 @@ Send with Resend \`POST https://api.resend.com/emails\`, header \`Idempotency-Ke
 | Recommendations on demand (Growth, 1 per day) | \`generate-recommendations\` |
 | Scrape (3 per brand per day) | \`scrape-site\` using \`usage_ledger\` count |
 | CSV export (Starter+) | \`/api/export\` checks plan |
+| Free audits (1 per domain per 30 days, 3 per IP per day, 40 per day total) | \`free-audit\` using the \`audits\` table |
+| Digest test sends (3 per day) | \`send-digest\` with \`{ user_id, test: true }\` using \`email_log\` count |
 
 The browser may show limits, but a direct API call that skips the UI must hit the same wall.
 
@@ -290,12 +314,44 @@ Write these as Playwright tests where marked [e2e], SQL checks where marked [sql
 16. [e2e] Settings: turning Gemini off removes it from the next run's jobs.
 17. [e2e] Starter user cannot enable Grok (toggle locked with "Growth" badge) and a direct update of \`engines_enabled\` with 'grok' is ignored by \`run-checks\`.
 18. [e2e] Highlight test: in the prompt drilldown the brand appears with the green highlight and competitors with red; cited URLs are listed with favicons.
+19. [curl] POST \`free-audit\` twice for the same domain within 30 days: the second returns 429. A gmail.com address returns 400.
+20. [e2e] Submit \`/audit\` for a real domain: the result page fills in within 3 minutes and the audit email arrives once.
+21. [sql] \`select public.plan_limits('<starter user id>')\` returns prompts 25, engines 5, rechecks 5, cap 15; for a Growth user 60, 6, 10, 40.
+22. [e2e] At 1100px wide the sidebar collapses to 56px icons; at 375px nothing scrolls sideways on any \`/app\` page.
+
+### 21.1 Check the data with SQL (paste into Supabase > SQL Editor)
+
+\`\`\`sql
+-- Last run for a brand, with job counts by status
+select r.id, r.kind, r.status, r.cost_usd,
+       count(*) filter (where j.status = 'done')   as done,
+       count(*) filter (where j.status = 'failed') as failed,
+       count(*) as total
+from public.check_runs r join public.check_results j on j.run_id = r.id
+where r.brand_id = '<brand id>'
+group by r.id order by r.created_at desc limit 1;
+
+-- Month-to-date spend per user (the number the cap compares against)
+select user_id, round(sum(cost_usd)::numeric, 4) as mtd
+from public.usage_ledger
+where created_at >= date_trunc('month', now())
+group by user_id order by mtd desc;
+
+-- Any job charged twice? Should return 0 rows
+select ref, operation, count(*) from public.usage_ledger
+group by ref, operation having count(*) > 1;
+
+-- Today's scores
+select engine_key, visibility, share_of_voice, avg_position, mention_rate
+from public.daily_scores where brand_id = '<brand id>' and day = current_date
+order by engine_key;
+\`\`\`
 
 ## 22. Milestones
 
 | # | Milestone | Done when |
 | --- | --- | --- |
-| 1 | Scaffold, design system, auth pages, app shell (DESIGN.md) | Tests: auth pages render, sidebar and top bar work on mobile |
+| 1 | Scaffold, design system, auth pages, app shell (DESIGN.md) | Tests: auth pages render, sidebar collapses to icons under 1100px and works at 375px |
 | 2 | Database migration, RLS, Supabase auth wired, onboarding steps 1 to 3 UI | Test 10, 11 pass; profile row created on signup |
 | 3 | \`scrape-site\` with Firecrawl + brand summary | Tests 1, 2, 14 pass |
 | 4 | \`generate-prompts\` + prompt approval UI + limit triggers | Tests 3, 4 pass |
@@ -307,6 +363,8 @@ Write these as Playwright tests where marked [e2e], SQL checks where marked [sql
 | 10 | \`generate-recommendations\` + recommendations page | 5 recommendations with valid prompt ids |
 | 11 | \`send-digest\` with Resend | Test 15 passes |
 | 12 | Settings sliders, engines, alerts, billing page, CSV export | Tests 16, 17 pass |
-| 13 | Landing page (LANDING.md), comparison pages, audit form | Lighthouse 90+ on mobile |
-| 14 | Security sweep (shared playbook) + Factorie-specific tests | All 18 acceptance tests pass |
+| 13 | Landing page (LANDING.md), comparison pages, \`/audit\` form + \`free-audit\` | Tests 19, 20 pass; Lighthouse 90+ on mobile |
+| 14 | Security sweep (shared playbook) + Factorie-specific tests | All 22 acceptance tests pass |
+
+Rough hours (about 30 in total): M1 2h, M2 3h, M3 2.5h, M4 2h, M5 1.5h, M6 3h, M7 3h, M8 4h, M9 1.5h, M10 2h, M11 1.5h, M12 2h, M13 2h, M14 1h.
 `

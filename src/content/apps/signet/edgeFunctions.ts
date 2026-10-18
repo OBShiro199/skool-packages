@@ -160,7 +160,7 @@ Contract (deploy with --no-verify-jwt; CORS only for APP_URL and localhost):
   1. Validate t is 43 base64url characters, else respond as not found.
   2. hash = sha256Hex(t). Find share_links by token_hash where revoked_at is null and expires_at > now(). If none: try_rate_limit('pub-miss:' + ipHash, 20, 3600) (429 if exceeded), then 404 { error: { code: 'not_found' } }. Same body for unknown, revoked and expired.
   3. If has_active_access(workspace_id) is false: 200 { paused: true, agency: brand.sender_name }.
-  4. Return { proposal: version.snapshot, version_id, content_hash: version.content_hash, brand: { sender_name, primary_hex, accent_hex, font_pair, footer_text, logo_url (10 minute signed URL from brand-assets), show_footer: !plan_limits.remove_footer }, status, deposit: { amount_cents, currency, paid } | null, signed: { name, signed_at } | null }. Never return IPs, emails of members, internal ids other than version_id, or anything from other versions.
+  4. Return { proposal: version.snapshot, version_id, content_hash: version.content_hash, brand: { sender_name, primary_hex, footer_text, logo_url (10 minute signed URL from brand-assets), show_footer: !plan_limits.remove_footer }, status, deposit: { amount_cents, currency, paid } | null, signed: { name, signed_at } | null }. Never return IPs, emails of members, internal ids other than version_id, or anything from other versions.
   5. Header Cache-Control: private, max-age=0.
 - GET ?v=<verify token>: find signatures by verify_token_hash = sha256Hex(v). Recompute hashSnapshot(version.snapshot) and compare with signatures.content_hash and proposal_versions.content_hash. Return { ok: boolean, content_hash, signer_name, signed_at, agency, title }.
 - POST { t, event: 'open' | 'section' | 'heartbeat', session_id (uuid made by the browser), section_kind?, seconds? }:
@@ -188,7 +188,7 @@ Plan first, then wait for my OK.`,
 Build supabase/functions/sg-sign-proposal/index.ts. Read @PRD.md sections 12.5 and 13.6.
 
 Contract (deploy with --no-verify-jwt; CORS only for APP_URL):
-- POST { t, signer_name (2-120), signer_email (email), signer_title? (max 120), typed_signature (2-120), drawn_png_base64 (string), selected_option ('good'|'better'|'best'), agree: true, content_hash (64 hex) }. zod; agree must be literally true.
+- POST { t, signer_name (2-120), signer_email (email), signer_title? (max 120), typed_signature (2-120), drawn_png_base64 (string), selected_option ('good'|'better'|'best'), agree: true, content_hash (64 hex) }. zod; agree must be the boolean true.
 - Resolve the share link exactly like sg-public-proposal (404 for invalid). Rate limit try_rate_limit('sign:' + link.id, 5, 3600).
 - Load the version for link.version_id. Recompute hashSnapshot(version.snapshot). If it differs from version.content_hash: log level 'error' (this would mean the stored snapshot changed) and return 500. If body.content_hash differs from version.content_hash: 409 { code: 'changed', message: 'This proposal was updated. Reload to see the latest version.' }.
 - Decode the PNG: max 300 KB, must start with the PNG magic bytes 89 50 4E 47 0D 0A 1A 0A. drawn_sha256 = sha256Hex(bytes).
@@ -283,6 +283,7 @@ Contract (deploy with --no-verify-jwt):
 - Every client follow-up has an unsubscribe link APP_URL/api/unsubscribe?e=<email>&s=<HMAC-SHA256(email, UNSUBSCRIBE_SECRET)> (build that tiny Next.js route too: verify the HMAC, insert email_suppressions, show "You will not get reminders about this proposal again").
 - Daily digest: once per member per day at or after 08:00 in profiles.timezone, for notification_prefs.daily_digest = true. dedupeKey 'digest:' + user_id + ':' + local date. Skip if there was no activity.
 - Usage warnings: for each workspace with any usage this month, for kinds drafts, call_minutes, rewrites: if used >= 80% of the limit, sendEmail kind 'usage_80' to the owner with dedupeKey 'usage80:' + ws + ':' + kind + ':' + YYYY-MM.
+- Storage clean-up: for calls with status 'drafted' or 'failed', storage_path not null and updated_at older than 30 days, delete the object from call-audio and set storage_path = null (the transcript stays). Max 100 per run.
 - Process at most 200 emails per run; Resend's API rate limit applies, so send sequentially with withRetry.
 - Response { ok, follow_ups, digests, warnings, ms }.
 

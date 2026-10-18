@@ -5,12 +5,18 @@ import { buildPhases } from '../phases'
 const modules = import.meta.glob<Record<string, unknown>>('./*.ts', { eager: true })
 const ORDER = ['etcher', 'factorie', 'ethereel', 'conversate', 'outbounder', 'signet', 'folio', 'bookwell', 'helpdeck']
 
+/**
+ * Kits shown to members. A kit is added here only after it is complete and checked, so
+ * half-written kits in this folder never appear in the library.
+ */
+export const PUBLISHED = ['bookwell', 'helpdeck']
+
 const isApp = (v: unknown): v is AppDef => !!v && typeof v === 'object' && 'slug' in v && 'content' in v
 
 export const APPS: AppDef[] = Object.entries(modules)
   .filter(([path]) => !path.endsWith('/index.ts'))
   .flatMap(([, mod]) => Object.values(mod).filter(isApp))
-  .filter((a) => a.slug !== 'closebook') // replaced by Etcher
+  .filter((a) => PUBLISHED.includes(a.slug))
   .filter((a, i, all) => all.findIndex((b) => b.slug === a.slug) === i)
   .sort((a, b) => (ORDER.indexOf(a.slug) + 1 || 99) - (ORDER.indexOf(b.slug) + 1 || 99))
 

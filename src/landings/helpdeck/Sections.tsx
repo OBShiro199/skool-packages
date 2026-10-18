@@ -62,13 +62,13 @@ export function Problem() {
   const inView = useInView(ref, { once: true, amount: 0.6 })
   const hours = useCountUp(30, 900, inView)
   return (
-    <section className="hd-section" id="problem" aria-labelledby="problem-h">
+    <section className="hd-section hd-problem" id="problem" aria-labelledby="problem-h">
       <div className="hd-container">
         <Reveal className="hd-section-head">
           <h2 id="problem-h" className="hd-h2">You answer the same 30 questions every week.</h2>
           <p className="hd-sub">The answers are already in your docs. Customers do not read them, and your inbox fills up anyway.</p>
         </Reveal>
-        <div className="hd-problem-grid">
+        <div className="hd-cells hd-problem-grid hd-bleed">
           {PROBLEMS.map((p, i) => (
             <Reveal key={p.t} className="hd-tile hd-problem-card" delay={i * 0.08}>
               <ProblemVis kind={p.vis} />
@@ -273,7 +273,7 @@ export function Pricing() {
       <div className="hd-container">
         <Reveal className="hd-section-head">
           <span className="hd-eyebrow">Pricing</span>
-          <h2 id="pricing-h" className="hd-h2">One price. No per-resolution fees.</h2>
+          <h2 id="pricing-h" className="hd-h2">One price. No <span className="hd-nowrap">per-resolution</span> fees.</h2>
           <p className="hd-sub">Every plan starts with a 7-day free trial.</p>
         </Reveal>
         <div className="hd-toggle" role="group" aria-label="Billing period">

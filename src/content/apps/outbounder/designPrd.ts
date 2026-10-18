@@ -96,6 +96,40 @@ All built from base components and tokens. Heights and widths below are fixed so
 | \`EmptyState\` | Inside the table area, centred, 13px: one line in ink 500, one line muted, one button. No illustrations. |
 | \`LintRow\` | Under the sequence body: word count tag ("62 words"), then warning tags in amber ("Link in step 1", "Over 120 words", "Spam word: guarantee"). Height reserved for one row of tags. |
 
+### 3.1 Component states
+
+| Component | Rest | Hover | Focus | Selected / active | Disabled | Loading |
+| --- | --- | --- | --- | --- | --- | --- |
+| Primary button | White, \`--accent-edge\`, \`--accent-ink\` label | \`--hover\` fill | 2px outline, 2px offset | Press to 98% scale | Ghost label, edge stays | Spinner over the label, width unchanged |
+| Secondary button | White, \`--btn-edge\`, body ink | \`--hover\` fill | Same | Press 98% | Ghost label | Same |
+| Table row | White | \`--row-hover\` | Inset 2px outline | \`--accent-soft\` + accent edge | 50% ink | 48px skeleton |
+| Filter chip | Hairline edge, label + value | \`--hover\` | Outline | \`--accent-soft\` + edge when a value is set | n/a | n/a |
+| StatusPill | Hue fill and edge | Tooltip with time | n/a | n/a | n/a | Pulsing dot for working states |
+| DnsRecordRow copy | Ghost icon | \`--hover\` | Outline | Tick for 1.5 s, same width | n/a | n/a |
+| EmailPreview | Read only | n/a | n/a | Edit mode: dashed hairline on hover of editable fields | n/a | Body area keeps its height, live status "Writing" |
+| UsageMeter | Accent bar | Tooltip with exact numbers | n/a | n/a | n/a | Bar eases to value |
+
+### 3.2 Button and label copy deck
+
+Verb first, says exactly what happens, cost or count in brackets where it helps (base section 09).
+
+| Place | Label |
+| --- | --- |
+| Leads step | Find 25 leads (286 left) |
+| Leads toolbar | Import CSV · Export |
+| Review footer | Approve · Edit · Regenerate (2 left) · Reject |
+| Review toolbar | Approve all above 0.8 (41) |
+| Launch | Launch campaign (64 emails) |
+| Domain wizard | Add domain · Copy all records · Check again · Create 2 inboxes |
+| Inbox composer | Send reply |
+| Inbox thread | Mark done · Suppress · Open lead |
+| Billing | Manage billing · Upgrade to Growth |
+| Plan picker | Start 7-day free trial |
+| Selection bar | Approve (12) · Reject (12) · Remove (12) |
+| Toasts | Approved · Copied · Inbox created · Reply sent · 12 approved, 3 skipped |
+| Errors | Could not reach Prospeo. The search will retry in 2 minutes. |
+| Errors | This domain is your main website. Use a separate one, like tryacme.com. |
+
 Loading: base rules. Spinners appear after 200ms, stay at least 400ms, and overlay labels in place. Skeleton rows are 48px with two grey bars (\`--hover\`), never shimmering.
 
 ## 4. Onboarding, auth and billing screens
@@ -227,6 +261,14 @@ StepWizard on a page card (sidebar visible), 5 steps: ICP, Leads, Sequence, Inbo
 - 5 stat boxes: Sent, Delivered %, Bounce %, Reply %, Interested %. Percentages under 10% with one decimal ("3.4%"), above 10% none.
 - Line chart (sends in accent, replies in green), bar chart of reply rate by step, two tables (per campaign, per inbox). Charts: 1px lines, no gridlines except 3 hairlines, axis text 12px faint, tooltips are floating boxes with the base shadow and tabular numbers. Empty: "Charts appear after your first 20 sends."
 
+### 5.12 Campaign overview (\`/app/campaigns/[id]\`)
+
+- Toolbar: campaign name (ellipsis at 320px), StatusPill, right: "Pause" or "Resume" (fixed width so the swap never shifts), "Launch campaign" primary while not active.
+- Toolbar tabs under it (36px segmented): Leads, Sequence, Review, Activity, Settings. The URL holds the tab.
+- Summary strip (48px): leads, approved, sent, replies, interested, bounce rate, each in a fixed-width tabular slot.
+- Activity tab: an event table (time, event, lead, details), 48px rows, filter chips by event type.
+- Settings tab: name, send days, window, fallback time zone, inboxes attached. "Archive campaign" with a coral edge at the bottom; the confirm morphs in the same dialog.
+
 ### 5.10 Recipient unsubscribe page (\`/u/[token]\`)
 
 - No app chrome. A 420px centred box: "You're unsubscribed. {{sender_company}} won't email you again." A small undo link for 24 hours. No Outbounder marketing. Invalid token: "This link is not valid any more. You will not get further emails from this sender if you reply 'no'."
@@ -238,6 +280,21 @@ StepWizard on a page card (sidebar visible), 5 steps: ICP, Leads, Sequence, Inbo
 - Results: 3 boxes in reserved space (min-height set before results arrive), each with the first line in 14/22, the quoted source fact in muted, a copy icon button.
 - After results: a hairline box with the accent edge: "Want this for 100 leads, sent for you? Try Outbounder free for 7 days."
 - Limit reached: the input disables in place and shows "You have used today's 3. Enter your email to get 10 more."
+
+### 5.13 Data formatting
+
+| Data | Format | Example |
+| --- | --- | --- |
+| Counts | Locale grouping, singular and plural | 1 lead · 1,204 leads |
+| Percentages | One decimal under 10%, none above | 3.4% · 42% |
+| Times in tables | User's time zone, 24h, lead's local time in brackets where it matters | 14:00 (09:00 local) |
+| Dates | Day and short month, year only if not this year | 22 Oct · 3 Jan 2027 |
+| Relative times | Under 1 hour "12 min ago", under 1 day "3 h ago", then the date | 3 h ago |
+| Money | Dollar sign, no decimals for plan prices, 2 decimals for costs | $79 · $10.85 |
+| Domains and emails | Lowercase, ellipsis in the middle when cut | olly@tryac…me.com |
+| AI attribution | Always name the source page | Written by Claude from northpeak.studio/about |
+
+Never say "AI magic". Error copy says what happened and what to do next.
 
 ## 6. States
 
@@ -274,6 +331,35 @@ Base curves and durations apply. Additions:
 - Review queue: the next email fades in place, 200ms. No sideways slides.
 - The landing page hero is the only place where text "types" in; inside the app AI text fades in over 200ms.
 - Reduced motion: dots are static, bars jump to their value, everything else appears instantly.
+
+## 7b. Stability checklist per screen
+
+Before a screen is done, check each row and fix anything that moves (base section 08).
+
+| Screen | Things that must not move |
+| --- | --- |
+| Leads | Count in the toolbar going 9 to 100; JobProgress appearing and finishing; StatusPill changes; selection bar counts going 9 to 120 |
+| Review | Approve to next email; "Edited" tag appearing; regenerate running; progress "9 of 64" to "10 of 64" |
+| Sequence | "Saving" to "Saved"; lint tags appearing; switching preview lead |
+| Inbox | New reply arriving at the top (insert above without moving the selected row out of view); unread dot clearing |
+| Domains | DNS pills Waiting to Valid; copy icon to tick; "Check again" loading |
+| Billing | Meters updating; monthly to annual price swap (tabular, fixed width) |
+| Campaign overview | Pause to Resume label swap; summary numbers growing |
+
+## 7c. Keyboard shortcuts
+
+| Where | Key | Action |
+| --- | --- | --- |
+| Anywhere | cmd+k | Command menu |
+| Anywhere | g then c / i / d | Go to Campaigns / Inbox / Domains |
+| Review | A / X / E / R | Approve / Reject / Edit / Regenerate |
+| Review, inbox | J / K | Next / previous |
+| Inbox | cmd+enter | Send reply |
+| Inbox | 1 to 5 | Relabel: interested, not now, unsubscribe, out of office, other |
+| Tables | x | Select the focused row |
+| Overlays | Escape | Close |
+
+Shortcuts never fire while focus is in an input or textarea. A "?" key opens a dialog listing them.
 
 ## 8. Accessibility
 
@@ -327,6 +413,35 @@ Tick each one in a Chrome DevTools MCP screenshot pass at 1440px and 375px:
 - [ ] Billing: trialing, Starter with upgrade box, Growth, paywall
 - [ ] Settings tabs including Suppression; Documentation; Help; unsubscribe page
 - [ ] 402 limit dialog, auto-pause banner, offline banner
+
+## 12b. Token overrides (add after the base tokens)
+
+\`\`\`css
+:root {
+  /* Outbounder brand accent: pastel periwinkle with soft fill and edge */
+  --accent: #6a7ee6;
+  --accent-soft: #f2f4fe;
+  --accent-edge: #c9d1f7;
+  --accent-ink: #3d4fae;
+  /* point the base blue tokens at the brand accent */
+  --blue: var(--accent);
+  --blue-soft: var(--accent-soft);
+  --blue-edge: var(--accent-edge);
+  /* tag inks used by Outbounder status pills (fill = ink at 7%, edge = ink at 35%) */
+  --tag-grey: #62666d;
+  --tag-accent: #3d4fae;
+  --tag-blue: #2f6fbf;
+  --tag-green: #1f8a3a;
+  --tag-amber: #9a6508;
+  --tag-coral: #c43c3c;
+  --tag-violet: #7a4fc9;
+  --tag-teal: #1d7f7a;
+  /* email preview body only */
+  --email-text: 14px/22px;
+}
+\`\`\`
+
+Tailwind: map these in \`tailwind.config.ts\` under \`colors.accent\` and \`colors.tag\`. Pills use \`color-mix(in srgb, var(--tag-green) 7%, white)\` for the fill and 35% for the edge.
 
 ## 13. Handoff rules for Claude Code
 

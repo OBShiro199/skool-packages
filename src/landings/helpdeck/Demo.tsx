@@ -45,6 +45,12 @@ export function LiveDemo() {
   const [thinking, setThinking] = useState(false)
   const [draft, setDraft] = useState('')
   const timers = useRef<number[]>([])
+  const bodyRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = bodyRef.current
+    if (el) el.scrollTop = el.scrollHeight
+  }, [msgs, thinking])
 
   useEffect(() => () => timers.current.forEach(window.clearTimeout), [])
 
@@ -103,6 +109,7 @@ export function LiveDemo() {
         </Reveal>
 
         <Reveal delay={0.08} className="hd-demo-card">
+          <div className="hd-demo-top">
           <form className="hd-demo-form" onSubmit={submit} noValidate>
             <label className="hd-field">
               <span className="hd-sr">Docs or help centre URL</span>
@@ -119,13 +126,18 @@ export function LiveDemo() {
             </button>
           </form>
           <p className="hd-demo-note">We email the demo link so you can come back to it.</p>
+          </div>
 
           <div className="hd-demo-stage" aria-live="polite">
             <AnimatePresence mode="wait">
               {phase === 'idle' && (
                 <motion.div key="idle" className="hd-demo-idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <div className="hd-demo-ghost" aria-hidden="true">
-                    <i className="hd-line w60" /><i className="hd-line w80" /><i className="hd-line w45" />
+                    <div className="hd-ghost-head"><i /><span><b className="hd-line w45" /><b className="hd-line w30" /></span></div>
+                    <div className="hd-ghost-body">
+                      <b className="hd-ghost-bubble l" /><b className="hd-ghost-bubble r" /><b className="hd-ghost-bubble l w" />
+                    </div>
+                    <div className="hd-ghost-input" />
                   </div>
                   <p>Your bot appears here, trained on your pages.</p>
                 </motion.div>
@@ -163,7 +175,7 @@ export function LiveDemo() {
                         <span><i className="hd-status-dot" /> Trained on 12 pages</span>
                       </div>
                     </div>
-                    <div className="hd-chat-body hd-chat-body-demo">
+                    <div className="hd-chat-body hd-chat-body-demo" ref={bodyRef}>
                       <div className="hd-bubble hd-bubble-bot">Hi! I have read 12 pages of {domain}. What would you like to know?</div>
                       {msgs.map((m, i) => (
                         <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.24, ease: EASE }} className="hd-msg-wrap">

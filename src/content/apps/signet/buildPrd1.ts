@@ -4,7 +4,9 @@ export const buildPrd1 = `# Signet: build PRD
 
 Version 1.0. Download this file, save it as \`PRD.md\` in the root of your project folder, and reference it
 in Claude Code with \`@PRD.md\`. Claude Code reads it before every task. Where this file and your instinct
-disagree, this file wins. The look and feel lives in \`@DESIGN.md\`, the marketing page in \`@LANDING.md\`.
+disagree, this file wins. The look and feel lives in \`@DESIGN_SYSTEM.md\` (the Quiet Precision base system) and
+\`@DESIGN.md\` (Signet's accent and screens), the marketing page in \`@LANDING.md\`. Your \`CLAUDE.md\` should
+contain the line \`UI rules: @DESIGN_SYSTEM.md @DESIGN.md\`.
 
 ## 0. How to use this document
 
@@ -12,8 +14,8 @@ disagree, this file wins. The look and feel lives in \`@DESIGN.md\`, the marketi
 - Sections 6 to 17 are the spec. Claude Code builds from them.
 - Section 21 lists the build milestones. Do them in order. Do not start a milestone before the one
   before it passes its acceptance tests (section 20).
-- Every new Claude Code session, say: "Read @PRD.md and @DESIGN.md. We are on milestone N. Plan first,
-  then wait for my OK."
+- Every new Claude Code session, say: "Read @PRD.md, @DESIGN_SYSTEM.md and @DESIGN.md. We are on milestone N.
+  Plan first, then wait for my OK."
 - Use Opus at high effort (\`/model opus\`, \`/effort high\`) for anything that touches the database schema,
   RLS, signatures, Stripe or the public share page. Medium is fine for UI copy and layout.
 
@@ -180,7 +182,7 @@ The app shell has a left sidebar (see DESIGN.md section 6). One level, no nested
 | \`/app/templates\` | member | Saved templates. Owners/admins can delete |
 | \`/app/analytics\` | member | Win rate, average deal size, median time to sign, proposals by status, per member |
 | \`/app/catalogue\` | member (edit: owner/admin) | Services, prices, units, and pricing rules |
-| \`/app/brand\` | member (edit: owner/admin) | Logo, colours, font pair, cover image, signature-block footer text |
+| \`/app/brand\` | member (edit: owner/admin) | Logo, agency colour, cover image, footer text, voice notes |
 | \`/app/docs\` | member | Documentation: how to record, how pricing rules work, FAQ |
 | \`/app/help\` | member | Contact form (Resend to the founder) and links |
 | \`/app/billing\` | owner | Plan, usage meters (proposals, call minutes, rewrites, seats), Stripe portal button |

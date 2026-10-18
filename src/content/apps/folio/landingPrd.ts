@@ -3,7 +3,7 @@
 export const landingPrd = `# Folio: landing page PRD
 
 Save this file as \`LANDING.md\` in your project root. In Claude Code, say:
-"Build the landing page exactly as described in @LANDING.md, using the tokens in @DESIGN.md."
+"Build the landing page exactly as described in @LANDING.md, using @DESIGN_SYSTEM.md as the base and the Folio accent in @DESIGN.md."
 
 ## 0. Page goal
 - One job: get a founder, coach or agency owner to click **Start free trial**.
@@ -13,49 +13,55 @@ Save this file as \`LANDING.md\` in your project root. In Claude Code, say:
 - Route: \`/\` in the \`(marketing)\` route group. \`/pricing\` and \`/templates\` reuse nav and footer.
 
 ## 1. Global rules
+Marketing builds on \`@DESIGN_SYSTEM.md\` (Quiet Precision) and \`@DESIGN.md\` but is allowed to be more expressive:
+it is **square** (0 radius on sections, cards, buttons and inputs), uses bigger type, and shows the colourful
+slides large. The neutrals, Geist, the motion curves, white edged buttons and the stability rules still apply.
+
 ### 1.1 Tokens
-Use @DESIGN.md tokens. The landing page adds:
+Use the DESIGN_SYSTEM.md tokens and the Folio accent from DESIGN.md. The landing page adds:
 | Token | Value | Use |
 |---|---|---|
-| \`--hero-bg\` | radial-gradient(1200px 600px at 70% 10%, #EEE9FF 0%, #F8F7FC 60%) | Hero and final CTA |
-| \`--chip\` | #EEE9FF | Eyebrow pills, small labels |
-| \`--shadow-slide\` | 0 24px 60px rgba(45,30,120,0.16) | Floating slide mockups |
-| \`--ink-soft\` | #3F3A5A | Body copy |
+| \`--hero-wash\` | #f5f3fd (accent soft) | Hero and final CTA band, flat colour, no gradient |
+| \`--rail\` | 1px \`--hairline\` | Left and right lines of the 1180px marketing rail, and between sections |
+| \`--shadow-slide\` | 0 4px 16px rgba(8,9,10,.08), 0 0 0 1px rgba(8,9,10,.04) | Floating slide mockups (base float shadow) |
 
-### 1.2 Type scale
-| Style | Mobile | Desktop | Font / weight |
+### 1.2 Type scale (Geist 400, 500, 600 only)
+| Style | Mobile | Desktop | Tracking / weight |
 |---|---|---|---|
-| Display (H1) | 42px / 1.05 | 68px / 1.02 | Bricolage Grotesque 700 |
-| H2 | 32px / 1.12 | 46px / 1.08 | Bricolage Grotesque 700 |
-| H3 | 21px / 1.3 | 24px / 1.3 | Inter 650 |
-| Body | 17px / 1.6 | 18px / 1.6 | Inter 400 |
-| Small | 14px / 1.5 | 14px / 1.5 | Inter 500 |
+| Display (H1) | 40 / 1.04 | 52 / 1.04 | -0.045em / 500 |
+| H2 | 24 / 32 | 35 / 1.12 | -0.035em / 500 |
+| H3 | 20 / 26 | 20 / 26 | -0.025em / 500 |
+| Body | 16 / 24 | 16 / 24 | -0.014em / 400, max 65 characters wide |
+| Small | 13 / 18 | 13 / 18 | -0.014em / 400, faint ink for labels |
+Headings use \`text-wrap: balance\`. Sentence case everywhere, never all caps. Figures in prices use tabular numbers.
 
 ### 1.3 Layout
-- Container 1180px max, side padding 16px mobile, 24px tablet, 32px desktop.
-- Section padding 72px mobile, 120px desktop. Every section has \`scroll-margin-top: 84px\`.
-- Alternate backgrounds: \`--bg\`, \`--surface\`. Hero and final CTA use \`--hero-bg\`.
+- Base marketing rail: 1180px max with hairlines left and right; side padding 16px mobile, 24px tablet, 32px desktop.
+- Section padding 56px mobile, 80px desktop, separated by a full-width hairline. \`scroll-margin-top: 72px\`.
+- All sections are white except the hero and final CTA band (\`--hero-wash\`). No grey panels.
+- Grid children get \`min-width: 0\`; the page clips sideways overflow. Check 320, 375, 430, 768, 1024, 1440px.
 
 ### 1.4 Motion principles
-- Easing \`cubic-bezier(0.22, 1, 0.36, 1)\`. Default reveal: opacity 0 to 1 and translateY 18px to 0, 560ms,
-  when 20% in view, once. Stagger children 70ms, max 6 per group.
+- Base curves: \`cubic-bezier(0.16, 1, 0.3, 1)\` for reveals, \`cubic-bezier(0.2, 0, 0, 1)\` for morphs.
+- Default reveal: opacity 0 to 1 and translateY 8px to 0, 320ms, when 20% in view, once per session.
+  Stagger 40ms, max 6 per group.
 - Framer Motion (\`motion\` package), \`whileInView\`, \`viewport={{ once: true, amount: 0.2 }}\`.
-- Only animate \`transform\` and \`opacity\`.
-- \`prefers-reduced-motion: reduce\`: reveals become instant opacity changes, loops stop, auto-advancing slide
-  decks stay on slide 1 with arrows, the demo video shows its poster with a play button.
+- Only \`transform\` and \`opacity\`. Marketing may loop gentle idle motion in the hero (allowed here, not in the app).
+- \`prefers-reduced-motion: reduce\`: everything shows its end state, loops stop, the demo video shows its poster
+  with a play button.
 
 ### 1.5 Buttons
-- Primary: \`--brand\` (#6D4AFF), white text, 52px tall mobile, 48px desktop, 12px radius, 600 weight.
-- Secondary: white with 1.5px \`--line\` border, \`--ink\` text.
-- Hover lifts 2px with \`--shadow-2\`, 160ms. Press scale 0.98.
+- Every button is white with an edge, square on marketing. Primary: 46px (large), 1px \`--ink\` edge, ink text
+  500. Secondary: 46px, 1px \`--btn-edge\`, body ink. No filled or black buttons.
+- Hover: hover fill (#f5f5f6), 120ms. Press: 98% scale. Width never changes, including while loading.
 - Every **Start free trial** goes to \`/signup\` and fires \`cta_click\` with \`location\`.
 
 ## 2. Sticky nav
-- 64px tall. Background \`--bg\` at 85% with \`backdrop-filter: blur(12px)\`. Bottom border appears after 8px scroll.
-- Left: logo (stacked cards mark in \`--brand\`) + "Folio".
+- 56px tall, white, 1px hairline at the bottom, square. Sits inside the rail.
+- Left: logo (three-card mark in the accent) + "Folio" in Geist 600.
 - Centre (desktop): **How it works**, **Templates**, **Pricing**, **FAQ** (smooth scroll; Templates goes to \`/templates\`).
 - Right: **Log in** text link, **Start free trial** primary.
-- Mobile: logo, small **Start free trial** (40px), menu button opening a full-width Sheet with links and Log in.
+- Mobile: logo, small **Start free trial** (36px), menu button opening a side panel over the page with the links and Log in.
 - Motion: slides down on load 400ms. Hides on scroll down after 400px, shows on scroll up (240ms).
 
 ## 3. Hero
@@ -74,8 +80,8 @@ Use @DESIGN.md tokens. The landing page adds:
   never see the product", bullets, stat "87%", step "03", CTA with headshot. Each slide rotated -8, -4, 0, 4, 8
   degrees with \`--shadow-slide\`.
 - Floating chip 1 (top left): source chip "blog.yoursite.com/onboarding" with a link icon.
-- Floating chip 2 (bottom right): calendar chip "Tue 08:30 · LinkedIn · Scheduled" in \`--info-soft\`.
-- Floating chip 3 (desktop, right edge): "PDF ready · 9 slides" in \`--ok-soft\`.
+- Floating chip 2 (bottom right): calendar chip "Tue 08:30 · LinkedIn · Scheduled" as a blue tag (pastel fill, edge, readable ink).
+- Floating chip 3 (desktop, right edge): "PDF ready · 9 slides" as a green tag.
 
 ### 3.3 Live hero demo (optional, ship after launch week)
 - Under the buttons: input "Paste a blog URL to see your hook slide" with an arrow button.
@@ -111,7 +117,7 @@ Use @DESIGN.md tokens. The landing page adds:
   1. **90 minutes per carousel.** Write the hook, cut the post into slides, fix the spacing, export, convert, upload.
   2. **Generic templates.** AI tools give you the same slides everyone else posts. Your brand disappears.
   3. **No idea what worked.** Posts go out from three different tools and nobody checks which ones performed.
-- Stat box (\`--chip\`): **3 carousels a week at 90 minutes each is 19 hours a month.** Link: **Work out yours** (opens
+- Stat box (\`--accent-soft\` with an \`--accent-edge\` border): **3 carousels a week at 90 minutes each is 19 hours a month.** Link: **Work out yours** (opens
   a small inline calculator: carousels per week x minutes each = hours per month, and the cost at your hourly rate).
 - Motion: cards stagger. "19 hours" counts up from 0 over 900ms in view (reduced motion: static).
 
@@ -175,7 +181,7 @@ body, 3 ticks.
 
 ## 8. How it works
 - H2: **Three steps. Five minutes the first time, two after that.**
-- Steps (row on desktop, vertical timeline on mobile with a 2px \`--line\` connector):
+- Steps (row on desktop, vertical timeline on mobile with a 1px \`--hairline\` connector):
   1. **Set up your brand kit.** Logo, colours, fonts, headshot, handle.
   2. **Paste a source.** A blog URL, a YouTube link, an idea, or a voice note.
   3. **Edit, export, schedule.** Tweak any slide, download the PDF or schedule it to LinkedIn.
@@ -203,7 +209,7 @@ body, 3 ticks.
 - Before publishing, check every [verify] cell on each competitor's live pricing and feature pages and add a
   footnote: **Prices and features checked [Month Year]. Tell us if something changed.**
 - Never claim a competitor lacks a feature unless their site shows it. If unsure, write "Limited" or remove the row.
-- Mobile: horizontal scroll, first column sticky, Folio column on \`--brand-soft\`, "Swipe to compare" hint
+- Mobile: horizontal scroll, first column sticky, Folio column on \`--accent-soft\` with an \`--accent-edge\` outline, "Swipe to compare" hint
   fades after first scroll.
 - Motion: Folio column header glows once in view (reduced motion: none).
 
@@ -241,7 +247,7 @@ body, 3 ticks.
 
 - Under the cards: **Trial includes 5 carousels so you can try every feature. Limits reset on the 1st of each month.
   You always see what you have left before you press a button.**
-- Motion: cards rise with stagger. Pro sits 8px higher with \`--shadow-2\` on desktop.
+- Motion: cards rise with stagger. Pro has an \`--accent-edge\` border and the "Most popular" 4px pill; cards stay the same height.
 - Yearly toggle uses the yearly Stripe price ids (\`STRIPE_PRICE_*_YEARLY\`).
 
 ## 12. FAQ
@@ -271,7 +277,7 @@ body, 3 ticks.
 - Add FAQPage JSON-LD with these 11 questions.
 
 ## 13. Final CTA
-- \`--hero-bg\`, centred.
+- \`--hero-wash\`, centred.
 - H2: **Your next 10 posts are already written. They are in your blog.**
 - Subhead: **Turn one into a carousel in the next 5 minutes.**
 - Primary: **Start free trial**. Microcopy: **7 days free · Cancel any time**
@@ -297,8 +303,8 @@ body, 3 ticks.
 
 ### 15.1 OG image
 - 1200 x 630 via \`next/og\` at \`app/opengraph-image.tsx\` (this is Satori too, same rules as the slides).
-- \`--hero-bg\` colours. Left: H1 **Your best ideas, as carousels, in your brand.** 60px Bricolage 700. Under it:
-  **Blog · YouTube · Idea · Voice note → LinkedIn PDF** 26px \`--ink-soft\`.
+- \`--hero-wash\` colours. Left: H1 **Your best ideas, as carousels, in your brand.** 52px Geist 500. Under it:
+  **Blog · YouTube · Idea · Voice note → LinkedIn PDF** 24px \`--muted\`.
 - Right: 3 fanned slides. Bottom left: logo. Same image for Twitter \`summary_large_image\`.
 
 ## 16. Analytics events
@@ -324,7 +330,7 @@ body, 3 ticks.
 ## 18. Performance and accessibility
 - Lighthouse mobile: Performance 90+, Accessibility 100, SEO 100.
 - Hero slides are HTML, not images, so they paint instantly. Video loads lazily.
-- Preload Bricolage 700 and Inter 400 only. JS on \`/\` under 130 KB gzipped.
+- Preload Geist 400 and 500 only. JS on \`/\` under 130 KB gzipped.
 - Contrast 4.5:1, focus rings visible, every animation respects reduced motion.
 
 ## 19. Build order for Claude Code

@@ -29,7 +29,7 @@ create type public.video_status as enum (
   'awaiting_assets',  -- "Motion graphics" was ticked: waiting for screenshots or Skip
   'queued',           -- waiting for a free processing slot (Gentle = 1, Fast = 2)
   'preparing',        -- ffmpeg: normalise to source.mp4, extract audio
-  'transcribing',     -- Groq Whisper: every word with a start and end time
+  'transcribing',     -- Groq Whisper large-v3-turbo: every word with a start and end time
   'cutting',          -- silence map, adaptive threshold, kept segments
   'analysing',        -- face and eye detection (MediaPipe)
   'planning',         -- Claude: cutaways, subtitle; code: follow card cue, layout
@@ -54,7 +54,7 @@ create type public.render_status as enum ('queued', 'rendering', 'mixing', 'expo
 create type public.post_status as enum ('queued', 'handing_over', 'scheduled', 'published', 'partial', 'failed', 'cancelled');
 create type public.caption_source as enum ('claude', 'rewrite', 'user');
 create type public.revision_status as enum ('requested', 'planning', 'rendering', 'applied', 'impossible', 'failed', 'undone');
-create type public.ledger_kind as enum ('video', 'render', 'revision', 'caption_rewrite', 'grant', 'refund');
+create type public.ledger_kind as enum ('video', 'render', 'revision', 'caption_rewrite', 'transcription', 'claude', 'grant', 'refund');
 create type public.event_status as enum ('started', 'progress', 'done', 'failed', 'skipped');
 
 -- ---------------------------------------------------------------------
@@ -575,6 +575,7 @@ create table public.usage_ledger (
   seconds integer not null default 0,
   cost_usd numeric(8,4),
   note text not null default '',
+  idempotency_key text unique,                       -- e.g. 'render:<render_id>' so a retry never bills twice
   created_at timestamptz not null default now()
 );
 
@@ -627,8 +628,9 @@ create table public.inbound_events (
 -- answers "how much may they use?". Edge functions and Trigger.dev tasks
 -- call these, so the rules live in one place.
 --   Trial:   5 videos in total, clips up to 120 s, Gentle only.
---   Creator: 15 videos a month, clips up to 120 s, Gentle only, 2 revisions each.
---   Pro:     40 videos a month, clips up to 180 s, Fast allowed, 4 revisions each.
+--   Creator: 30 videos a month (one a day), clips up to 120 s, Gentle only, 2 revisions each.
+--   Pro:     90 videos a month, clips up to 180 s, Fast allowed, 4 revisions each.
+-- Keep these numbers in sync with lib/plans.ts and PRD section 14.
 -- ---------------------------------------------------------------------
 create or replace function public.has_active_access(p_user uuid)
 returns boolean
@@ -672,13 +674,13 @@ begin
   end if;
 
   if v_plan = 'pro' then
-    return jsonb_build_object('access', true, 'tier', 'pro', 'videos_per_period', 40,
+    return jsonb_build_object('access', true, 'tier', 'pro', 'videos_per_period', 90,
       'max_clip_seconds', 180, 'max_file_mb', 2048, 'fast_allowed', true,
       'revisions_per_video', 4, 'max_batch', 10, 'caption_rewrites_per_video', 10,
       'period_start', coalesce(v_period_start, date_trunc('month', now())));
   end if;
 
-  return jsonb_build_object('access', true, 'tier', 'creator', 'videos_per_period', 15,
+  return jsonb_build_object('access', true, 'tier', 'creator', 'videos_per_period', 30,
     'max_clip_seconds', 120, 'max_file_mb', 2048, 'fast_allowed', false,
     'revisions_per_video', 2, 'max_batch', 5, 'caption_rewrites_per_video', 5,
     'period_start', coalesce(v_period_start, date_trunc('month', now())));
@@ -812,8 +814,34 @@ $$;
 
 revoke execute on function public.assign_slot(uuid, uuid, text, boolean) from public, anon, authenticated;
 grant execute on function public.assign_slot(uuid, uuid, text, boolean) to service_role;
-revoke execute on function public.can_start_video(uuid, integer, bigint, integer) from public, anon;
-grant execute on function public.can_start_video(uuid, integer, bigint, integer) to authenticated, service_role;
+-- These take a user id, so the browser must not call them for someone else.
+-- The browser uses my_limits() below; edge functions and tasks use the secret key.
+revoke execute on function public.can_start_video(uuid, integer, bigint, integer) from public, anon, authenticated;
+grant execute on function public.can_start_video(uuid, integer, bigint, integer) to service_role;
+revoke execute on function public.plan_limits(uuid) from public, anon, authenticated;
+grant execute on function public.plan_limits(uuid) to service_role;
+revoke execute on function public.videos_used(uuid) from public, anon, authenticated;
+grant execute on function public.videos_used(uuid) to service_role;
+revoke execute on function public.has_active_access(uuid) from public, anon;
+grant execute on function public.has_active_access(uuid) to authenticated, service_role;
+revoke execute on function public.next_free_slot(uuid, timestamptz) from public, anon, authenticated;
+grant execute on function public.next_free_slot(uuid, timestamptz) to service_role;
+
+-- What the usage meter in the sidebar shows: "12 of 30 videos this month".
+-- Always about the signed-in person, so it cannot leak anyone else's numbers.
+create or replace function public.my_limits()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select public.plan_limits((select auth.uid()))
+         || jsonb_build_object('videos_used', public.videos_used((select auth.uid())));
+$$;
+
+revoke execute on function public.my_limits() from public, anon;
+grant execute on function public.my_limits() to authenticated;
 
 -- Posts that Zernio should get now: approved, slot within 6 days, not handed over.
 create or replace function public.due_for_handover(p_limit integer default 20)
@@ -834,6 +862,57 @@ $$;
 
 revoke execute on function public.due_for_handover(integer) from public, anon, authenticated;
 grant execute on function public.due_for_handover(integer) to service_role;
+
+-- ---------------------------------------------------------------------
+-- 19b. Email log and rate limits
+-- ELI5: email_log remembers every email we sent, so "your reel is ready"
+-- never goes out twice for the same video (dedupe_key is unique).
+-- rate_limit_hits counts clicks per person per minute, so nobody can hammer
+-- Rewrite or Request revision and run up the Claude bill.
+-- ---------------------------------------------------------------------
+create table public.email_log (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users (id) on delete cascade,
+  kind text not null check (kind in ('welcome', 'first_reel_ready', 'batch_ready', 'post_live', 'post_failed', 'reconnect_social', 'trial_ending', 'limit_near', 'limit_reached')),
+  to_email text not null,
+  dedupe_key text not null unique,                   -- 'first_reel_ready:<video_id>'
+  resend_id text,
+  status text not null default 'queued' check (status in ('queued', 'sent', 'failed')),
+  error text,
+  created_at timestamptz not null default now()
+);
+
+create index email_log_user_id_idx on public.email_log (user_id, created_at desc);
+
+create table public.rate_limit_hits (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  bucket text not null,                              -- 'rewrite-caption', 'request-revision', 'create-upload'
+  window_start timestamptz not null,
+  hits integer not null default 0,
+  primary key (user_id, bucket, window_start)
+);
+
+-- Returns true if the call is allowed, false if the person is over the limit.
+create or replace function public.hit_rate_limit(p_user uuid, p_bucket text, p_max integer, p_window_seconds integer)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_window timestamptz := to_timestamp(floor(extract(epoch from now()) / p_window_seconds) * p_window_seconds);
+  v_hits integer;
+begin
+  insert into public.rate_limit_hits (user_id, bucket, window_start, hits)
+  values (p_user, p_bucket, v_window, 1)
+  on conflict (user_id, bucket, window_start) do update set hits = public.rate_limit_hits.hits + 1
+  returning hits into v_hits;
+  return v_hits <= p_max;
+end;
+$$;
+
+revoke execute on function public.hit_rate_limit(uuid, text, integer, integer) from public, anon, authenticated;
+grant execute on function public.hit_rate_limit(uuid, text, integer, integer) to service_role;
 
 -- ---------------------------------------------------------------------
 -- 20. Views (security_invoker = true so RLS still applies)
@@ -892,6 +971,8 @@ alter table public.usage_ledger enable row level security;
 alter table public.subscriptions enable row level security;
 alter table public.stripe_events enable row level security;
 alter table public.inbound_events enable row level security;
+alter table public.email_log enable row level security;
+alter table public.rate_limit_hits enable row level security;
 
 -- profiles: read and edit your own card (zernio_profile_id is protected below).
 create policy profiles_select_own on public.profiles for select to authenticated
@@ -988,7 +1069,8 @@ create policy post_captions_insert_own on public.post_captions for insert to aut
     and exists (select 1 from public.videos v where v.id = video_id and v.user_id = (select auth.uid()))
   );
 
--- stripe_events and inbound_events: RLS on with no policies = server only.
+-- stripe_events, inbound_events, email_log and rate_limit_hits:
+-- RLS on with no policies = server only.
 
 -- Column-level locks. RLS decides WHICH rows; these grants decide WHICH
 -- columns the browser may change. Everything else is server only.
@@ -1000,6 +1082,8 @@ revoke insert, update, delete on public.subscriptions from anon, authenticated;
 revoke insert, update, delete on public.usage_ledger from anon, authenticated;
 revoke all on public.stripe_events from anon, authenticated;
 revoke all on public.inbound_events from anon, authenticated;
+revoke all on public.email_log from anon, authenticated;
+revoke all on public.rate_limit_hits from anon, authenticated;
 
 -- ---------------------------------------------------------------------
 -- 22. Realtime
@@ -1095,11 +1179,14 @@ select cron.schedule(
 select cron.schedule(
   'ethereel-trim-job-events',
   '17 3 * * *',
-  $cron$ delete from public.job_events where created_at < now() - interval '30 days'; $cron$
+  $cron$
+  delete from public.job_events where created_at < now() - interval '30 days';
+  delete from public.rate_limit_hits where window_start < now() - interval '1 day';
+  $cron$
 );
 
 -- =====================================================================
--- Done. Check: Table Editor shows 21 tables, Storage shows 4 buckets,
+-- Done. Check: Table Editor shows 23 tables, Storage shows 4 buckets,
 -- Integrations > Cron shows 2 jobs, and Advisors > Security shows no
 -- "RLS disabled" errors.
 -- =====================================================================

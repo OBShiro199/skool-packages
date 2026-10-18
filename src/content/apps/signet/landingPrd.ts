@@ -15,48 +15,53 @@ Save this file as \`LANDING.md\` in your project root. In Claude Code, say:
 
 ## 1. Global rules
 
-### 1.1 Tokens
-Use the tokens from \`@DESIGN.md\` (light only on the landing page). The landing page adds:
+### 1.1 Base and tokens
+The landing page uses \`@DESIGN_SYSTEM.md\` (Quiet Precision) and the Signet accent from \`@DESIGN.md\`, with the
+system's marketing rules: **square corners** (0 radius on boxes and frames; pills keep 4px), a 1180px rail with a
+hairline left and right, and more expressive type and visuals than the app. Buttons stay white with a firm ink edge;
+there are no filled or black buttons, even here. The landing page adds:
 
 | Token | Value | Use |
 |---|---|---|
-| \`--hero-bg\` | #FBF1E3 | Hero and final CTA background |
-| \`--band\` | #F6EFE4 | Alternate section background |
-| \`--chip\` | #FDECD3 | Eyebrow labels, small pills |
-| \`--shadow-card\` | 0 18px 40px rgba(61, 29, 2, 0.12) | Product shots, pricing cards |
+| \`--hero-tint\` | #f8f7fe | Hero and final CTA band (the accent at about 3%) |
+| \`--band\` | #fafafb | Alternate section background (system row hover) |
+| \`--chip\` | #f4f2fd | Eyebrow pills (accent soft) with \`--accent-edge\` |
+| \`--frame\` | 1px solid #e6e6e9 + system shadow-float | Product shots, pricing boxes |
 
-No solid black or dark full-width blocks. Contrast comes from Fraunces headings and amber accents.
+No dark full-width blocks. Contrast comes from large Geist display type, ink, and the violet accent used sparingly.
 
 ### 1.2 Type scale
-| Style | Mobile | Desktop | Weight | Font |
+Geist only (400, 500, 600), tracking from the system table. Marketing may use the system Display size and above.
+
+| Style | Mobile | Desktop | Weight | Tracking |
 |---|---|---|---|---|
-| Display (hero H1) | 40px / 1.05 | 66px / 1.02 | 600 | Fraunces |
-| H2 | 30px / 1.15 | 46px / 1.1 | 600 | Fraunces |
-| H3 | 20px / 1.3 | 24px / 1.3 | 600 | Inter |
-| Body | 17px / 1.6 | 18px / 1.65 | 400 | Inter |
-| Eyebrow | 13px / 1.4, uppercase, 0.08em tracking | same | 600 | Inter |
+| Display (hero H1) | 40px / 1.04 | 64px / 1.02 | 500 | -0.045em |
+| H2 | 32px / 1.1 | 48px / 1.06 | 500 | -0.04em |
+| H3 | 20px / 26px | 24px / 32px | 500 | -0.025em |
+| Body | 16px / 26px | 16px / 26px | 400 | -0.011em |
+| Eyebrow | 13px / 18px pill, sentence case | same | 500 | -0.014em |
 
 ### 1.3 Layout
-- Container max width 1180px, side padding 16px mobile, 24px tablet, 32px desktop.
-- Section padding: 72px top and bottom mobile, 120px desktop.
-- Section backgrounds alternate: \`--bg\`, \`--band\`, \`--bg\`. Hero and final CTA use \`--hero-bg\`.
+- The 1180px rail with 1px hairlines left and right; side padding 16px mobile, 24px tablet, 32px desktop.
+- Section padding 56px mobile, 80px desktop (system marketing values). Sections split by full-width hairlines.
+- Section backgrounds alternate white and \`--band\`. Hero and final CTA use \`--hero-tint\`.
+- Grid children get \`min-width: 0\` and the page clips sideways overflow (system rule).
 
 ### 1.4 Motion principles
-- Easing \`cubic-bezier(0.22, 1, 0.36, 1)\`.
-- Default scroll reveal: opacity 0 to 1 and translateY 18px to 0, 560ms, when 20% of the element is in
-  view, once. Use IntersectionObserver (no heavy animation library needed; Framer Motion is fine if
-  already installed).
+- System curves: \`cubic-bezier(0.16, 1, 0.3, 1)\` for reveals, the morph curve for anything that changes size.
+- Default scroll reveal: opacity 0 to 1 and translateY 12px to 0, 360ms, when 20% of the element is in view,
+  once per session. IntersectionObserver is enough.
 - Stagger children 80ms, max 6 per group.
 - \`prefers-reduced-motion: reduce\`: no translate, no parallax, no auto-playing loops; fades 150ms only.
   The demo video shows its poster with a play button instead of autoplaying.
 
 ## 2. Sticky nav
 
-- 64px high, \`--bg\` at 85% opacity with \`backdrop-filter: blur(10px)\`, 1px \`--line\` bottom border once the
+- 64px high, white at 90% opacity with \`backdrop-filter: blur(10px)\`, 1px hairline bottom border once the
   page scrolls past 8px.
-- Left: logo mark (amber envelope with a small waveform inside) + wordmark "Signet".
+- Left: the seal mark (a violet wax seal with a small waveform pressed into it) + wordmark "Signet".
 - Centre (desktop): How it works, Features, Pricing, Compare, FAQ (anchor links, smooth scroll, offset 72px).
-- Right: "Log in" (ghost), "Start free trial" (primary).
+- Right: "Log in" (secondary, light edge), "Start free trial" (primary, firm ink edge).
 - Mobile: logo + "Start free trial" (small) + menu button opening a Sheet with the anchor links.
 - Motion: on load, nav fades in 300ms. No reveal on scroll.
 
@@ -73,7 +78,7 @@ No solid black or dark full-width blocks. Contrast comes from Fraunces headings 
   1. Back layer: the editor with a proposal for "Northwind Coffee", exec summary visible.
   2. Front left card: a call card with a waveform and the JobProgress at "Drafting".
   3. Front right card: a toast "Jane Cole signed. Deposit $3,600 paid." with a green tick.
-  All three in rounded 18px frames with \`--shadow-card\`.
+  All three in square frames with \`--frame\`.
 - Motion: copy reveals with stagger (eyebrow, H1, subhead, buttons, trust line). The product layers slide in
   from 24px below at 0ms, 140ms and 280ms. The JobProgress dots fill once on load (1.6s). The toast pops at
   1.8s with a 1.03 scale settle. Reduced motion: everything visible, no fills or pops.
@@ -91,21 +96,21 @@ No solid black or dark full-width blocks. Contrast comes from Fraunces headings 
 
 - Eyebrow: "The gap that loses deals"
 - H2: "The call went great. The proposal went out five days later."
-- Three columns (stacked on mobile), each with a small amber line icon:
+- Three columns (stacked on mobile), each with a small violet line icon (Lucide, 1.5 stroke):
   1. **"I will write it tonight."** "Three hours rebuilding last month's proposal, with the old client's name
      still in the footer."
   2. **"Did they even open it?"** "A PDF in an inbox tells you nothing. You find out it was a no when they
      stop replying."
   3. **"Now send the invoice."** "Signed by email, invoiced separately, deposit chased by hand. Every step
      is a chance to stall."
-- Closing line, centred, in Fraunces 24px: "The first credible proposal in the inbox usually wins."
+- Closing line, centred, in Geist 500 24px: "The first credible proposal in the inbox usually wins."
 - Motion: columns stagger 80ms.
 
 ## 6. Product demo
 
 - Eyebrow: "See it work"
 - H2: "45 minute call in. Proposal out in four."
-- A 16:9 video frame (rounded 18px, \`--shadow-card\`) with a poster image and a large amber play button.
+- A 16:9 video frame (square, \`--frame\`) with a poster image and a large white play button with a firm edge.
   Video: 60 seconds, screen recording (Screen Studio), captions burned in: upload a call, the brief appears,
   draft appears, rewrite the summary "shorter", send, open on a phone, sign, pay deposit, owner gets the
   "Signed" email.
@@ -133,7 +138,7 @@ Alternate image left and right on desktop. Each section: eyebrow, H3-sized H2 (u
 - Heading: "A full proposal with three options, priced from your rate card."
 - Body: "Exec summary, problem, solution, scope, timeline, good/better/best pricing, terms and next steps.
   It only prices with the services and rules you set, so there are no made-up numbers."
-- Bullets: "Your logo, colours and fonts" / "Rush fees and minimums applied for you" / "Start from a
+- Bullets: "Your logo and brand colour" / "Rush fees and minimums applied for you" / "Start from a
   template that already wins"
 - Visual: three pricing cards, the middle one marked "Recommended".
 
@@ -152,7 +157,7 @@ Alternate image left and right on desktop. Each section: eyebrow, H3-sized H2 (u
   they lingered on, before you pick up the phone."
 - Bullets: "Opened, signed and paid alerts" / "Time per section" / "Polite follow-up after 3 days, on
   autopilot"
-- Visual: the activity heatmap with "Pricing: 4 min 12 s" in amber.
+- Visual: the activity heatmap with "Pricing: 4 min 12 s" in the accent.
 
 ### 7.5 Signed and paid on one page
 - Eyebrow: "Close"
@@ -179,7 +184,7 @@ Parallax on visuals of 12px max over the section height (desktop only, off for r
 
 - Eyebrow: "Three steps"
 - H2: "From call to deposit"
-- Three numbered cards connected by a dotted amber line (horizontal desktop, vertical mobile):
+- Three numbered cards connected by a dotted violet line (horizontal desktop, vertical mobile):
   1. **"Upload the call"** "Drop in the recording, record in the browser, or import from Zoom or Meet."
   2. **"Check and send"** "Fix the brief, tweak the draft, send a link. About 10 minutes."
   3. **"Get signed and paid"** "They read, sign and pay the deposit. You get an email at each step."
@@ -207,7 +212,7 @@ Parallax on visuals of 12px max over the section height (desktop only, off for r
 
 - Under the table: "Signet is cheaper for small teams because you pay per workspace, not per seat.
   Studio covers 3 people for $99."
-- Motion: rows fade in with 40ms stagger. The Signet column has a \`--brand-soft\` tint and a "You are
+- Motion: rows fade in with 40ms stagger. The Signet column has an \`--accent-soft\` tint and a "You are
   here" style top chip "Signet".
 
 ## 10. Testimonials slot
@@ -217,7 +222,7 @@ Parallax on visuals of 12px max over the section height (desktop only, off for r
 - Three quote cards. Until you have real quotes, render the slot with placeholder cards showing a soft
   dashed border and the text "Your first customer quote goes here", visible only in development. In
   production the section is hidden until \`TESTIMONIALS\` (a constant in \`lib/testimonials.ts\`) has 3 items.
-- Card: quote (Fraunces 20px), name, role, company, small avatar. One number per quote where possible
+- Card: quote (Geist 500 20px), name, role, company, small avatar. One number per quote where possible
   ("Sent the proposal 40 minutes after the call. Signed the next morning.").
 
 ## 11. Pricing
@@ -227,7 +232,7 @@ Parallax on visuals of 12px max over the section height (desktop only, off for r
 - Subhead: "Every plan starts with a 7 day free trial. Cancel any time from Billing."
 - **Toggle:** Monthly / Annual, pill switch, Annual shows a chip "2 months free". Default Monthly. The toggle
   animates the price digits (crossfade 200ms) and swaps the Checkout price id.
-- Three cards, middle highlighted with a 2px \`--brand\` border and "Most popular" chip:
+- Three cards, middle highlighted with a 1px \`--accent-edge\` border plus the accent soft fill and "Most popular" chip:
 
 | | Solo | Studio | Agency |
 |---|---|---|---|
@@ -245,7 +250,7 @@ Parallax on visuals of 12px max over the section height (desktop only, off for r
 
 - Each card lists: "Unlimited blank and template proposals", "E-signature and deposits", "View tracking
   and follow-ups", "Brand kit" (Solo: "Logo and 1 colour").
-- Under the cards: an ROI line in Fraunces 22px: "Win one extra $5,000 project a quarter and Studio pays for
+- Under the cards: an ROI line in Geist 500 24px: "Win one extra $5,000 project a quarter and Studio pays for
   itself 15 times over."
 - Risk reversal line: "No setup fee. No contract. Deposits go straight to your Stripe."
 - Buttons go to \`/signup?plan=studio&interval=month\` (plan and interval carried into Checkout after signup).
@@ -286,7 +291,7 @@ Accordion, one open at a time, first closed. Each answer 1 to 3 sentences.
 
 ## 13. Final CTA
 
-- Background \`--hero-bg\`, centred.
+- Background \`--hero-tint\`, centred.
 - H2: "Send the next proposal before the client cools off."
 - Subhead: "Upload your last discovery call and see the draft in about 10 minutes."
 - Primary button: "Start free trial". Line under: "7 days free. No setup fee."
@@ -299,7 +304,7 @@ Accordion, one open at a time, first closed. Each answer 1 to 3 sentences.
   (Documentation, Proposal templates, Discovery call checklist), Company (About, Contact), Legal (Privacy,
   Terms).
 - Bottom row: "Signet" wordmark, "Made for people who sell their time.", copyright year.
-- Background \`--band\`, text \`--ink-soft\`.
+- Background \`--band\`, text body ink, top hairline.
 
 ## 15. Responsive notes
 
@@ -324,7 +329,7 @@ Accordion, one open at a time, first closed. Each answer 1 to 3 sentences.
 ## 17. OG image
 
 - 1200 x 630, generated with \`next/og\` at \`app/opengraph-image.tsx\`.
-- Background \`--hero-bg\`, left: logo + "Proposals from a sales call." in Fraunces 64px, \`--ink\`.
+- Background white with a hairline frame, left: seal mark + "Proposals from a sales call." in Geist 500 64px, ink.
   Right: a tilted proposal card with three pricing chips and a green "Signed" pill.
 - Also a Twitter card (same image, \`summary_large_image\`).
 

@@ -202,10 +202,10 @@ function InboxVisual() {
 
 export function Features() {
   return (
-    <section className="hd-section" id="product" aria-labelledby="product-h">
+    <section className="hd-section hd-features" id="product" aria-labelledby="product-h">
       <div className="hd-container">
         <h2 id="product-h" className="hd-sr">What Helpdeck does</h2>
-        <div className="hd-bento">
+        <div className="hd-cells hd-bento hd-bleed">
           <Tile className="hd-tile-lg hd-tile-answer">
             <AnswerVisual />
             <TileCopy eyebrow="Trust" title="Every answer shows where it came from."

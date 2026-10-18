@@ -12,14 +12,14 @@ export const frontendTasks: Task[] = [
       eli5('What is an ICP?', 'ICP means ideal customer profile: the exact type of person you want to email. Job title, country, company size, industry. Outbounder turns those answers into a search, so vague answers give you vague leads.'),
       p('This wizard is the first thing a new user sees. The live sample on step 4 is your trust moment: they see a real first line written from a real company website **before** they meet the plan picker and Stripe Checkout.'),
       prompt('out-fe-icp-prompt', 'Build the ICP wizard', `
-Read @PRD.md sections 7.3, 13 and 16 and @DESIGN.md section 5.3. Build /app/onboarding as a full-screen wizard using the StepWizard component.
+Read @PRD.md sections 7.3, 13 and 16 and @DESIGN_SYSTEM.md @DESIGN.md section 4.2. Build /app/onboarding as a full-screen wizard using the StepWizard component.
 
 Steps:
 1. Who: job titles chip input with suggestions (Founder, CEO, Head of Marketing, VP Sales, Head of Talent, Managing Director), seniority toggle chips, and "I run an agency" checkbox.
 2. Where: country multi-select, optional city chips, "Company HQ in these countries" toggle.
 3. Company: headcount toggle cards (1-10, 11-50, 51-200, 201-500), industry keyword chips, exclude keyword chips.
 4. Offer: website URL (save the hostname to profiles.website_domain), one-sentence offer, optional proof line, sender name, company, physical address. Character counters.
-4b. Plan picker: Starter and Growth cards with a monthly/annual toggle exactly as DESIGN.md 5.3. Growth preselected when "I run an agency" is ticked.
+4b. Plan picker: Starter and Growth cards with a monthly/annual toggle exactly as DESIGN.md 4.2. Growth preselected when "I run an agency" is ticked.
 5. Domain prompt (after checkout).
 
 Save to profiles (icp jsonb plus offer, proof, sender fields) on every Continue so a refresh never loses answers. Validate each step with zod before Continue is enabled. icp.titles, icp.countries and icp.keywords are string arrays, never comma strings.
@@ -31,7 +31,7 @@ Live sample on step 4: a route handler /api/onboarding/sample that:
 - scrapes the first company's homepage with Firecrawl,
 - calls claude-sonnet-5-5 with the PRD 12.1 prompt and schema (same settings as the personalise function),
 - returns { company, domain, first_line, signal }. Never returns an email address.
-Show the loading steps from DESIGN.md while it runs. If anything fails: "We couldn't fetch a sample this time. You'll see real ones in a minute." and let them continue.
+Show the live status line from DESIGN.md 4.2 while it runs, inside the reserved 220px box so nothing jumps. If anything fails: "We couldn't fetch a sample this time. You'll see real ones in a minute." and let them continue.
 
 The plan picker calls /api/stripe/checkout with { plan, interval }. On return (?step=domain) poll the subscriptions row every 2 seconds for up to 60 seconds until status is trialing, then show step 5. Fire PostHog events icp_completed, sample_line_viewed and plan_selected.
 
@@ -77,19 +77,19 @@ found -> verifying -> verified -> enriching -> enriched -> personalising -> read
 ready -> approved -> sending -> completed
                         \\-> replied | bounced | unsubscribed`, 'Every lead_status the table must show with its own StatusPill tone.'),
       prompt('out-fe-leads-prompt', 'Build the leads table', `
-Read @PRD.md sections 7.3, 10 and 15.2 and @DESIGN.md sections 4, 5.6 and 5.21. Build /app/campaigns/[id]/leads.
+Read @PRD.md sections 7.3, 10 and 15.2 and @DESIGN_SYSTEM.md @DESIGN.md sections 3 and 5.4. Build /app/campaigns/[id]/leads.
 
 - Server component loads the campaign (getClaims + RLS) and the first 200 leads joined with lead_enrichment (ai_confidence, site_markdown is not null as has_site, source_urls).
 - "Find leads" control: count segmented control (25, 50, 100, 250) with the UsageMeter for leads under it ("286 leads left this month" from usage_this_month and plan_limits). Options bigger than what is left are disabled with a tooltip. The button creates a uuid when it renders and sends it as the Idempotency-Key header to the find-leads edge function. 402 opens the limit dialog from DESIGN.md section 6; 409 shows "Already finding leads for this campaign".
 - JobProgress above the table: subscribe to Realtime on lead_jobs for this campaign. Show "Finding leads: 64 of 100". Failed job card with Retry (creates a new job).
-- Client table with TanStack Table + shadcn table. Columns as DESIGN.md 5.6. Local time column with Intl.DateTimeFormat from lead.timezone.
-- Realtime: postgres_changes on public.leads filtered by campaign_id=eq.<id>. Merge updates and flash the row with --primary-soft for 600ms.
+- Client table with TanStack Table + shadcn table. Columns and fixed widths as DESIGN.md 5.4, 48px rows. Local time column with Intl.DateTimeFormat from lead.timezone.
+- Realtime: postgres_changes on public.leads filtered by campaign_id=eq.<id>. Merge updates and cross-fade the changed cells (160ms); never flash, move or resize the row.
 - PipelineBar on top with counts per status group, updating live.
 - Filters in the URL query string: search, status multi-select, "Needs review" quick filter.
-- Row click opens a Sheet: lead details, scraped summary with source links, AI fields with AiMark, message history, and actions Approve, Reject, Regenerate (personalise edge function with the user's JWT), Remove, Suppress (insert into suppression_list with reason manual).
-- Bulk bar: Approve, Reject, Remove. Only rows in ready, needs_review or approved can change status; show a toast with how many were skipped.
+- Row click opens the side panel (overlays from the right, never reflows the page): lead details, scraped summary with source links, AI fields with AiMark, message history, and actions Approve, Reject, Regenerate (personalise edge function with the user's JWT), Remove, Suppress (insert into suppression_list with reason manual).
+- Floating selection bar (DESIGN_SYSTEM.md): Approve (n), Reject (n), Remove (n) with fixed widths. Only rows in ready, needs_review or approved can change status; show a toast with how many were skipped.
 - Upload CSV: the file goes to the private "imports" bucket at <user_id>/<timestamp>.csv, then the browser parses it (papaparse) and inserts rows with source 'csv' and status 'found' in batches of 50. Columns email, first_name, last_name, title, company_name, company_domain. If an insert fails with "limit_reached", stop and show how many were imported. Export CSV of the current filter.
-- Virtualise rows over 200. Loading: 8 skeleton rows. Empty state from DESIGN.md.
+- Virtualise rows over 200. Loading: 8 skeleton rows. Empty state from DESIGN.md section 6.
 
 Plan first, then wait for my OK.`),
       steps(
@@ -155,7 +155,7 @@ STEP 3 · day 8 · new thread
 Subject: close the loop?
 Not sure outbound is on your list this quarter, {{first_name}}. Reply "later" and I'll check back in a couple of months. If it is, the samples are ready.`),
       prompt('out-fe-seq-prompt', 'Build the sequence editor', `
-Read @PRD.md sections 8 (Sequence and review) and 14.3 and @DESIGN.md sections 4 (EmailPreview, VariableChip) and 5.7. Build /app/campaigns/[id]/sequence and reuse it inside step 3 of the campaign builder.
+Read @PRD.md sections 8 (Sequence and review) and 14.3 and @DESIGN_SYSTEM.md @DESIGN.md sections 3 (EmailPreview, VariableChip, LintRow) and 5.5. Build /app/campaigns/[id]/sequence and reuse it inside step 3 of the campaign builder.
 
 - Load or create the campaign's sequence and its steps. New campaigns get the 3 default steps from default-sequence.txt, which I will paste below.
 - Left column: step cards with delay_days input, same/new thread toggle (step 1 is always a new thread and the toggle is hidden), subject input, auto-growing body textarea that highlights {{variables}} in mono, VariableChip row that inserts at the cursor.
@@ -201,14 +201,14 @@ order by q.created_at desc, s.step_number limit 3;`),
     blocks: [
       p('Nothing sends without approval. This page is where users spend most of their time before launch, so it has to be fast: one email on screen, the reason for the first line next to it, and a single key for each action.'),
       prompt('out-fe-review-prompt', 'Build the review queue', `
-Read @PRD.md sections 8 (Sequence and review), 10.4 and 12 and @DESIGN.md sections 5.5 (step 5), 5.8 and 7. Build /app/campaigns/[id]/review and the launch step.
+Read @PRD.md sections 8 (Sequence and review), 10.4 and 12 and @DESIGN_SYSTEM.md @DESIGN.md sections 5.3 (step 5), 5.6 and 7. Build /app/campaigns/[id]/review and the launch step.
 
 - Load leads in ready and needs_review (filter: Ready, Needs review, All), needs_review first, then ai_confidence ascending, joined with lead_enrichment.
-- Left 60%: EmailPreview in edit mode. Subject input and a body textarea styled like the mail body. First line highlighted with --violet-soft and AiMark. Edits save final_subject/final_body and set edited = true (the only enrichment columns the browser can update).
+- Left 60%: EmailPreview in edit mode. Subject input and a body textarea styled like the mail body. First line with the violet 7% underlay and AiMark. Edits save final_subject/final_body and set edited = true (the only enrichment columns the browser can update).
 - Right 40%: "Why this line" panel: ai_signal quote, source_urls links, site_summary as 3 bullets, lead fields, ConfidenceMeter, ai_skip_reason in a warning Alert.
 - Keys: A approve, X reject, E focus the body, R regenerate popover (hint input, calls personalise with { lead_id, hint } and the user's JWT; 429 regen_limit shows "No regenerations left for this lead"; 402 shows the limit dialog), J/K next/previous. KeyboardHint in the footer. Ignore shortcuts while typing.
-- Slide animation on approve/reject as DESIGN.md 7, reduced motion respected.
-- "Approve all above 0.8" enabled after 10 manual decisions in this campaign (events email_approved/email_rejected). Confirm dialog with the exact count.
+- After approve/reject the next email fades in place (200ms), nothing slides; reduced motion shows it instantly.
+- "Approve all above 0.8" enabled after 10 manual decisions in this campaign (events email_approved/email_rejected). The confirm morphs inside the same dialog and shows the exact count.
 - Write events email_approved (edited, confidence), email_rejected, email_regenerated; mirror to PostHog.
 - Launch step: checklist (domain verified, at least 1 active inbox attached, at least 10 approved, sender name and physical address set), then "Launch campaign" calls supabase.rpc('launch_campaign', { p_campaign: id }). Map errors: no_verified_inbox, need_10_approved, missing_sender_details, campaign_limit, no_access to friendly messages. Success dialog: "64 emails queued. First ones go out at the next 08:00 in each lead's time zone."
 
@@ -249,7 +249,7 @@ select status, step_number, count(*) from public.messages where direction = 'out
     blocks: [
       eli5('Why a second domain?', 'Your main domain is like your home address. If you post 1,000 letters a day from it and people complain, the post office starts binning everything from that address, including your invoices. A lookalike domain (tryacme.com) takes that risk instead, and your home address stays clean.'),
       prompt('out-fe-domain-prompt', 'Build the domain wizard', `
-Read @PRD.md sections 11.7 and 14.1 to 14.2 and @DESIGN.md section 5.9 (and DnsRecordRow, CapacityMeter in section 4). Build /app/domains, /app/domains/new and /app/domains/[id].
+Read @PRD.md sections 11.7 and 14.1 to 14.2 and @DESIGN_SYSTEM.md @DESIGN.md section 5.8 (and DnsRecordRow, CapacityMeter in section 3). Build /app/domains, /app/domains/new and /app/domains/[id].
 
 - Step 1, Buy: explanation card, suggested names from profiles.website_domain (try, get, use, hey, with prefixes) each with a "Check on Porkbun" link (https://porkbun.com/checkout/search?q=<name>), input "Domain you bought". Warning Alert if it matches the main domain. "Add domain" calls setup-domain { action: 'create' }. 402 shows "Starter includes 2 domains. Upgrade for 3."
 - Step 2, DNS: a DnsRecordRow for every record returned (type badge, host, value, priority for MX, status chip). Porkbun tab (default) explains: "Porkbun > Domain Management > Details > DNS Records. Type, Host, Answer. Leave Host blank for the root." and shows the Host with the domain stripped, so users never paste tryacme.com twice. "Copy all as text" button.
@@ -293,7 +293,7 @@ select email, status, daily_cap, sent_today, public.inbox_effective_cap(id) as c
     blocks: [
       eli5('What is a thread?', 'A thread is one conversation: your email, their reply, your reply. AgentMail gives each thread an id. We store it on every message so replies stay together, the same way Gmail groups them.'),
       prompt('out-fe-inbox-prompt', 'Build the unified inbox', `
-Read @PRD.md sections 7.3, 8 (Replies) and 12.3 and @DESIGN.md sections 4 (ClassificationBadge) and 5.10. Build /app/inbox.
+Read @PRD.md sections 7.3, 8 (Replies) and 12.3 and @DESIGN_SYSTEM.md @DESIGN.md sections 3 (ClassificationBadge) and 5.7. Build /app/inbox.
 
 - Three panes: filters (All, Interested, Not now, Unsubscribe, OOO, Other, Unread, by campaign, by inbox), thread list, thread view. Selected thread in the URL (?thread=<agentmail_thread_id>) so Resend alert links open it directly.
 - Thread list: group messages by agentmail_thread_id where at least one inbound message exists. Show the latest inbound classification, lead name, company, snippet, time, unread dot (read_at is null). 50 per page.

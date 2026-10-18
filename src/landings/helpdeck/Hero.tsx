@@ -11,29 +11,19 @@ const HANDOFF = "I'm not sure about this one. Want a human to email you?"
 const FULL_SCRIPT = `Visitor: ${Q1} Helpdeck: ${A1} Source: Exporting invoices, docs.acme.com. Visitor: ${Q2} Helpdeck: ${HANDOFF}`
 
 /** Scripted hero conversation. Steps: 1 q1, 2 dots, 3 typing, 4 chip, 5 q2, 6 dots, 7 handoff. */
+// Delay before moving on from each step; step 3 waits for the typing to finish first.
+const NEXT_MS: Record<number, number> = { 0: 900, 1: 600, 2: 700, 3: 250, 4: 1250, 5: 600, 6: 700 }
+
 function useScript(run: number) {
   const reduce = useReducedMotion()
   const [step, setStep] = useState(0)
   const typing = useTyping(A1, step >= 3)
+  useEffect(() => { setStep(0) }, [run])
   useEffect(() => {
-    if (reduce) { setStep(7); return }
-    setStep(0)
-    const t = [
-      window.setTimeout(() => setStep(1), 900),
-      window.setTimeout(() => setStep(2), 1500),
-      window.setTimeout(() => setStep(3), 2200),
-    ]
-    return () => t.forEach(window.clearTimeout)
-  }, [run, reduce])
-  useEffect(() => {
-    if (reduce || step !== 3 || !typing.done) return
-    const t = [
-      window.setTimeout(() => setStep(4), 250),
-      window.setTimeout(() => setStep(5), 1500),
-      window.setTimeout(() => setStep(6), 2100),
-      window.setTimeout(() => setStep(7), 2800),
-    ]
-    return () => t.forEach(window.clearTimeout)
+    if (reduce || step >= 7) return
+    if (step === 3 && !typing.done) return
+    const t = window.setTimeout(() => setStep((s) => s + 1), NEXT_MS[step])
+    return () => window.clearTimeout(t)
   }, [step, typing.done, reduce])
   return { step: reduce ? 7 : step, typed: reduce ? A1 : typing.shown }
 }
@@ -146,8 +136,8 @@ export function Hero() {
                 <i className="hd-line w80" /><i className="hd-line w55" />
               </div>
             </div>
-            <div className="hd-chat-dock"><HeroChat /></div>
           </div>
+          <div className="hd-chat-dock"><HeroChat /></div>
         </motion.div>
       </div>
     </header>

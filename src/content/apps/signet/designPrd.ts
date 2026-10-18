@@ -92,7 +92,7 @@ proposal copy, both inside the system's size scale:
 | Proposal section heading | 24 / 32 (system H2) | 500 | Section titles |
 | Proposal cover title | 35 / 1.12 (system H1) | 500 | Cover only |
 | Pricing total | 24 / 32, tabular-nums | 500 | Option cards |
-| Typed signature | 32 / 40, Geist 400 italic synthesis off: use the agreed script face "Caveat" for the signature line only | 400 | Sign block |
+| Typed signature | 32 / 40 in "Caveat" (the signature line only) | 400 | Sign block |
 
 The typed signature is the one exception to "one family": it is a picture of a name, not UI text, and it is never
 used anywhere else.

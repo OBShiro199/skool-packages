@@ -10,13 +10,13 @@ export const frontendTasks: Task[] = [
     xp: 50,
     blocks: [
       { type: 'callout', tone: 'eli5', title: 'Why the catalogue comes first', text: 'Signet is only allowed to price proposals from your own price list. No list, no prices. So the very first thing a new user does is tell Signet what they sell and for how much. That is also what makes the drafts feel like theirs.' },
-      { type: 'prompt', id: 'sgn-fe-workspace-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 4, 7, 8 and 10, and @DESIGN.md sections 6, 7.2 and 7.9.
+      { type: 'prompt', id: 'sgn-fe-workspace-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 4, 7, 8 and 10, @DESIGN_SYSTEM.md, and @DESIGN.md sections 6, 7.2 and 7.9.
 
 Build:
 1. app/onboarding/page.tsx: the 4-step card from DESIGN.md 7.2. Step 1 calls supabase.rpc('create_workspace', { p_name }). Step 2 uploads the logo to brand-assets/<workspace_id>/logo.<ext> (browser client, RLS applies), suggests 8 swatches from the logo using a small canvas k-means, saves brand_kits. Step 3 inserts services and updates pricing_rules.deposit_pct. Step 4 shows "Connect Stripe" (links to /api/stripe/connect/start, built later) and "Skip for now".
 2. lib/workspace.ts: getCurrentWorkspace() on the server: getClaims, then profiles.current_workspace_id, then the workspace and the user's role. Redirect to /onboarding if none.
 3. app/app/catalogue/page.tsx: Tabs Services and Pricing rules exactly as DESIGN.md 7.9. Members see read-only fields with the lock note (check the role from getCurrentWorkspace, and rely on RLS as the real guard).
-4. app/app/brand/page.tsx: the brand form with a live mini share-page preview at 375px wide using the brand colours and font pair.
+4. app/app/brand/page.tsx: the brand form with a live mini share-page preview at 375px wide using the agency accent from lib/brand.ts.
 5. The app shell sidebar from DESIGN.md section 6 with these items in this order: Proposals, Calls, Templates, Analytics, Catalogue, Brand, then the bottom group Documentation, Help, Billing, Settings. Billing hidden for non-owners. Mini usage meter above the bottom group (reads plan_limits and usage_this_month through an RPC call).
 Use only design tokens, no raw hex. Then run the app and screenshot onboarding steps 2 and 3 at 390px and 1440px.` },
       { type: 'steps', items: [
@@ -53,7 +53,7 @@ join public.brand_kits b on b.workspace_id = w.id;` },
     xp: 60,
     blocks: [
       { type: 'callout', tone: 'eli5', title: 'Why the upload is "resumable"', text: 'A one hour video can be 500 MB. On café Wi-Fi a normal upload fails at 90% and starts again from zero. A resumable upload sends the file in small pieces and remembers which pieces arrived, so a dropped connection only costs you one piece.' },
-      { type: 'prompt', id: 'sgn-fe-calls-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 9.1 and 11.1, and @DESIGN.md sections 7.4, 7.5 and 15.
+      { type: 'prompt', id: 'sgn-fe-calls-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 9.1 and 11.1, @DESIGN_SYSTEM.md, and @DESIGN.md sections 7.4, 7.5 and 15.
 
 Build:
 1. app/app/proposals/new/page.tsx with the three option cards. "From a call" has Tabs: Upload, Record, Import (Import shows a Studio-plan chip on Solo and is built later).
@@ -96,7 +96,7 @@ from public.jobs order by created_at desc limit 10;` },
     xp: 70,
     blocks: [
       { type: 'callout', tone: 'eli5', title: 'Blocks, not HTML', text: 'Each section is saved as a list of simple blocks: a heading, a paragraph, some bullets. Never as raw HTML. That way nothing a client or the AI types can sneak a script onto the public page, and the same blocks render nicely on a phone, a laptop and in print.' },
-      { type: 'prompt', id: 'sgn-fe-editor-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 8 (block format), 9.2, 13.4 and 14.4, and @DESIGN.md sections 7.6, 7.7 and 14.
+      { type: 'prompt', id: 'sgn-fe-editor-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 8 (block format), 9.2, 13.4 and 14.4, @DESIGN_SYSTEM.md, and @DESIGN.md sections 7.6, 7.7 and 14.
 
 Build app/app/proposals/[id]/page.tsx:
 1. Three columns: section rail (dnd-kit reorder, pricing pinned after timeline with a lock icon), canvas (max 760px, brand colours via lib/brand.ts), right panel (status, Preview, Send, client fields, follow-up Switch, rewrite meter, last 5 activity events).
@@ -145,7 +145,7 @@ where kind = 'rewrites' order by created_at desc limit 1;` },
     xp: 75,
     blocks: [
       { type: 'callout', tone: 'eli5', title: 'Why the link is a long random string', text: 'Clients never log in, so the link itself is the key. A 43 character random token has more possible values than there are atoms in a mountain, so nobody can guess one. We only keep a fingerprint (hash) of it in the database, so even a leaked database does not hand out working links.' },
-      { type: 'prompt', id: 'sgn-fe-share-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 6 (flow), 12 and 13.5 to 13.7, and @DESIGN.md sections 7.7 and 8.
+      { type: 'prompt', id: 'sgn-fe-share-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 6 (flow), 12 and 13.5 to 13.7, @DESIGN_SYSTEM.md, and @DESIGN.md sections 7.7 and 8.
 
 Build:
 1. app/api/proposals/[id]/send/route.ts (server, secret key client after getClaims + membership + has_active_access): build the snapshot { title, client, agency, sections (kind, title, body in position order), options (tier, name, summary, line_items, total_cents, recommended), terms, currency, valid_until }, content_hash = sha256 of canonicalJson(snapshot) (same canonicalJson as supabase/functions/_shared/canonical.ts: copy it into lib/canonical.ts and add a test that both produce the same hash for the same object). Insert proposal_versions (version_no + 1). Create a token (32 random bytes, base64url), insert share_links with token_hash. Set status 'sent' if draft, first_sent_at if null, has_unsent_changes false. If "Email it for me", send proposal_sent via Resend from "<sender_name> via Signet" with reply-to the user. Return { url: APP_URL + '/p/' + token }.
@@ -199,7 +199,7 @@ from public.signatures s join public.proposal_versions v on v.id = s.version_id;
     minutes: 80,
     xp: 55,
     blocks: [
-      { type: 'prompt', id: 'sgn-fe-analytics-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 10, 15 and 17, and @DESIGN.md sections 7.8, 7.10, 7.11 and 7.12.
+      { type: 'prompt', id: 'sgn-fe-analytics-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 10, 15 and 17, @DESIGN_SYSTEM.md, and @DESIGN.md sections 7.8, 7.10, 7.11 and 7.12.
 
 Build:
 1. app/app/proposals/[id]/activity/page.tsx: timeline (sent, opened with device, section time, follow-ups from email_log, signed, paid), section heatmap bars and option interest bars from section_view_events.

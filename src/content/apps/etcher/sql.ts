@@ -251,7 +251,7 @@ as $$
 $$;
 
 -- Paywall: true when the workspace has a trialing or active subscription.
-create or replace function public.workspace_has_access(ws uuid)
+create or replace function public.has_active_access(ws uuid)
 returns boolean
 language sql
 stable
@@ -499,8 +499,13 @@ create table public.workspace_telephony (
   twiml_app_sid text check (twiml_app_sid ~ '^AP[0-9a-f]{32}$'),
   api_key_sid text check (api_key_sid ~ '^SK[0-9a-f]{32}$'),
   byoc_trunk_sid text check (byoc_trunk_sid ~ '^BY[0-9a-f]{32}$'),
-  regulatory_bundle_sid text,
-  address_sid text,
+  regulatory_bundle_sid text check (regulatory_bundle_sid ~ '^BU[0-9a-f]{32}$'),
+  bundle_status text not null default 'none' check (bundle_status in
+    ('none', 'draft', 'pending-review', 'in-review', 'twilio-approved', 'twilio-rejected')),
+  bundle_rejection_reason text,
+  address_sid text check (address_sid ~ '^AD[0-9a-f]{32}$'),
+  inbound_fallback text not null default 'voicemail' check (inbound_fallback in ('voicemail', 'ring_all', 'hangup')),
+  ring_timeout_seconds int not null default 20 check (ring_timeout_seconds between 10 and 60),
   status text not null default 'not_started' check (status in ('not_started', 'provisioning', 'ready', 'suspended', 'error')),
   last_error text,
   created_at timestamptz not null default now(),
@@ -559,6 +564,7 @@ create table public.calls (
   answered_at timestamptz,
   ended_at timestamptz,
   duration_seconds int not null default 0 check (duration_seconds >= 0),
+  billable_minutes int not null default 0 check (billable_minutes >= 0),
   disposition public.call_disposition,
   notes text check (char_length(notes) <= 5000),
   recorded boolean not null default false,
@@ -592,6 +598,11 @@ create table public.recordings (
   duration_seconds int not null default 0,
   channels int not null default 1,
   status text not null default 'pending' check (status in ('pending', 'stored', 'failed', 'deleted')),
+  -- The recording callback only queues the row. A worker downloads it with
+  -- retries: attempts counts tries, next_attempt_at is the backoff clock.
+  attempts int not null default 0,
+  next_attempt_at timestamptz not null default now(),
+  size_bytes bigint,
   twilio_deleted_at timestamptz,
   error text,
   created_at timestamptz not null default now(),
@@ -600,6 +611,7 @@ create table public.recordings (
 );
 create index recordings_workspace_idx on public.recordings (workspace_id);
 create index recordings_call_idx on public.recordings (workspace_id, call_id);
+create index recordings_queue_idx on public.recordings (next_attempt_at) where status = 'pending';
 
 -- ---------------------------------------------------------------------
 -- 9. ACTIVITY TIMELINE AND TASKS
@@ -756,6 +768,132 @@ create index email_log_workspace_idx on public.email_log (workspace_id, created_
 create index email_log_user_idx on public.email_log (user_id);
 
 -- ---------------------------------------------------------------------
+-- 10b. USAGE LEDGER, MINUTE PACKS AND RATE LIMITS
+-- ELI5: every paid thing Etcher does for a workspace (a minute on the
+-- phone, a phone number rented, a recording stored) is written here as a
+-- line, like a till receipt. Adding up this month's lines tells us how
+-- many minutes are left before the cap. idempotency_key stops the same
+-- call being counted twice when Twilio sends its callback twice.
+-- ---------------------------------------------------------------------
+create table public.usage_ledger (
+  id bigint generated always as identity primary key,
+  workspace_id uuid not null references public.workspaces (id) on delete cascade,
+  user_id uuid references auth.users (id) on delete set null,
+  metric text not null check (metric in
+    ('call_minutes', 'number_month', 'recording_minutes', 'minute_pack', 'export', 'import_rows')),
+  quantity int not null,
+  cost_micros bigint not null default 0,
+  ref_id text,
+  idempotency_key text not null unique,
+  occurred_at timestamptz not null default now()
+);
+create index usage_ledger_ws_metric_idx on public.usage_ledger (workspace_id, metric, occurred_at desc);
+create index usage_ledger_user_idx on public.usage_ledger (user_id);
+
+-- ELI5: a tiny counter per (key, time window). Edge functions call
+-- try_rate_limit('token:<user>', 60, 3600) and get false when someone
+-- hammers an endpoint. Named api_rate_limits so it never clashes with the
+-- generic rate_limits table the security sweep adds.
+create table public.api_rate_limits (
+  bucket text not null,
+  window_start timestamptz not null,
+  count int not null default 0,
+  primary key (bucket, window_start)
+);
+
+-- ---------------------------------------------------------------------
+-- 10c. PLAN LIMITS AND USAGE MATHS
+-- ELI5: both plans (Monthly $149, Annual $949) have unlimited seats and
+-- include 1,000 call minutes per calendar month, 3 phone numbers and
+-- 12 months of recordings. Extra minutes come in packs of 1,000 bought
+-- from Billing; each pack adds a 'minute_pack' line this month.
+-- Workspaces on their own Twilio account or SIP trunk pay Twilio
+-- directly, so their cap is effectively unlimited (we still meter).
+-- ---------------------------------------------------------------------
+create or replace function public.plan_limits(ws uuid)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select jsonb_build_object(
+    'included_minutes', 1000,
+    'pack_minutes', coalesce((
+      select sum(u.quantity) from public.usage_ledger u
+      where u.workspace_id = ws and u.metric = 'minute_pack'
+        and u.occurred_at >= date_trunc('month', now())
+    ), 0),
+    'max_numbers', 3,
+    'recording_retention_days', 365,
+    'max_import_rows', 50000,
+    'max_exports_per_day', 10,
+    'byo', coalesce((select t.mode <> 'etcher_subaccount' from public.workspace_telephony t where t.workspace_id = ws), false)
+  );
+$$;
+
+create or replace function public.usage_this_month(ws uuid, p_metric text)
+returns bigint
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce(sum(u.quantity), 0)::bigint
+  from public.usage_ledger u
+  where u.workspace_id = ws
+    and u.metric = p_metric
+    and u.occurred_at >= date_trunc('month', now());
+$$;
+
+-- What the Calling page meter shows: used, cap, left. Members only.
+create or replace function public.minutes_status(ws uuid)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  v_limits jsonb;
+  v_used bigint;
+  v_cap bigint;
+begin
+  if not public.is_workspace_member(ws) then
+    raise exception 'Not a member' using errcode = '42501';
+  end if;
+  v_limits := public.plan_limits(ws);
+  v_used := public.usage_this_month(ws, 'call_minutes');
+  v_cap := (v_limits ->> 'included_minutes')::bigint + (v_limits ->> 'pack_minutes')::bigint;
+  return jsonb_build_object(
+    'used', v_used,
+    'cap', case when (v_limits ->> 'byo')::boolean then null else v_cap end,
+    'left', case when (v_limits ->> 'byo')::boolean then null else greatest(v_cap - v_used, 0) end,
+    'resets_at', (date_trunc('month', now()) + interval '1 month')
+  );
+end;
+$$;
+
+-- Fixed-window rate limiter used by edge functions (secret key only).
+create or replace function public.try_rate_limit(p_bucket text, p_max int, p_window_seconds int)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_start timestamptz := to_timestamp(floor(extract(epoch from now()) / p_window_seconds) * p_window_seconds);
+  v_count int;
+begin
+  insert into public.api_rate_limits (bucket, window_start, count)
+  values (p_bucket, v_start, 1)
+  on conflict (bucket, window_start) do update set count = public.api_rate_limits.count + 1
+  returning count into v_count;
+  return v_count <= p_max;
+end;
+$$;
+
+-- ---------------------------------------------------------------------
 -- 11. TRIGGERS THAT KEEP DATA HONEST
 -- ---------------------------------------------------------------------
 
@@ -833,6 +971,7 @@ declare
   v_stage_pipeline uuid;
   v_stage_ws uuid;
   v_kind public.stage_kind;
+  v_moved boolean;
 begin
   select s.pipeline_id, s.workspace_id, s.kind
     into v_stage_pipeline, v_stage_ws, v_kind
@@ -848,7 +987,14 @@ begin
     select p.currency into new.currency from public.pipelines p where p.id = new.pipeline_id;
   end if;
 
-  if tg_op = 'INSERT' or new.stage_id is distinct from old.stage_id then
+  -- Never touch OLD on INSERT: it does not exist yet.
+  if tg_op = 'INSERT' then
+    v_moved := true;
+  else
+    v_moved := new.stage_id is distinct from old.stage_id;
+  end if;
+
+  if v_moved then
     new.stage_changed_at := now();
     new.status := case v_kind
       when 'won' then 'won'::public.deal_status
@@ -973,6 +1119,10 @@ begin
   -- The secret key (edge functions, account deletion) has no uid: allow.
   if v_uid is null then
     return coalesce(new, old);
+  end if;
+  -- The whole workspace is being deleted (cascade): nothing to protect.
+  if tg_op = 'DELETE' and not exists (select 1 from public.workspaces w where w.id = old.workspace_id) then
+    return old;
   end if;
 
   if tg_op = 'UPDATE' then
@@ -1229,7 +1379,7 @@ begin
   if not public.has_workspace_role(p_workspace_id, 'admin') then
     raise exception 'Only admins can add pipelines' using errcode = '42501';
   end if;
-  if not public.workspace_has_access(p_workspace_id) then
+  if not public.has_active_access(p_workspace_id) then
     raise exception 'Your trial or plan has ended' using errcode = '42501';
   end if;
   select count(*) into v_count from public.pipelines where workspace_id = p_workspace_id and archived_at is null;
@@ -1367,6 +1517,13 @@ grant execute on function public.complete_onboarding_step(uuid, text) to authent
 grant execute on function public.touch_last_seen() to authenticated;
 grant execute on function public.account_deletion_blocker() to authenticated;
 grant execute on function public.delete_workspace(uuid, text) to authenticated;
+revoke execute on function public.minutes_status(uuid) from public, anon;
+grant execute on function public.minutes_status(uuid) to authenticated;
+-- Only edge functions (secret key) may call these.
+revoke execute on function public.try_rate_limit(text, int, int) from public, anon, authenticated;
+revoke execute on function public.plan_limits(uuid) from public, anon;
+grant execute on function public.plan_limits(uuid) to authenticated;
+revoke execute on function public.usage_this_month(uuid, text) from public, anon, authenticated;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 revoke execute on function public.handle_new_workspace() from public, anon, authenticated;
 revoke execute on function public.write_audit() from public, anon, authenticated;
@@ -1400,6 +1557,8 @@ alter table public.import_jobs enable row level security;
 alter table public.export_jobs enable row level security;
 alter table public.audit_log enable row level security;
 alter table public.email_log enable row level security;
+alter table public.usage_ledger enable row level security;
+alter table public.api_rate_limits enable row level security;
 
 -- ---------------------------------------------------------------------
 -- 14. POLICIES, ONE PER OPERATION
@@ -1456,11 +1615,11 @@ create policy companies_select on public.companies for select to authenticated
          and (deleted_at is null or public.has_workspace_role(workspace_id, 'admin')));
 create policy companies_insert on public.companies for insert to authenticated
   with check (public.is_workspace_member(workspace_id)
-              and public.workspace_has_access(workspace_id)
+              and public.has_active_access(workspace_id)
               and created_by = (select auth.uid()));
 create policy companies_update on public.companies for update to authenticated
   using (public.is_workspace_member(workspace_id))
-  with check (public.is_workspace_member(workspace_id) and public.workspace_has_access(workspace_id));
+  with check (public.is_workspace_member(workspace_id) and public.has_active_access(workspace_id));
 create policy companies_delete on public.companies for delete to authenticated
   using (public.has_workspace_role(workspace_id, 'admin'));
 
@@ -1470,11 +1629,11 @@ create policy people_select on public.people for select to authenticated
          and (deleted_at is null or public.has_workspace_role(workspace_id, 'admin')));
 create policy people_insert on public.people for insert to authenticated
   with check (public.is_workspace_member(workspace_id)
-              and public.workspace_has_access(workspace_id)
+              and public.has_active_access(workspace_id)
               and created_by = (select auth.uid()));
 create policy people_update on public.people for update to authenticated
   using (public.is_workspace_member(workspace_id))
-  with check (public.is_workspace_member(workspace_id) and public.workspace_has_access(workspace_id));
+  with check (public.is_workspace_member(workspace_id) and public.has_active_access(workspace_id));
 create policy people_delete on public.people for delete to authenticated
   using (public.has_workspace_role(workspace_id, 'admin'));
 
@@ -1482,7 +1641,7 @@ create policy people_delete on public.people for delete to authenticated
 create policy cfd_select on public.custom_field_defs for select to authenticated
   using (public.is_workspace_member(workspace_id));
 create policy cfd_insert on public.custom_field_defs for insert to authenticated
-  with check (public.has_workspace_role(workspace_id, 'admin') and public.workspace_has_access(workspace_id));
+  with check (public.has_workspace_role(workspace_id, 'admin') and public.has_active_access(workspace_id));
 create policy cfd_update on public.custom_field_defs for update to authenticated
   using (public.has_workspace_role(workspace_id, 'admin'))
   with check (public.has_workspace_role(workspace_id, 'admin'));
@@ -1493,7 +1652,7 @@ create policy cfd_delete on public.custom_field_defs for delete to authenticated
 create policy pipelines_select on public.pipelines for select to authenticated
   using (public.is_workspace_member(workspace_id));
 create policy pipelines_insert on public.pipelines for insert to authenticated
-  with check (public.has_workspace_role(workspace_id, 'admin') and public.workspace_has_access(workspace_id));
+  with check (public.has_workspace_role(workspace_id, 'admin') and public.has_active_access(workspace_id));
 create policy pipelines_update on public.pipelines for update to authenticated
   using (public.has_workspace_role(workspace_id, 'admin'))
   with check (public.has_workspace_role(workspace_id, 'admin'));
@@ -1504,7 +1663,7 @@ create policy pipelines_delete on public.pipelines for delete to authenticated
 create policy stages_select on public.stages for select to authenticated
   using (public.is_workspace_member(workspace_id));
 create policy stages_insert on public.stages for insert to authenticated
-  with check (public.has_workspace_role(workspace_id, 'admin') and public.workspace_has_access(workspace_id));
+  with check (public.has_workspace_role(workspace_id, 'admin') and public.has_active_access(workspace_id));
 create policy stages_update on public.stages for update to authenticated
   using (public.has_workspace_role(workspace_id, 'admin'))
   with check (public.has_workspace_role(workspace_id, 'admin'));
@@ -1517,11 +1676,11 @@ create policy deals_select on public.deals for select to authenticated
          and (deleted_at is null or public.has_workspace_role(workspace_id, 'admin')));
 create policy deals_insert on public.deals for insert to authenticated
   with check (public.is_workspace_member(workspace_id)
-              and public.workspace_has_access(workspace_id)
+              and public.has_active_access(workspace_id)
               and created_by = (select auth.uid()));
 create policy deals_update on public.deals for update to authenticated
   using (public.is_workspace_member(workspace_id))
-  with check (public.is_workspace_member(workspace_id) and public.workspace_has_access(workspace_id));
+  with check (public.is_workspace_member(workspace_id) and public.has_active_access(workspace_id));
 create policy deals_delete on public.deals for delete to authenticated
   using (public.has_workspace_role(workspace_id, 'admin'));
 
@@ -1564,7 +1723,7 @@ create policy activities_select on public.activities for select to authenticated
   using (public.is_workspace_member(workspace_id) and deleted_at is null);
 create policy activities_insert on public.activities for insert to authenticated
   with check (public.is_workspace_member(workspace_id)
-              and public.workspace_has_access(workspace_id)
+              and public.has_active_access(workspace_id)
               and actor_id = (select auth.uid())
               and type in ('note', 'email', 'call', 'meeting'));
 create policy activities_update on public.activities for update to authenticated
@@ -1581,7 +1740,7 @@ create policy tasks_select on public.tasks for select to authenticated
   using (public.is_workspace_member(workspace_id));
 create policy tasks_insert on public.tasks for insert to authenticated
   with check (public.is_workspace_member(workspace_id)
-              and public.workspace_has_access(workspace_id)
+              and public.has_active_access(workspace_id)
               and created_by = (select auth.uid()));
 create policy tasks_update on public.tasks for update to authenticated
   using (public.is_workspace_member(workspace_id))
@@ -1595,7 +1754,7 @@ create policy imports_select on public.import_jobs for select to authenticated
   using (public.has_workspace_role(workspace_id, 'admin'));
 create policy imports_insert on public.import_jobs for insert to authenticated
   with check (public.has_workspace_role(workspace_id, 'admin')
-              and public.workspace_has_access(workspace_id)
+              and public.has_active_access(workspace_id)
               and created_by = (select auth.uid())
               and status = 'queued');
 create policy imports_update on public.import_jobs for update to authenticated
@@ -1617,6 +1776,11 @@ create policy audit_select on public.audit_log for select to authenticated
 create policy email_log_select on public.email_log for select to authenticated
   using (user_id = (select auth.uid())
          or (workspace_id is not null and public.has_workspace_role(workspace_id, 'admin')));
+
+-- usage ledger: members read (the meters), only edge functions write.
+-- api_rate_limits has no policies at all: secret key only.
+create policy usage_select on public.usage_ledger for select to authenticated
+  using (public.is_workspace_member(workspace_id));
 
 -- ---------------------------------------------------------------------
 -- 15. VIEWS FOR THE KANBAN HEADERS AND ANALYTICS
@@ -1699,6 +1863,82 @@ select
 from public.calls c
 group by 1, 2, 3;
 
+-- custom_field_values: one row per (record, field) with its value.
+-- ELI5: values are stored inside each record's "custom" jsonb column (fast
+-- to read with the record, no joins). This view unfolds them into rows so
+-- filters, exports and reports can treat them like a normal table.
+create view public.custom_field_values with (security_invoker = true) as
+select p.workspace_id, 'person'::public.record_entity as entity, p.id as record_id,
+       f.id as field_id, f.key, f.label, f.field_type, p.custom -> f.key as value
+from public.people p
+join public.custom_field_defs f
+  on f.workspace_id = p.workspace_id and f.entity = 'person' and f.archived_at is null
+where p.deleted_at is null and p.custom ? f.key
+union all
+select c.workspace_id, 'company'::public.record_entity, c.id,
+       f.id, f.key, f.label, f.field_type, c.custom -> f.key
+from public.companies c
+join public.custom_field_defs f
+  on f.workspace_id = c.workspace_id and f.entity = 'company' and f.archived_at is null
+where c.deleted_at is null and c.custom ? f.key
+union all
+select d.workspace_id, 'deal'::public.record_entity, d.id,
+       f.id, f.key, f.label, f.field_type, d.custom -> f.key
+from public.deals d
+join public.custom_field_defs f
+  on f.workspace_id = d.workspace_id and f.entity = 'deal' and f.archived_at is null
+where d.deleted_at is null and d.custom ? f.key;
+
+-- ---------------------------------------------------------------------
+-- 15b. HOUSEKEEPING (called daily by pg_cron, see PRD section 15)
+-- ELI5: soft-deleted things wait 30 days in a bin so a mistake can be
+-- undone, then this function empties the bin for good. It returns the
+-- storage paths the cron edge function must also delete from Storage.
+-- ---------------------------------------------------------------------
+create or replace function public.purge_expired()
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_ws uuid[];
+  v_people int;
+  v_companies int;
+  v_deals int;
+begin
+  select coalesce(array_agg(id), '{}') into v_ws
+  from public.workspaces where deleted_at < now() - interval '30 days';
+
+  delete from public.deals where deleted_at < now() - interval '30 days';
+  get diagnostics v_deals = row_count;
+  delete from public.people where deleted_at < now() - interval '30 days';
+  get diagnostics v_people = row_count;
+  delete from public.companies where deleted_at < now() - interval '30 days';
+  get diagnostics v_companies = row_count;
+
+  delete from public.api_rate_limits where window_start < now() - interval '2 days';
+  update public.invitations set revoked_at = now()
+  where accepted_at is null and revoked_at is null and expires_at < now() - interval '30 days';
+
+  delete from public.workspaces where id = any (v_ws);
+
+  return jsonb_build_object(
+    'purged_workspaces', v_ws,
+    'people', v_people, 'companies', v_companies, 'deals', v_deals,
+    'expired_exports', coalesce((
+      select jsonb_agg(e.file_path) from public.export_jobs e
+      where e.expires_at < now() and e.file_path is not null
+    ), '[]'::jsonb),
+    'old_recordings', coalesce((
+      select jsonb_agg(r.storage_path) from public.recordings r
+      where r.status = 'stored' and r.created_at < now() - interval '365 days'
+    ), '[]'::jsonb)
+  );
+end;
+$$;
+revoke execute on function public.purge_expired() from public, anon, authenticated;
+
 -- ---------------------------------------------------------------------
 -- 16. STORAGE BUCKETS (all private)
 -- ELI5: files are stored as <workspace_id>/<something>/<file>. The
@@ -1738,7 +1978,7 @@ create policy imports_read on storage.objects for select to authenticated
 create policy imports_upload on storage.objects for insert to authenticated
   with check (bucket_id = 'imports'
               and public.has_workspace_role(public.path_segment_uuid(name, 1), 'admin')
-              and public.workspace_has_access(public.path_segment_uuid(name, 1)));
+              and public.has_active_access(public.path_segment_uuid(name, 1)));
 create policy imports_delete on storage.objects for delete to authenticated
   using (bucket_id = 'imports'
          and public.has_workspace_role(public.path_segment_uuid(name, 1), 'admin'));
@@ -1759,5 +1999,9 @@ alter publication supabase_realtime add table public.import_jobs;
 alter publication supabase_realtime add table public.export_jobs;
 alter publication supabase_realtime add table public.activities;
 
--- Done. Check: Table Editor shows 23 tables, each with a green "RLS enabled".
+alter publication supabase_realtime add table public.recordings;
+
+-- Done. Check: Table Editor shows 25 tables, each with "RLS enabled".
+-- Then run: select public.plan_limits(id) from public.workspaces limit 1;
+-- (empty until you create a workspace in the app, that is fine).
 `

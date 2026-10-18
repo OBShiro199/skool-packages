@@ -218,7 +218,7 @@ I will paste each competitor's current pricing page text so the numbers are corr
     blocks: [
       { type: 'prompt', id: 'sgn-mk-in-calculator-prompt', title: 'Paste into Claude Code', code: `Add app/(marketing)/tools/proposal-cost-calculator/page.tsx: "What are slow proposals costing you?"
 Inputs: proposals per month, hours per proposal, your hourly rate, average deal size, days from call to proposal today.
-Outputs in big numbers: hours a month spent writing, cost of that time per year, and "If faster proposals win you just one more deal a quarter: +$X a year".
+Outputs in big numbers: hours a month spent writing, cost of that time per year, and "If faster proposals win you one more deal a quarter: +$X a year".
 Explain the maths under it in a "How we calculate" note. One CTA: "Get your next proposal drafted from the call" -> /signup. Optional email capture "Email me this breakdown" saved to a calculator_leads table (RLS on, insert-only policy for anon via a server action with rate limiting). SEO metadata and a 3-question FAQ.` },
       { type: 'steps', items: ['Deploy it.', 'Link it from the landing page footer and the template pages.', 'Share it in two agency groups as a free tool.'] },
     ],

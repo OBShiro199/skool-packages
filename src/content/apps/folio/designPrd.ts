@@ -405,4 +405,48 @@ Run these by hand after each screen is built. Any item that moves is a bug.
 | \`/docs\`, \`/docs/[slug]\` | Marketing nav | n/a |
 | \`/paywall\` | None | None |
 | \`/templates\`, \`/templates/[layout]\` | Marketing nav | n/a |
+
+## 17. Forms in Folio
+- Labels above inputs in faint ink, helper text below in faint, errors replace helper text in danger ink with
+  \`role=alert\`. The line height is reserved so an error never pushes the next field.
+- URL inputs trim spaces and add https:// when missing. YouTube Shorts links are accepted.
+- Drop zones use the base dashed "add" border, 6px radius, a 16px Lucide Upload icon, "Drop an image or click to
+  upload" and the type and size limit in faint. Drag-over: accent-edge border and accent-soft fill.
+- Hex inputs accept 3 or 6 digit hex with or without #, show tabular figures, and update the preview on blur
+  and on Enter.
+- Autosave fields show a 13px "Saved" status in a reserved slot on the right of the toolbar, never a toast.
+
+## 18. Dialogs and side panels in Folio
+| Overlay | Type | Width | Steps |
+|---|---|---|---|
+| Export | Dialog | 520px | Progress, Done |
+| Schedule post | Dialog | 520px | Account, Time, Caption |
+| Invite member | Dialog | 520px | Email and role, Sent |
+| Delete brand kit | Dialog | 520px | Confirm (type the brand name) |
+| Calendar post details | Side panel | 400px | n/a |
+| Job details (Help) | Side panel | 400px | n/a |
+| Layout picker on phones | Side panel from the bottom | Full width, 85vh max | n/a |
+- Never stack two overlays. A dialog that needs another step morphs its height in place.
+- Closing a dialog with unsaved changes asks "Discard changes?" inside the same dialog, with "Keep editing" as
+  the default.
+
+## 19. Documentation articles (\`/docs\`)
+1. Set up your brand kit
+2. Turn a blog post into a carousel
+3. Turn a YouTube video into a carousel
+4. Record a voice note
+5. Edit slides, rewrite with AI and reorder
+6. Export PNGs and a LinkedIn PDF
+7. Connect LinkedIn and Instagram and schedule posts
+8. Plans, limits and what counts as a carousel, a rewrite and an export
+Each article: H2 title, one sentence summary, numbered steps with screenshots, "Common problems" with 3 fixes.
+
+## 20. Illustration and imagery
+- One illustration motif: three stacked rounded cards drawn in 1.5px lines, ghost ink, with a single accent card
+  on top. Used for empty states (48px) and the wordmark mark (16px). No people, no stock photos, no gradients.
+- Screenshots in docs and emails sit in a 1px hairline frame with 6px radius, never with a drop shadow.
+- Slide thumbnails are real renders (slide 1 of the latest export) or live DOM previews at small scale. Never a
+  placeholder picture once a carousel exists.
+- Avatars: 20px in rows, 32px in member tables, circles, with initials in muted ink on the hover fill when there is
+  no photo.
 `

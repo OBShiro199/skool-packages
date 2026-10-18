@@ -9,7 +9,8 @@ Version 1.1 (Oct 2026). Save this file as \`PRD.md\` in the root of your project
 - Read sections 1 to 4 once so you know what you are building and for whom.
 - Sections 5 to 17 are the spec. Claude Code builds from them.
 - Section 22 lists build milestones. Do them in order. Do not start a milestone before the one before it passes its acceptance tests (section 21).
-- Every time you start a new Claude Code session, say: "Read @PRD.md and @DESIGN.md. We are on milestone N. Plan first, then wait for my OK."
+- Every time you start a new Claude Code session, say: "Read @PRD.md @DESIGN_SYSTEM.md @DESIGN.md. We are on milestone N. Plan first, then wait for my OK."
+- Save the vault's Quiet Precision design system as \`DESIGN_SYSTEM.md\` and the design PRD as \`DESIGN.md\` in the same folder. \`CLAUDE.md\` must contain the line \`UI rules: @DESIGN_SYSTEM.md @DESIGN.md\`.
 - When Claude Code makes a decision this file does not cover, ask it to add a line to section 27 ("Decisions made during build").
 
 ## 1. Problem
@@ -144,7 +145,7 @@ One level only. No nested menus. Suppression lives as a tab inside Settings, not
 
 | Route | Purpose |
 | --- | --- |
-| \`/\` | Landing page from \`@LANDING.md\` |
+| \`/\` | Landing page from \`@LANDING.md\` (square marketing style) |
 | \`/pricing\` | Starter and Growth, monthly/annual toggle, limits table, FAQ |
 | \`/login\`, \`/signup\` | Email + password, "Continue with Google". Signup goes to \`/app/onboarding\` |
 | \`/forgot-password\`, \`/reset-password\` | Supabase reset flow |
@@ -740,7 +741,7 @@ Each milestone ends with a commit and a push.
 
 | # | Milestone | What gets built | Tests |
 | --- | --- | --- | --- |
-| 1 | Skeleton | Next.js, Tailwind, shadcn, DESIGN.md tokens, Supabase helpers, auth pages, app shell with the sidebar from 7.1 | Sign up and log in |
+| 1 | Skeleton | Next.js, Tailwind, shadcn, DESIGN_SYSTEM.md tokens + DESIGN.md accent, Supabase helpers, auth pages, app shell with the sidebar from 7.1 | Sign up and log in |
 | 2 | Database | Run the migration, generate types, profiles trigger | 2 |
 | 3 | Billing | 4 Stripe prices, Checkout with trial and plan picker, webhook with \`plan\`, portal, paywall | 1, 17, 18 |
 | 4 | ICP + campaigns | Onboarding wizard, campaigns list, builder steps 1 and 2 | |

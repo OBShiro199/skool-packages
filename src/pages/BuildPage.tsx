@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
+import { Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowRight, Calculator, Check, FolderDown, Lock, Trophy } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Calculator, Check, Clock, FolderDown, Lock, Sparkles, Trophy } from 'lucide-react'
 import { getApp, getPhases } from '../content/apps'
 import type { Task } from '../content/types'
 import { useStore, useUser } from '../lib/store'
 import { appStats, fmtMinutes, phaseStats, taskStats } from '../lib/progress'
 import { Bar } from '../components/Ring'
 import { PhaseIcon } from '../components/PhaseIcon'
-import { TaskCard, type StepState } from '../components/TaskCard'
-import { TriggerContext } from '../components/Blocks'
+import { Tick } from '../components/TaskCard'
+import { BlockView, TriggerContext } from '../components/Blocks'
 import { DownloadCodeModal } from '../components/DownloadCodeModal'
 import { CostCalculator } from '../components/CostCalculator'
 import { DownloadsPanel } from '../components/DownloadsPanel'
@@ -17,6 +17,13 @@ import { toast } from '../components/Toasts'
 import { burst, celebrate } from '../lib/confetti'
 import { LOCK_PROGRESSION } from '../lib/flags'
 
+const EASE = [0.16, 1, 0.3, 1] as const
+
+/**
+ * The build: one step per page. A phase strip across the top, the step in the middle,
+ * Previous / Next at the bottom. Steps slide horizontally; nothing expands or collapses,
+ * so the page never jumps.
+ */
 export default function BuildPage() {
   const { slug } = useParams()
   const app = getApp(slug)
@@ -26,62 +33,39 @@ export default function BuildPage() {
   const setActive = useStore((s) => s.setActiveApp)
   const [params, setParams] = useSearchParams()
   const [zipOpen, setZipOpen] = useState(false)
-  const [openTask, setOpenTask] = useState<string | null>(null)
-
-  /**
-   * Open or close a step without the page jumping. When a step opens, the one above it may
-   * collapse at the same time, which would push the clicked header up and leave the reader
-   * part-way down. We pin the clicked header to where it was on screen while the
-   * open/close animation runs, then stop.
-   */
-  const focusStep = useCallback((id: string | null, anchorId?: string) => {
-    const el = anchorId ? document.getElementById(`task-${anchorId}`) : null
-    const startTop = el?.getBoundingClientRect().top
-    setOpenTask(id)
-    if (!el || startTop === undefined) return
-    const target = Math.max(80, startTop)
-    const until = performance.now() + 450
-    const pin = () => {
-      const top = el.getBoundingClientRect().top
-      if (Math.abs(top - target) > 1) window.scrollBy(0, top - target)
-      if (performance.now() < until) requestAnimationFrame(pin)
-    }
-    requestAnimationFrame(pin)
-  }, [])
+  const [dir, setDir] = useState(1)
   const [phaseDone, setPhaseDone] = useState<string | null>(null)
 
   const phases = useMemo(() => (app ? getPhases(app) : []), [app])
   const checked = (app && user.progress[app.slug]?.checked) || {}
   const stats = app ? appStats(app, checked) : null
 
-  // A phase unlocks when every phase before it is complete.
-  const unlockedUpTo = stats ? stats.currentPhase : 0
-  const requested = params.get('tab')
-  const showCosts = requested === 'costs'
-  const showDownloads = requested === 'downloads'
-  const showExtra = showCosts || showDownloads
-  const reqIndex = phases.findIndex((p) => p.id === requested)
-  const phaseIndex = reqIndex >= 0 ? reqIndex : unlockedUpTo
-  const phase = phases[phaseIndex]
-  const phaseLocked = LOCK_PROGRESSION && phaseIndex > unlockedUpTo
+  // Where we are: ?tab=<phaseId>&step=<n>, else the saved position, else the first unfinished step.
+  const view = params.get('tab')
+  const showCosts = view === 'costs'
+  const showDownloads = view === 'downloads'
+  const extra = showCosts || showDownloads
+  const saved = (app && user.progress[app.slug]?.lastTab) || ''
+  const firstOpen = useMemo(() => {
+    for (let i = 0; i < phases.length; i++) {
+      const s = phases[i].tasks.findIndex((t) => !taskStats(t, checked).complete)
+      if (s >= 0) return { pi: i, si: s }
+    }
+    return { pi: Math.max(0, phases.length - 1), si: 0 }
+  }, [phases]) // eslint-disable-line
+  const [savedPhase, savedStep] = saved.split('.')
+  const phaseId = view && !extra ? view : savedPhase || phases[firstOpen.pi]?.id
+  const pi = Math.max(0, phases.findIndex((p) => p.id === phaseId))
+  const phase = phases[pi]
+  const rawStep = params.get('step') ?? (phase?.id === savedPhase ? savedStep : undefined)
+  const si = Math.min(Math.max(0, Number(rawStep ?? (pi === firstOpen.pi ? firstOpen.si : 0)) || 0), Math.max(0, (phase?.tasks.length ?? 1) - 1))
+  const task = phase?.tasks[si]
 
-  // Within a phase, a step unlocks when every step before it is complete.
-  const stepStates: StepState[] = useMemo(() => {
-    if (!phase) return []
-    let blocked = phaseLocked
-    let currentSet = false
-    return phase.tasks.map((t): StepState => {
-      if (blocked) return 'locked'
-      if (taskStats(t, checked).complete) return 'done'
-      if (!currentSet) { currentSet = true; if (LOCK_PROGRESSION) blocked = true; return 'current' }
-      return 'todo'
-    })
-  }, [phase, checked, phaseLocked])
-  const currentTask = phase?.tasks[stepStates.indexOf('current')]
-
-  useEffect(() => { if (app) { setLastTab(app.slug, showExtra ? requested! : phase.id); setActive(app.slug) } }, [app, phase?.id, showExtra]) // eslint-disable-line
-  // Open the current step whenever the phase changes.
-  useEffect(() => { setOpenTask(currentTask?.id ?? null) }, [phase?.id]) // eslint-disable-line
+  useEffect(() => {
+    if (!app) return
+    setActive(app.slug)
+    if (!extra && phase) setLastTab(app.slug, `${phase.id}.${si}`)
+  }, [app, phase?.id, si, extra]) // eslint-disable-line
 
   const allItems = useMemo(() => {
     const m = new Map<string, { task: Task; phaseId: string; trigger?: string }>()
@@ -93,6 +77,23 @@ export default function BuildPage() {
     const st = useStore.getState()
     return (st.session && st.users[st.session]?.progress[app!.slug]?.checked) || {}
   }
+
+  const go = (toPhase: number, toStep: number, direction?: number) => {
+    if (!phases[toPhase]) return
+    setDir(direction ?? (toPhase > pi || (toPhase === pi && toStep > si) ? 1 : -1))
+    setParams({ tab: phases[toPhase].id, step: String(toStep) })
+    window.scrollTo({ top: 0 })
+  }
+  const next = () => {
+    if (!phase) return
+    if (si + 1 < phase.tasks.length) go(pi, si + 1, 1)
+    else if (pi + 1 < phases.length) go(pi + 1, 0, 1)
+  }
+  const prev = () => {
+    if (si > 0) go(pi, si - 1, -1)
+    else if (pi > 0) go(pi - 1, phases[pi - 1].tasks.length - 1, -1)
+  }
+  const firstUnfinished = (i: number) => Math.max(0, phases[i].tasks.findIndex((t) => !taskStats(t, checked).complete))
 
   const onToggle = useCallback((itemId: string, value?: boolean) => {
     if (!app) return
@@ -106,161 +107,183 @@ export default function BuildPage() {
     const after = readChecked()
     if (!wasTask && taskStats(ref.task, after).complete) {
       toast(ref.task.title, ref.task.xp)
-      const r = document.getElementById(`task-${ref.task.id}`)?.getBoundingClientRect()
-      burst(r ? { x: (r.left + 40) / window.innerWidth, y: (r.top + 30) / window.innerHeight } : undefined)
-      const next = ph.tasks.find((t) => !taskStats(t, after).complete)
-      setTimeout(() => {
-        setOpenTask(next?.id ?? null)
-        if (next) setTimeout(() => document.getElementById(`task-${next.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350)
-      }, 900)
+      burst({ x: 0.5, y: 0.9 })
     }
-    if (!wasPhase && phaseStats(ph, after).complete) setTimeout(() => { celebrate(); setPhaseDone(ph.id) }, 600)
+    if (!wasPhase && phaseStats(ph, after).complete) setTimeout(() => { celebrate(); setPhaseDone(ph.id) }, 400)
   }, [app, allItems, phases, toggle]) // eslint-disable-line
 
-  // Copy/download auto-ticks only count for steps that are unlocked.
   const fire = useCallback((trigger: string) => {
     const now = readChecked()
-    for (const [id, ref] of allItems) {
-      if (ref.trigger !== trigger || now[id]) continue
-      if (!LOCK_PROGRESSION || ref.task.id === currentTask?.id) onToggle(id, true)
-    }
-  }, [allItems, currentTask?.id, onToggle]) // eslint-disable-line
+    for (const [id, ref] of allItems) if (ref.trigger === trigger && !now[id] && ref.task.id === task?.id) onToggle(id, true)
+  }, [allItems, task?.id, onToggle]) // eslint-disable-line
 
-  if (!app || !stats) return <Navigate to="/app/library" replace />
+  // Keep the active phase visible in the strip on narrow screens (horizontal scroll only).
+  useEffect(() => {
+    const strip = document.querySelector<HTMLElement>('.phase-strip')
+    const el = strip?.querySelector<HTMLElement>('.ps-item.active')
+    if (!strip || !el) return
+    const left = el.offsetLeft - strip.clientWidth / 2 + el.clientWidth / 2
+    strip.scrollTo({ left: Math.max(0, left), behavior: 'smooth' })
+  }, [pi, extra])
+
+  // Arrow keys move between steps (not while typing or with a dialog open).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement
+      if (extra || /INPUT|TEXTAREA|SELECT/.test(t.tagName) || t.isContentEditable || document.querySelector('.modal-scrim')) return
+      if (e.key === 'ArrowRight') next()
+      if (e.key === 'ArrowLeft') prev()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
+
+  if (!app || !stats || !phase || !task) return <Navigate to="/app/library" replace />
   if (!user.commitments[app.slug]) return <Navigate to={`/app/library/${app.slug}`} replace />
 
-  const ps = stats.perPhase[phaseIndex]
-  const goTab = (id: string) => { setParams({ tab: id }); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  const ts = taskStats(task, checked)
   const totalSteps = phases.reduce((n, p) => n + p.tasks.length, 0)
   const stepsDone = stats.perPhase.reduce((n, p) => n + p.tasksDone, 0)
+  const globalIndex = phases.slice(0, pi).reduce((n, p) => n + p.tasks.length, 0) + si + 1
+  const isLast = pi === phases.length - 1 && si === phase.tasks.length - 1
+  const lockedNext = LOCK_PROGRESSION && !ts.complete
+  const nextTask = si + 1 < phase.tasks.length ? phase.tasks[si + 1] : phases[pi + 1]?.tasks[0]
   const donePhase = phases.find((p) => p.id === phaseDone)
-  const nextAfterDone = donePhase ? phases[phases.indexOf(donePhase) + 1] : undefined
-  const firstEver = stepsDone === 0
+  const backToStep = { tab: phase.id, step: String(si) }
 
   return (
     <TriggerContext.Provider value={fire}>
-      <div className="journey">
-        <aside className="journey-rail">
-          <div className="rail-app">
+      <div className="course">
+        <header className="course-head">
+          <div className="course-title">
             <span className="label">You are building</span>
             <b>{app.name}</b>
+          </div>
+          <div className="course-meter">
+            <div className="row between"><span className="label">{stepsDone} of {totalSteps} steps done</span><span className="course-pct">{Math.round(stats.pct * 100)}%</span></div>
             <Bar pct={stats.pct} />
-            <span className="muted" style={{ fontSize: 13 }}>{stepsDone} of {totalSteps} steps · {Math.round(stats.pct * 100)}%</span>
           </div>
-          <ol className="rail-list">
-            {phases.map((p, i) => {
-              const s = stats.perPhase[i]
-              const locked = LOCK_PROGRESSION && i > unlockedUpTo
-              const active = !showExtra && i === phaseIndex
-              const state = s.complete ? 'done' : locked ? 'locked' : i === unlockedUpTo ? 'current' : 'todo'
-              return (
-                <li key={p.id}>
-                  <button className={`rail-item ${state} ${active ? 'active' : ''}`} onClick={() => goTab(p.id)}>
-                    <span className="rail-dot">{s.complete ? <Check size={13} /> : locked ? <Lock size={11} /> : i + 1}</span>
-                    <span className="rail-text">
-                      <b>{p.label}</b>
-                      <span>{s.complete ? 'Complete' : locked ? 'Locked' : i > unlockedUpTo ? `${s.tasks} steps` : i === unlockedUpTo && s.tasksDone === 0 && i === 0 ? 'Start here' : `${s.tasksDone} of ${s.tasks} steps`}</span>
-                    </span>
-                  </button>
-                </li>
-              )
-            })}
-          </ol>
-          <div className="rail-extra">
-            <button className={`rail-item ${showCosts ? 'active' : ''}`} onClick={() => goTab('costs')}>
-              <span className="rail-dot plain"><Calculator size={13} /></span>
-              <span className="rail-text"><b>Costs & running</b><span>Calculator</span></span>
-            </button>
-            <button className={`rail-item ${showDownloads ? 'active' : ''}`} onClick={() => goTab('downloads')}>
-              <span className="rail-dot plain"><FolderDown size={13} /></span>
-              <span className="rail-text"><b>Downloadables</b><span>PRDs, SQL, prompts, zip</span></span>
-            </button>
+          <div className="row" style={{ gap: 8 }}>
+            <button className={`btn btn-sm ${showCosts ? 'btn-primary' : ''}`} onClick={() => setParams(showCosts ? backToStep : { tab: 'costs' })}><Calculator size={14} /> Costs</button>
+            <button className={`btn btn-sm ${showDownloads ? 'btn-primary' : ''}`} onClick={() => setParams(showDownloads ? backToStep : { tab: 'downloads' })}><FolderDown size={14} /> Downloadables</button>
           </div>
-        </aside>
+        </header>
 
-        <main className="journey-main">
-          <AnimatePresence mode="wait">
-            {showDownloads ? (
-              <motion.section key="downloads" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <header className="phase-intro">
-                  <span className="label">Downloadables</span>
-                  <h1>Every {app.name} file, ready to download</h1>
-                  <p className="muted">The PRDs, the database, every prompt, the env template and the marketing scripts. Each one is also inside the step that uses it.</p>
+        <nav className="phase-strip" aria-label="Phases">
+          {phases.map((p, i) => {
+            const s = stats.perPhase[i]
+            const active = !extra && i === pi
+            const locked = LOCK_PROGRESSION && i > stats.currentPhase
+            return (
+              <button key={p.id} className={`ps-item ${active ? 'active' : ''} ${s.complete ? 'done' : ''}`} disabled={locked}
+                onClick={() => go(i, i === pi && !extra ? si : firstUnfinished(i))} aria-current={active ? 'step' : undefined}>
+                <span className="ps-top">
+                  <span className="ps-num">{s.complete ? <Check size={11} /> : locked ? <Lock size={10} /> : i + 1}</span>
+                  <span className="ps-label">{p.label}</span>
+                </span>
+                <span className="ps-bar"><i style={{ width: `${s.pct * 100}%` }} /></span>
+              </button>
+            )
+          })}
+        </nav>
+
+        <div className="course-stage">
+          <AnimatePresence mode="wait" initial={false} custom={dir}>
+            {extra ? (
+              <motion.main key={view} className="course-main" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                <header className="step-intro">
+                  <span className="label">{showCosts ? 'Costs & running' : 'Downloadables'}</span>
+                  <h1>{showCosts ? `What ${app.name} costs to run, and what it makes` : `Every ${app.name} file, ready to download`}</h1>
+                  <p className="muted">{showCosts ? 'Every tool in the kit at today’s prices. Drag the sliders to see costs, profit and margin at any size.' : 'The PRDs, the database, every prompt, the env template and the marketing scripts. Each one is also inside the step that uses it.'}</p>
                 </header>
-                <DownloadsPanel app={app} onZip={() => setZipOpen(true)} />
-              </motion.section>
-            ) : showCosts ? (
-              <motion.section key="costs" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <header className="phase-intro">
-                  <span className="label">Costs & running</span>
-                  <h1>What {app.name} costs to run, and what it makes</h1>
-                  <p className="muted">Every tool in the kit at today’s prices. Drag the sliders to see costs, profit and margin at 10, 100 or 1,000 customers.</p>
-                </header>
-                <CostCalculator app={app} />
-              </motion.section>
+                {showCosts ? <CostCalculator app={app} /> : <DownloadsPanel app={app} onZip={() => setZipOpen(true)} />}
+              </motion.main>
             ) : (
-              <motion.section key={phase.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-                <header className="phase-intro">
-                  <span className="label">Phase {phaseIndex + 1} of {phases.length}</span>
-                  <h1><span className="phase-icon"><PhaseIcon icon={phase.icon} size={20} /></span>{phase.title}</h1>
-                  <p className="muted">{phase.goal}</p>
-                  {!phaseLocked && (
-                    <div className="phase-progress">
-                      <Bar pct={ps.pct} tone={ps.complete ? 'money' : undefined} />
-                      <span className="muted">{ps.tasksDone} of {ps.tasks} steps · about {fmtMinutes(phase.tasks.filter((t) => !taskStats(t, checked).complete).reduce((m, t) => m + t.minutes, 0))} left</span>
-                    </div>
-                  )}
+              <motion.main key={task.id} className="course-main"
+                initial={{ opacity: 0, x: dir * 56 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -56 }}
+                transition={{ duration: 0.32, ease: EASE }}>
+                <header className="step-intro">
+                  <div className="row wrap" style={{ gap: 10 }}>
+                    <span className="phase-pill"><PhaseIcon icon={phase.icon} size={13} /> Phase {pi + 1} · {phase.label}</span>
+                    <span className="label">Step {si + 1} of {phase.tasks.length}</span>
+                    {globalIndex === 1 && stepsDone === 0 && <span className="chip chip-signal">Start here</span>}
+                  </div>
+                  <h1>{task.title}</h1>
+                  <p className="muted">{task.outcome}</p>
+                  <div className="row wrap" style={{ gap: 16 }}>
+                    <span className="meta"><Clock size={13} /> {fmtMinutes(task.minutes)}</span>
+                    <span className="meta"><Sparkles size={13} /> {task.xp} XP</span>
+                    <span className="meta money" style={{ visibility: ts.complete ? 'visible' : 'hidden' }}><Check size={13} /> Done</span>
+                  </div>
+                  <div className="step-dots" aria-label={`Steps in ${phase.label}`}>
+                    {phase.tasks.map((t, i) => (
+                      <button key={t.id} title={`${i + 1}. ${t.title}`} aria-label={`Step ${i + 1}: ${t.title}`} aria-current={i === si ? 'step' : undefined}
+                        className={`sd ${i === si ? 'active' : ''} ${taskStats(t, checked).complete ? 'done' : ''}`} onClick={() => go(pi, i)} />
+                    ))}
+                  </div>
                 </header>
 
-                {phaseLocked && (
-                  <div className="locked-panel">
-                    <Lock size={20} />
-                    <div style={{ flex: 1 }}>
-                      <b>This phase is locked.</b>
-                      <p className="muted">Finish <b>{phases[unlockedUpTo].label}</b> first. Each phase builds on the one before it, so the steps only work in order.</p>
-                    </div>
-                    <button className="btn btn-primary" onClick={() => goTab(phases[unlockedUpTo].id)}>Go to {phases[unlockedUpTo].label} <ArrowRight size={15} /></button>
-                  </div>
-                )}
-
-                {app.status === 'preview' && !phaseLocked && ['foundations', 'backend', 'outbound', 'inbound', 'paid'].includes(phase.id) && (
+                {app.status === 'preview' && si === 0 && ['foundations', 'backend', 'outbound', 'inbound', 'paid'].includes(phase.id) && (
                   <p className="preview-note">Preview kit: the {app.name}-specific parts of this phase are shorter than the flagship kits.</p>
                 )}
 
-                <div className="step-list">
-                  {phase.tasks.map((t, i) => (
-                    <TaskCard key={t.id} task={t} index={i} total={phase.tasks.length} state={stepStates[i]} checked={checked}
-                      open={openTask === t.id} isFirstEver={firstEver && phaseIndex === 0 && i === 0}
-                      prevTitle={i > 0 ? phase.tasks[i - 1].title : phases[unlockedUpTo]?.label}
-                      onOpen={() => focusStep(openTask === t.id ? null : t.id, t.id)} onToggle={(id) => onToggle(id)} />
-                  ))}
+                <div className="step-content">
+                  {task.blocks.map((b, i) => <BlockView key={i} b={b} />)}
                 </div>
 
-                {ps.complete && phases[phaseIndex + 1] && (
-                  <div className="next-phase">
-                    <div style={{ flex: 1 }}>
-                      <span className="label">Phase complete</span>
-                      <b>Next: {phases[phaseIndex + 1].title}</b>
-                    </div>
-                    <button className="btn btn-primary" onClick={() => goTab(phases[phaseIndex + 1].id)}>Start {phases[phaseIndex + 1].label} <ArrowRight size={15} /></button>
+                <section className={`step-check ${ts.complete ? 'complete' : ''}`}>
+                  <div className="row between">
+                    <b>{ts.complete ? 'Step complete' : 'Tick these off to finish this step'}</b>
+                    <span className="muted">{ts.done} of {ts.total}</span>
                   </div>
-                )}
-              </motion.section>
+                  <Bar pct={ts.total ? ts.done / ts.total : 0} tone={ts.complete ? 'money' : undefined} />
+                  <div className="step-check-list">
+                    {task.checklist.map((item) => {
+                      const on = !!checked[item.id]
+                      return (
+                        <button key={item.id} className={`check ${on ? 'on' : ''}`} onClick={() => onToggle(item.id)}>
+                          <Tick on={on} />
+                          <span className="check-label">
+                            {item.label}
+                            <motion.i className="strike" initial={false} animate={{ scaleX: on ? 1 : 0 }} transition={{ duration: 0.35, ease: EASE }} />
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </section>
+              </motion.main>
             )}
           </AnimatePresence>
-        </main>
+        </div>
+
+        {!extra && (
+          <footer className="course-nav"><div className="course-nav-inner">
+            <button className="btn cn-btn" onClick={prev} disabled={pi === 0 && si === 0}>
+              <ArrowLeft size={15} /> Previous
+            </button>
+            <div className="cn-mid">
+              <span className="label">Step {globalIndex} of {totalSteps}</span>
+              <span className="cn-next">{nextTask ? `Next: ${nextTask.title}` : 'Last step'}</span>
+            </div>
+            <button className={`btn cn-btn ${ts.complete ? 'ready' : ''}`} onClick={next} disabled={isLast || lockedNext}
+              title={lockedNext ? 'Tick the checklist to continue' : undefined}>
+              Next <ArrowRight size={15} />
+            </button>
+          </div></footer>
+        )}
 
         <AnimatePresence>
           {donePhase && (
-            <motion.div className="phase-done" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 40 }}>
-              <Trophy size={22} />
+            <motion.div className="phase-done" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }} transition={{ duration: 0.24, ease: EASE }}>
+              <Trophy size={20} />
               <div style={{ flex: 1 }}>
                 <b>{donePhase.label} complete.</b>
-                <span> {phases.indexOf(donePhase) + 1} of {phases.length} phases done.{nextAfterDone ? ` ${nextAfterDone.label} is unlocked.` : ''}</span>
+                <span className="muted"> {phases.indexOf(donePhase) + 1} of {phases.length} phases done.</span>
               </div>
-              {nextAfterDone && (
-                <button className="btn btn-sm btn-primary" onClick={() => { goTab(nextAfterDone.id); setPhaseDone(null) }}>
-                  Start {nextAfterDone.label} <ArrowRight size={14} />
+              {phases[phases.indexOf(donePhase) + 1] && (
+                <button className="btn btn-sm btn-primary" onClick={() => { go(phases.indexOf(donePhase) + 1, 0, 1); setPhaseDone(null) }}>
+                  Start {phases[phases.indexOf(donePhase) + 1].label} <ArrowRight size={14} />
                 </button>
               )}
               <button className="btn btn-sm btn-ghost" onClick={() => setPhaseDone(null)}>Close</button>
@@ -269,7 +292,6 @@ export default function BuildPage() {
         </AnimatePresence>
 
         <DownloadCodeModal app={app} open={zipOpen} onClose={() => setZipOpen(false)} />
-        <Link to="/app" className="sr-only">Back to dashboard</Link>
       </div>
     </TriggerContext.Provider>
   )

@@ -2,9 +2,18 @@
 
 export const landingPrd = `# Outbounder: Landing page PRD
 
-Save this file as \`LANDING.md\` in your project root next to \`PRD.md\` and \`DESIGN.md\`. In Claude Code say: "Read @LANDING.md and @DESIGN.md. Build the landing page at \`app/(marketing)/page.tsx\` section by section. Show me a screenshot after each section at 1440px and 375px."
+Save this file as \`LANDING.md\` in your project root next to \`PRD.md\`, \`DESIGN_SYSTEM.md\` and \`DESIGN.md\`. In Claude Code say: "Read @LANDING.md @DESIGN_SYSTEM.md @DESIGN.md. Build the landing page at \`app/(marketing)/page.tsx\` section by section. Show me a screenshot after each section at 1440px and 375px."
 
-All tokens, fonts and components come from \`DESIGN.md\`. Every word of copy below is final unless marked [edit]. Prices of competitors are marked [verify]: check each vendor's pricing page the week you launch and update the "Prices checked" date.
+Tokens, Geist type and components come from \`DESIGN_SYSTEM.md\` (the base) and the Outbounder accent from \`DESIGN.md\`. Marketing may be more expressive than the app, within these rules:
+
+- **Square.** Marketing boxes, cards, images and the video frame have 0 radius (base: "marketing stays square"). Only tag pills keep 4px.
+- **Rail.** Content sits on the base 1180px marketing rail with a hairline left and right; sections are split by full-width hairlines and use 56px (mobile) / 80px (desktop) vertical padding.
+- **Type.** Geist only. Display 52/1.04 at 500 with -0.045em tracking for the H1, H2 at 35/1.12. Body copy 16/26 on marketing, max 65 characters wide.
+- **Colour.** White surfaces, ink, greys, and the periwinkle accent used more freely than in the app: soft accent bands and the accent edge on highlighted boxes. Still no solid dark or black blocks.
+- **Buttons.** White with a firm edge, never filled or black. Marketing primary: 46px, 1px ink edge (\`--ink\`), ink label at 500. Secondary: 46px, \`--btn-edge\`. Press to 98%.
+- **Motion.** Base curves; marketing allows the hero typing animation and scroll reveals listed in section 14.
+
+ Every word of copy below is final unless marked [edit]. Prices of competitors are marked [verify]: check each vendor's pricing page the week you launch and update the "Prices checked" date.
 
 ## 0. Page goals
 
@@ -40,11 +49,11 @@ Page outline, top to bottom:
 
 ## 2. Hero
 
-Layout: two columns on desktop (text 5/12, visual 7/12), stacked on mobile with the visual under the buttons. Background \`--background\` with a soft radial tint of \`--primary-soft\` behind the visual (no hard edges, no dark block).
+Layout: two columns on desktop (text 5/12, visual 7/12), stacked on mobile with the visual under the buttons. Background \`--surface\` with a soft radial tint of \`--accent-soft\` behind the visual (no hard edges, no dark block).
 
-- Eyebrow pill (\`--primary-soft\`, \`--primary\` text, 12px/500): "For founders and agencies who do their own outbound"
-- H1 (Display 56/60, mobile 40/44): **Cold email that reads like you wrote it.**
-- Subhead (Body large, \`--muted-foreground\`, max 520px): "Describe who you sell to. Outbounder finds verified leads, reads each company's website, writes a first line about something real, and sends from safe inboxes on your own outreach domain."
+- Eyebrow pill (\`--accent-soft\`, \`--accent-ink\` text, 12px/500): "For founders and agencies who do their own outbound"
+- H1 (Display 52/1.04, mobile 35/1.12): **Cold email that reads like you wrote it.**
+- Subhead (16/26, \`--muted-foreground\`, max 520px): "Describe who you sell to. Outbounder finds verified leads, reads each company's website, writes a first line about something real, and sends from safe inboxes on your own outreach domain."
 - Primary button (large): "Start 7-day free trial"
 - Secondary button (large, secondary style): "Try the free first-line generator"
 - Under the buttons, small muted line with three ticks: "7 days free" · "From $79/mo" · "Cancel in two clicks"
@@ -53,7 +62,7 @@ Hero visual: an animated product card (built in React, not a video) showing one 
 1. Row: avatar initials "SL", "Sarah Lee, Founder, Northpeak Studio", StatusPill "Finding".
 2. Pill steps through Verifying, Reading northpeak.studio, Writing (each 700ms).
 3. Row expands into an EmailPreview. The first line types in at 40ms per character with the violet AI mark: "Northpeak's case studies are all outdoor brands on Shopify, which is a sharp niche for a 12-person studio."
-4. Pill turns "Ready" in \`--primary\`. Pause 3 seconds, then loop with a second lead ("Tom Reid, MD, Fieldwork Recruitment").
+4. Pill turns "Ready" in \`--accent\`. Pause 3 seconds, then loop with a second lead ("Tom Reid, MD, Fieldwork Recruitment").
 - Under the card, a tiny caption in muted 12px: "Real example format. Every first line cites the page it came from."
 
 Utm banner: if the URL has \`utm_source=outbounder\`, show a dismissible \`--success-soft\` bar above the nav: "If one of our emails brought you here: yes, Outbounder wrote that first line. That is the product."
@@ -71,19 +80,19 @@ Utm banner: if the URL has \`utm_source=outbounder\`, show a dismissible \`--suc
   1. Icon \`Layers\`. Title "Four tools, one campaign". Text: "A lead database, a verifier, a sequencer and ChatGPT. $150 to $300 a month and an afternoon of copy and paste."
   2. Icon \`Clock\`. Title "3 to 5 minutes per first line". Text: "Real personalisation means opening every website. At 100 leads a week that is a full working day."
   3. Icon \`MailWarning\`. Title "One bad week burns a domain". Text: "Too many emails, too fast, from the wrong domain. Then even your invoices land in spam."
-- Line under the cards (Body large, centred): "Outbounder does all four jobs, with the safety rules built in."
+- Line under the cards (16/26, centred): "Outbounder does all four jobs, with the safety rules built in."
 
 ## 5. Product demo
 
 - H2: "See a campaign go from buyer to inbox in 2 minutes"
-- 16:9 video card (radius 16, border, shadow from DESIGN.md), poster image of the review queue. Plays inline with sound off and captions on. Length 1:50 to 2:10.
+- 16:9 video frame (square, 1px hairline, no shadow), poster image of the review queue. Plays inline with sound off and captions on. Length 1:50 to 2:10.
 - Script beats [edit]: 0:00 type the ICP; 0:20 leads stream in; 0:40 open one lead, show the website quote and the first line; 1:00 approve 5 with the A key; 1:15 domain page with green DNS rows; 1:30 inbox with an "Interested" reply; 1:50 "Start your trial".
 - Under the video: three small stats in a row (tabular numbers): "About 2 minutes to write 25 first lines" · "20 a day per new inbox" · "0 links in your first email".
 - Event: \`landing_video_played\` with \`percent\` at 25, 50, 75, 100.
 
 ## 6. Feature sections
 
-Alternating rows (text left / visual right, then swapped). Each visual is a real screenshot in a browser frame with a soft shadow. Max width 1200px.
+Alternating rows (text left / visual right, then swapped). Each visual is a real screenshot in a square browser frame with a 1px hairline. Max width 1200px.
 
 ### 6.1 Leads that match your buyer
 - Kicker: "Find"
@@ -110,7 +119,7 @@ Alternating rows (text left / visual right, then swapped). Each visual is a real
 - H3: "Your main domain never sends a cold email."
 - Text: "Outbounder sets up a separate outreach domain and inboxes for you, shows you every DNS record to paste into Porkbun, and starts each inbox at 20 emails a day. Sends go out in each lead's morning, in their time zone."
 - Four fact chips in a 2x2 grid with icons: "Separate outreach domain" · "20 a day per inbox to start" · "Plain text, no tracking pixels" · "Unsubscribe link and header on every email"
-- Background for this row: \`--primary-soft\` band, full width, 64px padding.
+- Background for this row: \`--accent-soft\` band, full width, 64px padding.
 - Visual: domain page with DNS rows turning green.
 
 ### 6.5 Every reply in one place, already sorted
@@ -168,7 +177,7 @@ An interactive strip under the feature rows that teaches the ramp and sells the 
 ## 9. Testimonials slot
 
 - H2: "From people sending with it"
-- Grid of 3 cards (1 column on mobile). Each: quote (Body large), name, role, company, small avatar, and one number chip ("11 interested replies in week one").
+- Grid of 3 cards (1 column on mobile). Each: quote (16/26), name, role, company, small avatar, and one number chip ("11 interested replies in week one").
 - Until you have 3 real quotes, replace this section with a single card: "We sell Outbounder with Outbounder." Text: "Every trial so far started with a cold email written and sent by this tool. Want the numbers? See our public dashboard." Link to a simple \`/open\` page showing sends, reply rate and interested count from your own account. [edit]
 - Never invent a quote.
 
@@ -196,7 +205,7 @@ Card anatomy (both cards, top to bottom):
 3. A 4-row "what you get each month" block with icons: leads, AI emails, sends, inboxes.
 4. Divider, then the shared list with ticks: verified emails, website-based first lines, unified inbox, AI reply labels, analytics, unsubscribe and suppression built in.
 5. Button full width.
-Growth card: 2px \`--primary\` border, "Most popular" pill on the top edge, 8px taller on desktop.
+Growth card: 1px \`--accent-edge\` border plus an \`--accent-soft\` fill, "Most popular" pill on the top edge, 8px taller on desktop.
 
 - Card buttons: "Start 7-day free trial" on both, linking with \`?plan=\` and \`?interval=\`.
 - Under the cards: "Trial limits: 50 leads and 100 sends. Nothing is charged for 7 days. Domains are bought separately on Porkbun (about $11 a year each)."
@@ -233,7 +242,7 @@ Accordion, one open at a time, first one open. H2: "Questions people ask before 
 
 ## 12. Final CTA
 
-- Full-width card, \`--primary-soft\` background, radius 24, 64px padding, centred.
+- Full-width card, \`--accent-soft\` background, square, 1px accent edge, 64px padding, centred.
 - H2: "Your next 100 cold emails, written and sent this week."
 - Sub: "Describe your buyer. See a real first line in 4 minutes. 7 days free."
 - Buttons: "Start 7-day free trial" (primary large), "Try the free first-line generator" (ghost).
@@ -248,14 +257,14 @@ Accordion, one open at a time, first one open. H2: "Questions people ask before 
 
 | Element | Motion | Duration and easing |
 | --- | --- | --- |
-| Section reveal | Fade in + translateY 16px to 0 when 20% in view (IntersectionObserver, once) | 400ms, \`cubic-bezier(0.2, 0.8, 0.2, 1)\` |
+| Section reveal | Fade in + translateY 16px to 0 when 20% in view (IntersectionObserver, once) | 360ms, \`cubic-bezier(0.16, 1, 0.3, 1)\` |
 | Hero card | Status steps, first line types at 40ms per character, loop every 9 s | Steps 700ms each |
 | Problem cards | Stagger 80ms between cards | 300ms |
 | Feature screenshots | Slight scale 0.98 to 1 with the reveal | 500ms |
 | DNS rows (6.4 visual) | Rows tick green one by one when in view | 150ms spring each, 250ms apart |
 | Pricing toggle | Price numbers cross-fade, no layout shift (fixed width, tabular numbers) | 200ms |
 | FAQ | Height auto animation | 200ms ease-out |
-| Buttons | Hover darken 6%, press scale 0.98 | 120ms |
+| Buttons | Hover fill \`--hover\`, press scale 0.98 | 120ms, base out-curve |
 
 Reduced motion (\`prefers-reduced-motion: reduce\`): no translate or scale, opacity fades only (150ms), hero shows the finished email with no typing, DNS rows already green.
 
@@ -274,7 +283,7 @@ Reduced motion (\`prefers-reduced-motion: reduce\`): no translate or scale, opac
 
 ## 15c. Accessibility
 
-- Colour contrast AA for every text and button in both themes; check the muted text on \`--primary-soft\` bands.
+- Colour contrast AA for every text and button (light only); check the muted text on \`--accent-soft\` bands.
 - The hero animation has \`aria-hidden="true"\`; a visually hidden paragraph describes it: "Example: Outbounder finds Sarah Lee, reads her studio's website and writes a first line about their outdoor-brand case studies."
 - Video has captions and a transcript link under it.
 - The comparison table uses \`th scope\`, and the scroll container has \`tabindex="0"\` and a label so keyboard users can scroll it.
@@ -293,7 +302,7 @@ Reduced motion (\`prefers-reduced-motion: reduce\`): no translate or scale, opac
 ## 17. OG image
 
 - 1200x630 PNG generated with \`next/og\` at \`app/opengraph-image.tsx\`.
-- Background \`--background\` with the soft \`--primary-soft\` radial tint. Left: wordmark and the H1 on two lines (64px, Inter Tight 600). Right: a cropped EmailPreview card showing a first line with the violet AI mark.
+- Background \`--surface\` with the soft \`--accent-soft\` radial tint. Left: wordmark and the H1 on two lines (64px, Geist 500, -0.045em). Right: a cropped EmailPreview card showing a first line with the violet AI mark.
 - Bottom left in muted 24px: "Leads, first lines and safe sending. From $79/mo."
 - Twitter card \`summary_large_image\` with the same image.
 
@@ -336,7 +345,7 @@ Paste these one at a time, check the screenshot, then move on:
 ## 21. Performance budget
 
 - LCP under 2.0 s on 4G, CLS under 0.05, total JS under 170 KB gzipped on the landing route.
-- Fonts: Inter and Inter Tight via \`next/font\` with \`display: swap\`, only the weights used.
+- Fonts: Geist via \`next/font\` (the \`geist\` package) with \`display: swap\`, only the weights used.
 - Video loads only when the section is near the viewport (\`preload="none"\` + poster).
 - Lighthouse target: 95+ on Performance, Accessibility, Best Practices and SEO.
 
