@@ -64,7 +64,7 @@ const supabaseRows = (pasteInto: string): KeyRow[] => [
 const stripeRows = (pasteInto: string, live: boolean): KeyRow[] => [
   { name: 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', where: `Stripe > Developers > API keys > Publishable key (${live ? 'pk_live_' : 'pk_test_'}...)`, pasteInto, secret: false },
   { name: 'STRIPE_SECRET_KEY', where: `Stripe > Developers > API keys > Secret key (${live ? 'sk_live_' : 'sk_test_'}...)`, pasteInto, secret: true },
-  { name: 'STRIPE_PRICE_ID', where: `Stripe > Product catalogue > your product > Pricing > ... > Copy price ID (price_...)`, pasteInto, secret: false },
+  { name: 'STRIPE_PRICE_ID', where: `Stripe > Product catalog > your product > Pricing > ... > Copy price ID (price_...)`, pasteInto, secret: false },
   {
     name: 'STRIPE_WEBHOOK_SECRET',
     where: live
@@ -106,8 +106,11 @@ Current plan: @PLAN.md and @TASKS.md
 - Build: \`npm run build\` (must pass before any commit)
 - Lint: \`npm run lint\`
 - Stripe webhooks locally: \`stripe listen --forward-to localhost:3000/api/stripe/webhook\`
-- Edge functions: \`npx supabase functions deploy <name>\`
+- Edge functions: \`npx supabase functions deploy <name> --no-verify-jwt\` (every function checks
+  auth in its own code: getClaims() for users, signature for webhooks, a shared secret for cron)
 - Edge function secrets: \`npx supabase secrets set NAME=value\` (I run this myself, never print values)
+- If port 3000 is busy, Next.js picks 3001. Tell me, because Stripe listen and Supabase
+  redirect URLs expect 3000.
 
 ## Environment variables
 - Browser-safe: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
@@ -153,6 +156,12 @@ Current plan: @PLAN.md and @TASKS.md
 - Supabase auth redirect URLs and the Stripe webhook endpoint must be set for
   localhost and Production separately.
 - Test and live Stripe modes have different keys and different whsec_ secrets.
+- Stripe API 2025-03-31 and later: current_period_end lives on subscription.items.data[0],
+  not on the subscription. An invoice's subscription id is at
+  invoice.parent.subscription_details.subscription.
+- .env.local is read only when npm run dev starts. After I edit it, I restart npm run dev.
+- Edge functions get SUPABASE_URL and SUPABASE_SECRET_KEYS (JSON, read ["default"]) by
+  default. The new sb_ keys are not JWTs: send them in the apikey header only.
 
 ## Compaction
 When compacting, always preserve the list of modified files, open TASKS.md items
@@ -167,7 +176,7 @@ const HOOK_SCRIPT = `
 FILE=$(jq -r '.tool_input.file_path // empty')
 case "$FILE" in
   *.env.example) exit 0 ;;
-  *.env|*.env.*|*package-lock.json|*/.git/*)
+  *.env|*.env.*|*package-lock.json|*/.git/*|*\\\\.git\\\\*)
     echo "Blocked: $FILE is protected. Ask the user to edit it." >&2
     exit 2
     ;;
@@ -211,6 +220,7 @@ function setupPhase(app: AppDef): Phase {
           `Type the command below and press Enter. It prints the folder you are in (your "home" folder).`,
         ),
         code('setup-terminal-pwd', 'Terminal (Mac and Windows)', 'bash', `pwd`),
+        p(`**Check it worked:** Mac prints something like \`/Users/yourname\`. Windows prints a small table with \`Path\` and something like \`C:\\Users\\yourname\`. Both are right.`),
         tip(
           'Three habits that save hours',
           `Copy and paste commands, never retype them. If a command prints red text, copy the whole message into Claude Code later and ask what it means. Press the Up arrow to bring back the last command.`,
@@ -246,16 +256,22 @@ curl -fsSL https://claude.ai/install.sh | bash
 # Windows (PowerShell)
 irm https://claude.ai/install.ps1 | iex
 
-# Windows only: Claude Code also needs Git for Windows.
-# Download and install it with all default options from:
+# Windows only: also install Git for Windows (all default options).
+# Claude Code runs without it, but this playbook needs it for git,
+# the protect-files hook and Bash commands:
 # https://git-scm.com/downloads/win
 `,
         ),
         code('setup-install-check', 'Check it worked (new terminal window)', 'bash', `claude --version`),
         warn(
-          'If it says "command not found"',
+          'If it says "command not found" or "not recognized"',
           `Close every terminal window and open a new one, then try again. Still broken? Run \`claude doctor\` and read the first red line. On Windows, restart the computer once after installing Git for Windows.`,
         ),
+        mistakes([
+          { mistake: `Windows: "The token '&&' is not a valid statement separator" or "'irm' is not recognized"`, fix: 'You are in the wrong kind of terminal. The irm command only works in PowerShell (the prompt starts with PS). Open PowerShell, not Command Prompt, and paste it again.' },
+          { mistake: 'Mac: "claude: command not found" even in a new window', fix: 'The installer put Claude in ~/.local/bin, which your terminal does not search yet. Run claude doctor, or paste the PATH line the installer printed at the end (it starts with echo export PATH) and open a new window.' },
+          { mistake: 'Login says your plan does not include Claude Code', fix: 'The free plan does not include it. Upgrade to Pro at claude.ai/upgrade, then run claude again and log in.' },
+        ]),
         links([
           { label: 'Claude plans', url: 'https://claude.ai/upgrade' },
           { label: 'Claude Code setup docs', url: 'https://code.claude.com/docs/en/setup' },
@@ -286,7 +302,12 @@ irm https://claude.ai/install.ps1 | iex
           `Close your terminal, open a new one and run the check below.`,
         ),
         code('setup-node-check', 'Check it worked', 'bash', `node -v\nnpm -v`),
-        p(`You should see something like \`v22.11.0\` and \`10.9.0\`. Any Node version of 22 or higher is fine.`),
+        p(`You should see something like \`v22.11.0\` and \`10.9.0\`. Any Node version of 22 or higher is fine (Next.js 16 needs at least 20.9).`),
+        mistakes([
+          { mistake: '"node is not recognized" or "command not found: node"', fix: 'The terminal was open during the install. Close every terminal window, open a new one and run node -v again. On Windows, restart the computer if it still fails.' },
+          { mistake: 'node -v prints v18 or v20.x lower than 20.9', fix: 'An old Node is installed. Download the current LTS from nodejs.org and install it over the top, then open a new terminal.' },
+          { mistake: 'Windows: "running scripts is disabled on this system" when you run npm or npx', fix: 'Run this once in PowerShell: Set-ExecutionPolicy -Scope CurrentUser RemoteSigned and answer Y. Then open a new window.' },
+        ]),
         links([
           { label: 'Node.js download', url: 'https://nodejs.org/en/download' },
           { label: 'VS Code download', url: 'https://code.visualstudio.com/' },
@@ -329,15 +350,20 @@ explorer .
         steps(
           `Run the commands. A Finder (Mac) or File Explorer (Windows) window opens showing the empty folder. Keep it open, you will drop files in here.`,
           `Open VS Code > **File > Open Folder...** > pick \`Projects/${slug}\` > Open. If asked "Do you trust the authors?", click **Yes**.`,
-          `Back in the terminal, run \`pwd\`. It should end in \`/Projects/${slug}\`.`,
+          `Back in the terminal, run \`pwd\`. Mac: it ends in \`/Projects/${slug}\`. Windows: it ends in \`\\Projects\\${slug}\`.`,
         ),
+        mistakes([
+          { mistake: 'Running the Mac commands in Windows PowerShell (or the other way round)', fix: 'Each box is for one system. Mac uses ~/ and forward slashes, Windows uses $HOME and backslashes.' },
+          { mistake: 'Starting claude from your home folder instead of the project folder', fix: `Claude then sees your whole home folder. Type /exit, run the cd line for your system, check pwd, then run claude again.` },
+          { mistake: 'Putting the folder inside iCloud Drive, OneDrive or Dropbox', fix: 'Syncing apps fight with the thousands of small files a Next.js app creates. Keep it in Projects in your home folder as shown.' },
+        ]),
         tip('Coming back tomorrow', `Every time you open a new terminal, run \`cd ~/Projects/${slug}\` (Mac) or \`cd $HOME\\Projects\\${slug}\` (Windows) before running \`claude\`.`),
         ascii(app.content.repoTree, `What your ${slug} folder will look like by the end. Claude Code creates almost all of it.`),
       ],
       checklist: [
         ['Run the folder commands for your system', 'copy:setup-folder-mac'],
         'Open the folder in VS Code',
-        `Check pwd ends in /Projects/${slug}`,
+        `Check pwd ends in Projects/${slug}`,
       ],
     }),
     task({
@@ -362,12 +388,16 @@ explorer .
             ['Shift + Enter', 'New line inside a message (for long prompts)'],
             ['Esc', 'Stops Claude mid-action'],
             ['Esc Esc', 'Rewinds to an earlier point if something went wrong'],
-            ['Shift + Tab', 'Cycles modes: auto, manual, accept edits, plan'],
+            ['Shift + Tab', 'Cycles modes: Manual (asks before each change), accept edits, plan, and auto if your account has it'],
             ['/clear', 'Wipes the conversation. Do this after every finished task'],
             ['/exit', 'Quits Claude Code'],
           ],
         ),
-        tip('Paste long prompts safely', `Every prompt in this playbook has a Copy button. Paste it into the Claude Code box with Cmd + V (Mac) or Ctrl + V (Windows) and press Enter once.`),
+        tip('Paste long prompts safely', `Every prompt in this playbook has a Copy button. Paste it into the Claude Code box with Cmd + V (Mac) or Ctrl + V (Windows) and press Enter once. If Ctrl + V does nothing in PowerShell, right-click inside the window to paste.`),
+        mistakes([
+          { mistake: 'The browser login tab never opens', fix: 'Claude Code prints a long login link. Copy it into your browser by hand, click Authorize, and paste the code it shows back into the terminal.' },
+          { mistake: 'Claude says it is in your home folder, not the project', fix: `Type /exit, cd into the ${slug} folder (see the last task), and run claude again.` },
+        ]),
       ],
       checklist: [['Run claude in your project folder', 'copy:setup-first-run-cmd'], 'Log in with your Claude account', 'Ask Claude which folder it is in'],
     }),
@@ -393,7 +423,7 @@ explorer .
         ),
         tip('Plan mode', `Press Shift + Tab until the bottom of the screen says **plan mode on**. Claude then reads and plans but changes nothing until you approve. You will use it for every big task.`),
       ],
-      checklist: [['Run /model opus', 'copy:setup-model-cmd'], 'Run /effort high', 'Press Shift + Tab until you see plan mode, then back to auto'],
+      checklist: [['Run /model opus', 'copy:setup-model-cmd'], 'Run /effort high', 'Press Shift + Tab until you see plan mode, then back to Manual'],
     }),
     task({
       id: 'setup-claude-md',
@@ -471,6 +501,12 @@ ${HOOK_SETTINGS.trim()}
           `Check it worked: Claude shows "Blocked: .env.local is protected" when it tries to write .env.local.`,
           `Run \`/hooks\` in Claude Code. You should see one PreToolUse hook listed.`,
         ),
+        mistakes([
+          { mistake: 'Every edit fails with "jq: command not found"', fix: 'jq is missing, or the terminal started before you installed it. Install it with the command Claude gave you, quit Claude Code with /exit, open a new terminal, cd into the folder and run claude again.' },
+          { mistake: 'The hook shows "Permission denied"', fix: 'The script is not executable. Ask Claude: "Run chmod +x .claude/hooks/protect-files.sh".' },
+          { mistake: 'Windows: the hook errors with "bash not found" or nothing is blocked', fix: 'Hooks run through Git Bash on Windows. Install Git for Windows (see "Buy Claude Pro and install Claude Code"), restart the computer, then run claude again.' },
+          { mistake: 'The hook did not block .env.local', fix: 'Claude Code only loads settings when it starts. Type /exit, run claude again, and repeat the test.' },
+        ]),
       ],
       checklist: [
         ['Copy the hook script', 'copy:setup-hook-script'],
@@ -635,6 +671,11 @@ ask me about it. Then show me both files' outline for approval.
         ),
         p(`**Check it worked:** in VS Code you now see \`PLAN.md\` and \`TASKS.md\`. Open TASKS.md: every task has a "Verify:" line.`),
         tip('If the plan is huge', `That is normal for a full app. You do not work through TASKS.md in one go. Each later task in this playbook tells Claude which part to build.`),
+        mistakes([
+          { mistake: 'Claude says it cannot find @PRD.md', fix: `The file is still in Downloads, or it was saved as PRD (1).md. Move it into the ${slug} folder and rename it to exactly PRD.md.` },
+          { mistake: 'Claude starts writing app code', fix: 'Press Esc, then Shift + Tab until it says plan mode on, and paste the prompt again.' },
+          { mistake: 'Claude runs out of room mid-plan', fix: 'Type /clear, then paste the prompt again. If it still stops, ask for PLAN.md first and TASKS.md in a second message.' },
+        ]),
       ],
       checklist: [
         ['Download PRD.md', 'download:fnd-build-prd'],
@@ -683,7 +724,7 @@ Do not write any app code yet.
 `,
         ),
         p(`**Check it worked:** Claude prints your colour hex codes and font names, and TASKS.md has the new tokens line.`),
-        tip('Optional design skill', `Anthropic publishes a frontend-design skill. In Claude Code run \`/plugin marketplace add anthropics/skills\` then \`/plugin install example-skills@anthropic-agent-skills\`. Claude then follows stricter design rules on every page.`),
+        tip('Optional design skill', `Anthropic publishes a frontend-design plugin. In Claude Code run \`/plugin install frontend-design@claude-plugins-official\` and choose to install it for this project. Claude then follows stricter design rules on every page. If it says the marketplace is unknown, run \`/plugin marketplace add anthropics/claude-plugins-official\` first.`),
       ],
       checklist: [
         ['Download DESIGN.md', 'download:fnd-design-prd'],
@@ -711,17 +752,27 @@ Create a Next.js App Router project in this folder for ${name}, with TypeScript,
 Tailwind CSS, ESLint, the src/ directory OFF, and the "@/*" import alias.
 
 IMPORTANT: this folder already contains CLAUDE.md, PRD.md, DESIGN.md, PLAN.md,
-TASKS.md and .claude/. Do not delete or overwrite any of them. If create-next-app
-refuses because the folder is not empty, scaffold into ./tmp-app, move every file
-and folder from tmp-app into the root (skip anything that already exists), then
-delete tmp-app.
+TASKS.md and .claude/. Do not delete or overwrite any of them. create-next-app
+refuses a folder that already has files, so scaffold into a temporary folder
+without any questions:
+
+  npx create-next-app@latest tmp-app --ts --tailwind --eslint --app --no-src-dir --import-alias "@/*" --use-npm --disable-git --yes
+
+Then move every file and folder from tmp-app into the root, including hidden
+ones like .gitignore. Skip anything that already exists in the root. If tmp-app
+has its own CLAUDE.md or AGENTS.md, do not copy it over mine: tell me what it
+says and add any useful Next.js notes to my CLAUDE.md. Delete tmp-app, then run
+npm install in the root. Tell me which Next.js version is in package.json.
 
 Then:
-1. Initialise shadcn/ui (npx shadcn@latest init) and add these components:
-   button, input, label, card, dialog, dropdown-menu, sonner, form, badge, avatar,
-   separator, skeleton, tabs.
-2. Apply the DESIGN.md tokens: colours as CSS variables in app/globals.css that
-   shadcn/ui uses, fonts via next/font, radius and spacing in the Tailwind theme.
+1. Initialise shadcn/ui with npx shadcn@latest init (accept the defaults, pick a
+   neutral base colour) and add these components:
+   button, input, label, card, dialog, dropdown-menu, sonner, field, form, badge,
+   avatar, separator, skeleton, tabs, accordion. If a component name does not
+   exist in the current shadcn registry, tell me and use its replacement.
+2. Apply the DESIGN.md tokens: colours as the CSS variables shadcn/ui uses in
+   app/globals.css, fonts via next/font, radius and spacing in the @theme block of
+   app/globals.css (Tailwind v4 has no tailwind.config file by default).
 3. Create .env.example with these names and empty values:
    NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
    SUPABASE_SECRET_KEY, NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
@@ -742,10 +793,14 @@ Then:
         ),
         code('fnd-scaffold-dev', 'Second terminal window', 'bash', `cd ~/Projects/${slug}\nnpm run dev`),
         eli5('What is localhost:3000?', `localhost means "this computer". 3000 is the door number the app listens on. Only you can see it. It goes public in the Deployment phase.`),
+        p(`**Check it worked:** the second window prints \`Ready\` and \`Local: http://localhost:3000\`, and the page shows your placeholder line.`),
         mistakes([
           { mistake: 'Running npm run dev in the same window as Claude Code', fix: 'Use a second terminal window. Claude Code stays in the first one.' },
           { mistake: 'Page shows "This site cannot be reached"', fix: 'The dev server is not running. Run npm run dev in the second window and wait for "Ready".' },
+          { mistake: '"Missing script: dev" or "Could not read package.json"', fix: `The second window is in the wrong folder. Run cd ~/Projects/${slug} (Mac) or cd $HOME\\Projects\\${slug} (Windows), then npm run dev.` },
+          { mistake: 'It says "Port 3000 is in use, trying 3001"', fix: 'An old dev server is still running somewhere. Find the other window and press Ctrl + C in it, or close every terminal window except Claude Code and start npm run dev again. The playbook expects port 3000.' },
           { mistake: 'Claude deleted PRD.md during scaffolding', fix: 'Download it again from Feed Claude the Build PRD and drop it back in the folder.' },
+          { mistake: 'A tmp-app folder is still there', fix: 'Ask Claude: "Check nothing in tmp-app is missing from the root, then delete tmp-app."' },
         ]),
       ],
       checklist: [
@@ -792,6 +847,7 @@ Plan mode first. Read @LANDING.md, @DESIGN.md and @PRD.md fully.
 Build the ${name} marketing site at app/(marketing)/page.tsx exactly as LANDING.md
 specifies: every section in the same order, the exact copy (headings, sub-lines,
 button labels, FAQ answers, pricing), the layout notes and the motion specs.
+Delete the placeholder app/page.tsx first: two page.tsx files for "/" break the build.
 
 Rules:
 - One component per section in components/landing/, named after the section.
@@ -818,6 +874,8 @@ difference from LANDING.md, then fix them.
         mistakes([
           { mistake: 'Claude skips sections to save time', fix: 'Say: "Compare the page against every section heading in LANDING.md and build the missing ones."' },
           { mistake: 'Animations make the page jumpy on phones', fix: 'Say: "On screens under 768px, reduce every motion distance by half and remove parallax."' },
+          { mistake: 'Build error: "You cannot have two parallel pages that resolve to the same path"', fix: 'Both app/page.tsx and app/(marketing)/page.tsx exist. Ask Claude to delete app/page.tsx.' },
+          { mistake: 'The page still shows the old placeholder', fix: 'Hard refresh with Cmd + Shift + R (Mac) or Ctrl + Shift + R (Windows). Still old? Stop npm run dev with Ctrl + C and start it again.' },
         ]),
       ],
       checklist: [
@@ -908,7 +966,8 @@ Pages (inside an app/(auth) route group with a shared centred layout and the log
    "Check your inbox for a reset link".
 4. /reset-password: new password + confirm password, button "Save new password".
 
-Use shadcn Form with react-hook-form and zod for validation (install them).
+Use the shadcn Field components (or the older Form component if that is what is
+installed) with react-hook-form, @hookform/resolvers and zod for validation.
 Show field errors under each field and a form-level error with sonner toasts.
 Disable the button and show a spinner while submitting. Every input has a label,
 correct type and autocomplete attribute. Must work at 375px wide.
@@ -921,6 +980,10 @@ Run npm run build and show me the output.
           `Type a valid email and an 8+ character password and submit: you should see "Not connected yet". That is correct for now.`,
           `Open /login, /forgot-password and /reset-password and check each one matches the design.`,
         ),
+        mistakes([
+          { mistake: 'A page shows 404', fix: 'Check the URL has no typo. If it is right, ask Claude: "List every page.tsx under app/(auth) and the URL each one serves."' },
+          { mistake: 'The page shows a red error overlay', fix: 'Copy the whole error text (or the bottom-left "Issues" panel) into Claude Code and ask it to fix the cause.' },
+        ]),
       ],
       checklist: [
         ['Run the auth pages prompt', 'copy:fnd-auth-pages-prompt'],
@@ -965,6 +1028,10 @@ Run npm run build and show me the output.
           `Press Back on step 2 and check your step 1 answer is still there.`,
           `The final Continue should take you to /app (a blank or 404 page is fine until the next task).`,
         ),
+        mistakes([
+          { mistake: 'Enter submits the whole form or skips a step', fix: 'Tell Claude: "Enter should only go to the next step, and only when the current answer is valid."' },
+          { mistake: 'Back loses your answer', fix: 'Tell Claude: "Keep all answers in one state object in the parent component, not inside each step."' },
+        ]),
       ],
       checklist: [['Run the onboarding prompt', 'copy:fnd-onboarding-prompt'], 'Click through every onboarding step', 'Check Back keeps your answers'],
     }),
@@ -1018,7 +1085,11 @@ Run npm run build and show me the output.
           `Click every sidebar item. None should show a 404.`,
           `Shrink the browser to phone width. The sidebar should turn into a menu button.`,
         ),
-        tip('Commit point', `This is a good moment to say to Claude: "Initialise git if it is not already, and commit everything with the message Add app shell". You push it online in the Deployment phase.`),
+        mistakes([
+          { mistake: '/app shows the landing page or a 404', fix: 'Ask Claude: "List every page.tsx under app/ with the URL it serves. /app must come from app/(app)/app/page.tsx."' },
+          { mistake: 'Build error about two pages resolving to the same path', fix: 'Two route groups both have a page for the same URL (for example /settings). Ask Claude to keep the one under app/(app) and delete the other.' },
+        ]),
+        tip('Commit point', `This is a good moment to save a version. First do the Deployment task "Install git and set your name" (5 minutes, you can do it now), then say to Claude: "Initialise git if it is not already, check .env.local is ignored, and commit everything with the message Add app shell". You push it online in the Deployment phase.`),
       ],
       checklist: [['Run the app shell prompt', 'copy:fnd-shell-prompt'], 'Open /app and click every sidebar link', 'Check the menu at phone width'],
     }),
@@ -1082,6 +1153,11 @@ Check that ${api.name} is set up correctly without printing any secret values.
 `,
     ),
     p(`**Check it worked:** Claude reports "OK" with a 200 status from ${api.name}. If you see 401, the key is wrong or has a space at the end: copy it again.`),
+    mistakes([
+      { mistake: 'Claude says the variable is undefined', fix: 'Next.js reads .env.local only when it starts. Save the file (the dot on the VS Code tab disappears), stop npm run dev with Ctrl + C and start it again.' },
+      { mistake: 'The key line has quotes, spaces or sits on two lines', fix: 'Each line must be NAME=value with nothing around the = sign and the whole key on one line.' },
+      { mistake: '402, 403 or "insufficient credits"', fix: `The key works but the ${api.name} account needs a plan, credits or a card on file. Check the billing page in the ${api.name} dashboard.` },
+    ]),
     links([
       { label: `${api.name} sign up`, url: api.signupUrl },
       { label: `${api.name} docs`, url: api.docsUrl },
@@ -1114,9 +1190,10 @@ function edgeFunctionTask(app: AppDef, fn: EdgeFunctionDef): Task {
     blocks.push(
       p(`This function needs ${fn.secrets.length === 1 ? 'one secret' : `${fn.secrets.length} secrets`}. Edge functions cannot read your \`.env.local\`, so you hand them over with the CLI. Run these in a normal terminal window (not inside Claude Code), replacing \`paste_value_here\` with the real value. Skip any you already set in an earlier task.`),
       code(`${id}-secrets`, 'Terminal (outside Claude Code)', 'bash', fn.secrets.map((n) => `npx supabase secrets set ${n}=paste_value_here`).join('\n')),
-      p(`Check with \`npx supabase secrets list\`. You see the names (not the values). \`SUPABASE_URL\` and \`SUPABASE_SERVICE_ROLE_KEY\` are there by default, so never set those yourself.`),
+      p(`Check with \`npx supabase secrets list\`. You see the names (not the values). Supabase gives every function \`SUPABASE_URL\`, \`SUPABASE_PUBLISHABLE_KEYS\` and \`SUPABASE_SECRET_KEYS\` (plus the legacy \`SUPABASE_SERVICE_ROLE_KEY\`) automatically. Never set names that start with \`SUPABASE_\` yourself: the CLI refuses them.`),
     )
   }
+  const isWebhook = /webhook|cron|schedule|stripe|callback/i.test(`${fn.trigger} ${fn.name}`)
   blocks.push(
     prompt(
       `${id}-prompt`,
@@ -1128,24 +1205,40 @@ General rules for this ${app.name} edge function:
 - Location: supabase/functions/${fn.name}/index.ts (create it with
   npx supabase functions new ${fn.name} if it does not exist).
 - Read secrets with Deno.env.get("NAME") only. Never hardcode or log them.
-- If it is called from the browser, check the caller's JWT with
-  supabase.auth.getClaims() and reject anonymous requests with 401. Handle the
-  OPTIONS preflight with CORS headers limited to http://localhost:3000 and
-  NEXT_PUBLIC_SITE_URL.
-- If it is called by a third-party webhook, verify that provider's signature
-  before doing anything.
+  For an admin client use SUPABASE_URL and
+  JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS")!)["default"] (the new sb_secret_
+  key; fall back to SUPABASE_SERVICE_ROLE_KEY only if SUPABASE_SECRET_KEYS is missing).
+- Set verify_jwt = false for this function in supabase/config.toml
+  ([functions.${fn.name}]) and deploy with --no-verify-jwt. The platform's built-in
+  check does not understand the new sb_ keys, so this function checks auth itself:
+- If it is called from the browser, read the user's token from the Authorization
+  header, check it with supabase.auth.getClaims(token) and reject anonymous
+  requests with 401. Handle the OPTIONS preflight with CORS headers limited to
+  http://localhost:3000 and the production site URL (a SITE_URL secret).
+- If it is called by a third-party webhook, verify that provider's signature on
+  the raw body (await req.text()) before doing anything, and skip duplicate event ids.
+- If it is called by a schedule (pg_cron), require a CRON_SECRET header that matches
+  a secret I set with npx supabase secrets set CRON_SECRET=...
 - Return JSON with clear error messages and correct status codes.
-- After writing it, deploy with: npx supabase functions deploy ${fn.name}
-  and show me the output. Then tell me exactly how to test it from the app.
+- After writing it, deploy with: npx supabase functions deploy ${fn.name} --no-verify-jwt
+  and show me the output. Then tell me exactly how to test it from the app, plus a
+  curl command I can run that should get 401 without a valid token or signature.
 `,
     ),
-    code(`${id}-deploy`, 'Deploy (Claude runs this, or you can)', 'bash', `npx supabase functions deploy ${fn.name}`),
+    code(`${id}-deploy`, 'Deploy (Claude runs this, or you can)', 'bash', `npx supabase functions deploy ${fn.name} --no-verify-jwt`),
+    p(`\`--no-verify-jwt\` switches off Supabase's built-in token check${isWebhook ? ` (a webhook or schedule has no user token, so the built-in check would reject every call with 401)` : ''}. The function's own code does the check instead, which is why the prompt above is strict about it.`),
     steps(
       `Paste the prompt into Claude Code (Shift + Tab to plan mode first if it touches payments or user data).`,
       `When it deploys, open Supabase > **Edge Functions** in the left sidebar. You should see \`${fn.name}\` in the list.`,
       `Do the action that starts it (${fn.trigger.replace(/\.$/, '')}).`,
       `Back in Supabase > Edge Functions > \`${fn.name}\` > **Logs**, you should see a new line with status 200. Anything red: copy the log line into Claude Code and ask it to fix the cause.`,
     ),
+    mistakes([
+      { mistake: 'Every call returns 401 "Invalid JWT" or "Missing authorization header"', fix: `It was deployed without --no-verify-jwt. Run npx supabase functions deploy ${fn.name} --no-verify-jwt again.` },
+      { mistake: 'Deploy says "Cannot find project ref" or "not linked"', fix: 'Run npx supabase link --project-ref <project-ref> in the project folder (see Install and link the Supabase CLI), then deploy again.' },
+      { mistake: 'The function runs but says a secret is undefined', fix: 'Secrets set after a deploy are picked up on the next call, but check the name matches exactly with npx supabase secrets list. Names are case sensitive.' },
+      { mistake: 'Browser console shows a CORS error', fix: 'Ask Claude: "The browser blocked the call with this CORS error: <paste>. Fix the OPTIONS handler and the Access-Control-Allow-Headers list, then redeploy."' },
+    ]),
   )
   return task({
     id,
@@ -1229,10 +1322,10 @@ function backendPhase(app: AppDef): Phase {
         ),
         steps(
           `In Supabase, open your project, click the **gear icon (Project Settings)** at the bottom of the left sidebar.`,
-          `Click **Data API**. Copy the **Project URL** (looks like \`https://abcd.supabase.co\`).`,
-          `Click **API Keys**. Copy the **Publishable key** (\`sb_publishable_...\`).`,
-          `On the same page under **Secret keys**, click the eye or copy icon next to the default secret key (\`sb_secret_...\`). If there is none, click **+ New secret key**, name it \`${slug}-server\`, and copy it.`,
-          `In VS Code, right-click in the file list > **New File** > name it exactly \`.env.local\` (with the dot at the start).`,
+          `Click **Data API**. Copy the **Project URL** (looks like \`https://abcd.supabase.co\`). Can't see it? Click **Connect** at the top of the project page: the URL is listed there too.`,
+          `Click **API Keys** and open the **Publishable and secret API keys** tab (not the "Legacy" tab). If you see a **Create new API keys** button, click it first. Copy the **Publishable key** (\`sb_publishable_...\`).`,
+          `On the same page under **Secret keys**, click the eye icon next to the \`default\` secret key and copy it (\`sb_secret_...\`). If there is none, click **+ New secret key**, name it \`${slug}-server\`, and copy it.`,
+          `In VS Code, right-click in the empty space of the file list (not inside a sub-folder) > **New File** > name it exactly \`.env.local\` (with the dot at the start). It must sit next to CLAUDE.md and package.json.`,
           `Paste the block below into it, fill in the three values after the \`=\` signs (no spaces, no quotes) and save.`,
           `Restart the dev server: Ctrl + C in the second terminal window, then \`npm run dev\`.`,
         ),
@@ -1253,6 +1346,12 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
         ]),
         warn('Never paste keys into Claude Code', `Claude does not need to see your keys to use them. If you ever paste a secret key into the chat, a screenshot or a commit, create a new one in Supabase and delete the old one.`),
         p(`**Check it worked:** in Claude Code ask "Does .env.local exist and does it contain the names NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY and SUPABASE_SECRET_KEY with non-empty values? Do not print the values." It should answer yes for all three. (The hook stops it editing the file, but it can still read names.)`),
+        mistakes([
+          { mistake: 'Windows saved it as .env.local.txt', fix: 'Notepad adds .txt. Create the file in VS Code as shown, or rename it in VS Code so the name is exactly .env.local.' },
+          { mistake: 'The file is inside app/ or another sub-folder', fix: 'Drag it in VS Code onto the empty space at the bottom of the file list so it sits in the project root.' },
+          { mistake: 'Copied the legacy anon or service_role key (starts eyJ...)', fix: 'Those still work for now, but this playbook uses the new keys. Copy the sb_publishable_ and sb_secret_ ones from the Publishable and secret API keys tab.' },
+          { mistake: 'Forgot to restart npm run dev', fix: 'Nothing in .env.local is read until npm run dev starts again. Ctrl + C, then npm run dev.' },
+        ]),
       ],
       checklist: [
         'Copy the Project URL',
@@ -1275,12 +1374,17 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
         ),
         steps(
           `Supabase > **Authentication** (left sidebar) > **Sign In / Providers**.`,
-          `Click **Email**. Turn **Confirm email** OFF. Leave **Enable Email provider** ON. Click **Save**.`,
+          `Find **Confirm email** (at the top under **User Signups**, or inside the **Email** provider panel, depending on your dashboard version). Turn it OFF. Leave **Enable Email provider** ON. Click **Save**.`,
           `Go to Authentication > **URL Configuration**.`,
           `**Site URL:** \`http://localhost:3000\`. Click **Save**.`,
           `Under **Redirect URLs** click **Add URL**, enter \`http://localhost:3000/**\` and save.`,
+          `**Check it worked:** reload the page. Confirm email is still off, Site URL shows \`http://localhost:3000\`, and the redirect list has \`http://localhost:3000/**\`.`,
         ),
         tip('You come back here twice', `In Deployment you add your Vercel URL, then your real domain. Supabase refuses to send users to any address that is not on this list.`),
+        mistakes([
+          { mistake: 'Signup works but the app says "Email not confirmed"', fix: 'Confirm email is still on, or you did not click Save. Turn it off again and save. Users created before the change stay unconfirmed: delete them in Authentication > Users and sign up again.' },
+          { mistake: 'Typed https://localhost:3000', fix: 'Local is http (no s). Fix both the Site URL and the redirect URL.' },
+        ]),
       ],
       checklist: ['Turn off Confirm email', 'Set Site URL to http://localhost:3000', 'Add http://localhost:3000/** to Redirect URLs'],
     }),
@@ -1333,7 +1437,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
         steps(
           `Quit Claude Code with \`/exit\`.`,
           `In the same terminal (inside \`${slug}\`), run the command below, replacing \`<project-ref>\` with the project ref you saved.`,
-          `Start Claude Code again with \`claude\`.`,
+          `Start Claude Code again with \`claude\`. It asks whether to use the new MCP server from \`.mcp.json\` in this project: choose **Yes** (or "Use this and all future MCP servers in this project").`,
           `Type \`/mcp\`. Select **supabase** > **Authenticate**. A browser tab opens: pick your organisation and click **Authorize**.`,
           `Back in Claude Code, \`/mcp\` should show supabase as **connected**.`,
           `Paste the verify prompt below.`,
@@ -1361,6 +1465,11 @@ Use the Supabase MCP. Do not change anything.
         ),
         p(`**Check it worked:** Claude prints your tables with "RLS on: yes" for each, and the advisor shows no ERROR level findings (WARN level items it explains are fine for now).`),
         tip('Ask Claude about your data any time', `"How many rows are in profiles?" or "Show me the last 5 errors in the auth logs" now work without you opening the dashboard.`),
+        mistakes([
+          { mistake: '/mcp does not list supabase', fix: 'You ran the add command in another folder, or inside Claude Code. /exit, cd into the project, run the command in the plain terminal, then start claude again.' },
+          { mistake: 'You left <project-ref> in the URL', fix: 'Run claude mcp remove supabase -s project, then the add command again with your real ref (no < > brackets).' },
+          { mistake: 'supabase shows "failed" or "needs authentication"', fix: 'Select it in /mcp and choose Authenticate again. Make sure you pick the organisation that owns this project in the browser.' },
+        ]),
       ],
       checklist: [
         ['Add the Supabase MCP with your project ref', 'copy:be-mcp-add'],
@@ -1394,10 +1503,15 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.
 2. lib/supabase/server.ts: async createClient() using cookies() from next/headers.
 3. lib/supabase/admin.ts: a client using SUPABASE_SECRET_KEY with
    import "server-only" at the top, so it can never be bundled for the browser.
-4. Session refresh: check the installed Next.js version in package.json. Next 16+
-   uses proxy.ts, Next 15 or earlier uses middleware.ts. Refresh the session with
-   supabase.auth.getClaims() and redirect logged-out users away from /app, /onboarding,
-   /settings and /billing to /login?next=<path>. Exclude static files and /api/stripe/webhook
+4. Session refresh: check the installed Next.js version in package.json and tell me.
+   Next 16+: a root proxy.ts that exports "async function proxy(request)".
+   Next 15 or earlier: a root middleware.ts that exports "async function middleware(request)".
+   Never create both. Put the logic in lib/supabase/proxy.ts as updateSession(request),
+   following the Supabase guide exactly (createServerClient with getAll/setAll cookies,
+   call supabase.auth.getClaims() straight after creating the client, return the
+   same response object so refreshed cookies reach the browser). Redirect logged-out
+   users away from /app, /onboarding, /settings and /billing to /login?next=<path>.
+   Exclude _next/static, _next/image, favicon, image files and /api/stripe/webhook
    from the matcher.
 5. Replace the placeholder actions in app/(auth)/actions.ts:
    - signUp: supabase.auth.signUp, then redirect to /onboarding.
@@ -1409,7 +1523,10 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.
    Show friendly errors ("Wrong email or password", "That email is already
    registered") instead of raw Supabase messages.
 6. app/auth/confirm/route.ts: handles the token_hash + type from the reset email
-   with verifyOtp and redirects to "next".
+   with verifyOtp and redirects to "next" (only allow paths that start with "/",
+   so nobody can bounce users to another site). On failure redirect to
+   /auth/auth-code-error, a simple page that says the link expired and links to
+   /forgot-password.
 7. Every server component and server action under app/(app) gets the user with
    supabase.auth.getClaims() (claims.sub is the user id). Never getSession().
 8. Save onboarding answers: fill in saveOnboarding() to update the user's row in
@@ -1432,6 +1549,9 @@ click to test sign up, log out, log in and forgot password.
           { mistake: 'Signup works but nothing appears in profiles', fix: 'The trigger that creates profiles did not run. Ask Claude to check the handle_new_user trigger with the Supabase MCP.' },
           { mistake: 'Logged-out users can still see /app', fix: 'The proxy or middleware file has the wrong name for your Next version. Ask Claude: "Check which Next.js version is installed and whether proxy.ts or middleware.ts is being called."' },
           { mistake: 'Invalid API key error', fix: 'A value in .env.local has a space or quote. Retype it, save, restart npm run dev.' },
+          { mistake: 'Error: "Your project\'s URL and Key are required"', fix: 'Next.js cannot see .env.local. Check the file is in the project root, named exactly .env.local, and restart npm run dev.' },
+          { mistake: 'The browser loops between /login and /app ("too many redirects")', fix: 'Ask Claude: "The proxy redirects in a loop. Make sure /login, /signup and /auth/* are never redirected for logged-out users, and that updateSession returns the response that carries the cookies."' },
+          { mistake: '"Email not confirmed" on login', fix: 'Confirm email is still on in Supabase. Turn it off (Turn off email confirm task), delete the test user in Authentication > Users and sign up again.' },
         ]),
       ],
       checklist: [
@@ -1444,24 +1564,23 @@ click to test sign up, log out, log in and forgot password.
     task({
       id: 'be-resend',
       title: 'Add Resend for email',
-      outcome: `${name} can send welcome emails, and Supabase sends login emails through Resend.`,
+      outcome: `${name} sends its welcome email through Resend, and password reset links work.`,
       minutes: 15,
       xp: 30,
       blocks: [
         eli5(
           'Why not let Supabase send emails?',
-          `Supabase's built-in email is for testing: it sends only a few per hour and often lands in spam. Resend is a proper email sender. You plug it into Supabase so password resets arrive fast, and ${name} uses it for its own emails too.`,
+          `Supabase's built-in email is for testing: it sends only a few per hour and only to people on your Supabase team (you). Resend is a proper email sender. ${name} uses it for welcome and billing emails now, and in Deployment you plug it into Supabase too, so login and reset emails reach every customer.`,
         ),
         steps(
-          `Resend dashboard > **API Keys** > **Create API Key**. Name: \`${slug}-dev\`. Permission: **Sending access**. Click **Add**. Copy the key (\`re_...\`).`,
-          `Open \`.env.local\` in VS Code and add the two lines below. Use \`onboarding@resend.dev\` for now: Resend lets you send from it to your own email address only, which is all you need while testing.`,
-          `Supabase > **Authentication > Emails** > **SMTP Settings** tab. Turn on **Enable Custom SMTP**.`,
-          `Fill in: **Sender email** \`onboarding@resend.dev\`, **Sender name** \`${name}\`, **Host** \`smtp.resend.com\`, **Port** \`465\`, **Username** \`resend\`, **Password** your \`re_...\` key. Click **Save changes**.`,
-          `In the same Emails section, open the **Templates** tab. Under **Reset password**, change the link to \`{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password\` and save.`,
+          `Resend dashboard > **API Keys** > **Create API Key**. Name: \`${slug}-dev\`. Permission: **Sending access**. Click **Add**. Copy the key (\`re_...\`). You only see it once.`,
+          `Open \`.env.local\` in VS Code and add the two lines below. Use \`onboarding@resend.dev\` for now: Resend lets you send from it to the email address you signed up to Resend with, which is all you need while testing.`,
+          `Leave Supabase's own email on its built-in sender for now. It delivers reset emails to your own address (you are on the Supabase team), which is enough to test. You switch it to Resend in Deployment > "Verify your sending domain in Resend", once you own a domain.`,
+          `Supabase > **Authentication > Emails** > **Templates** tab > **Reset password**. Replace the link in the message body with \`{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password\` and click **Save**.`,
           `Restart \`npm run dev\` and paste the prompt below.`,
         ),
         code('be-resend-env', '.env.local (add these lines)', 'env', `RESEND_API_KEY=\nEMAIL_FROM=${name} <onboarding@resend.dev>`),
-        keys([...resendRows('.env.local'), { name: 'SMTP password', where: 'Same re_ key', pasteInto: 'Supabase > Authentication > Emails > SMTP Settings', secret: true }]),
+        keys([...resendRows('.env.local')]),
         prompt(
           'be-resend-prompt',
           'Send the welcome email',
@@ -1482,21 +1601,28 @@ Run npm run build and show me the output.
         steps(
           `Sign up at localhost:3000/signup with **the same email you used for Resend** (onboarding@resend.dev only delivers to that address).`,
           `**Check it worked:** the welcome email arrives within a minute. Resend > **Emails** shows it as Delivered.`,
-          `Log out, click **Forgot password?**, enter that email. The reset email arrives, the link opens /reset-password, and you can save a new password.`,
+          `Log out, click **Forgot password?**, enter that email. The reset email arrives (from Supabase for now), the link opens /reset-password, and you can save a new password.`,
         ),
-        tip('Real sender address later', `In Deployment you verify your own domain in Resend, then swap \`onboarding@resend.dev\` for \`hello@yourdomain.com\` here and in Supabase SMTP.`),
+        tip('Real sender address later', `In Deployment you verify your own domain in Resend, swap \`onboarding@resend.dev\` for \`hello@yourdomain.com\`, and turn on Supabase custom SMTP through Resend.`),
+        mistakes([
+          { mistake: 'Resend error "You can only send testing emails to your own email address"', fix: 'onboarding@resend.dev only delivers to your Resend login email. Sign up with that address while testing.' },
+          { mistake: 'No welcome email and no error', fix: 'Check Resend > Emails. If nothing is listed, the send never ran: paste the npm run dev output into Claude Code. If it says Delivered, check spam.' },
+          { mistake: 'Reset link opens a page that says the link expired', fix: 'Each link works once, and email scanners sometimes click it first. Request a new one. Also check the template link is exactly as above and Save was clicked.' },
+          { mistake: 'Supabase error "Email address not authorized" for a reset', fix: 'The built-in sender only mails your Supabase team. Use your own email until custom SMTP is on (Deployment phase).' },
+        ]),
       ],
       checklist: [
         'Create a Resend API key',
         ['Add RESEND_API_KEY and EMAIL_FROM to .env.local', 'copy:be-resend-env'],
-        'Turn on custom SMTP in Supabase with smtp.resend.com',
+        'Update the Reset password email template in Supabase',
         ['Run the welcome email prompt', 'copy:be-resend-prompt'],
         'Receive the welcome email and a password reset email',
       ],
     }),
   ]
 
-  if (fns.length) {
+  const needsCli = fns.length > 0 || apis.some((a) => a.envVars.some((v) => /supabase secrets/i.test(v.pasteInto)))
+  if (needsCli) {
     tasks.push(
       task({
         id: 'be-cli',
@@ -1507,7 +1633,7 @@ Run npm run build and show me the output.
         blocks: [
           eli5(
             'What is an edge function?',
-            `An edge function is a small piece of server code that lives inside Supabase instead of in your Next.js app. It wakes up when something calls it (your app, a webhook, a schedule), does one job, and goes back to sleep. ${name} uses ${fns.length === 1 ? 'one' : fns.length} of them: ${fns.map((f) => f.name).join(', ')}.`,
+            `An edge function is a small piece of server code that lives inside Supabase instead of in your Next.js app. It wakes up when something calls it (your app, a webhook, a schedule), does one job, and goes back to sleep. ${fns.length ? `${name} uses ${fns.length === 1 ? 'one' : fns.length} of them: ${fns.map((f) => f.name).join(', ')}.` : `${name} needs the CLI to hand secret keys to Supabase.`}`,
           ),
           eli5(
             'What is the CLI?',
@@ -1516,8 +1642,8 @@ Run npm run build and show me the output.
           steps(
             `In a normal terminal window inside \`${slug}\` (not inside Claude Code), run the first command to install the CLI.`,
             `Run \`npx supabase login\`. A browser tab opens. Click **Authorize**, then come back.`,
-            `Run \`npx supabase init\` if there is no \`supabase/config.toml\` yet. Answer **N** to the VS Code settings questions.`,
-            `Run the link command with your project ref. When it asks for the database password, paste the one from your password manager (nothing shows as you paste: that is normal) and press Enter.`,
+            `Run \`npx supabase init\` if there is no \`supabase/config.toml\` yet. Answer **N** to the VS Code and IntelliJ settings questions.`,
+            `Run the link command with your project ref (the random string from your Supabase address bar, without the < >). If it asks for the database password, paste the one from your password manager (nothing shows as you paste: that is normal) and press Enter.`,
           ),
           code(
             'be-cli-cmds',
@@ -1531,7 +1657,13 @@ npx supabase link --project-ref <project-ref>
 `,
           ),
           code('be-cli-check', 'Check it worked', 'bash', `npx supabase functions list\nnpx supabase secrets list`),
-          p(`**Check it worked:** both commands print a table (it can be empty) instead of an error. \`secrets list\` shows the default \`SUPABASE_URL\` and \`SUPABASE_SERVICE_ROLE_KEY\` names.`),
+          p(`**Check it worked:** both commands print a table (it can be empty) instead of an error. \`secrets list\` usually shows the default \`SUPABASE_...\` names.`),
+          mistakes([
+            { mistake: '"Access token not provided" or "Unauthorized"', fix: 'Run npx supabase login again and finish the browser step. If the browser does not open, copy the link it prints into your browser.' },
+            { mistake: '"Cannot find project ref. Have you run supabase link?"', fix: 'You are in the wrong folder, or link did not finish. cd into your project folder (pwd to check) and run the link command again.' },
+            { mistake: 'Link fails with "password authentication failed"', fix: 'Wrong database password. Reset it in Supabase > Project Settings > Database > Reset database password, save it, and link again.' },
+            { mistake: 'Windows: "npx is not recognized" or "running scripts is disabled"', fix: 'Open a new PowerShell window after installing Node. For the scripts error run Set-ExecutionPolicy -Scope CurrentUser RemoteSigned once.' },
+          ]),
         ],
         checklist: [
           ['Install the CLI with npm', 'copy:be-cli-cmds'],
@@ -1606,10 +1738,10 @@ function paymentsPhase(app: AppDef): Phase {
         ),
         steps(
           `Log in at dashboard.stripe.com.`,
-          `Top right, make sure **Test mode** is on (or you are inside a **Sandbox**: the top bar turns orange or shows "Sandbox"). If you see neither, click your account name top left > **Switch to sandbox** > create one called \`${slug}\`.`,
-          `Click **Developers** (bottom left) > **API keys**.`,
+          `Make sure you are in a **Sandbox** or **Test mode** (the dashboard shows an orange "Sandbox" / "Test mode" banner). If not, click your account name top left > **Switch to sandbox** (or **Sandboxes** > **Create**) and make one called \`${slug}\`.`,
+          `Click **Developers** (bottom left) > **API keys**. (Newer dashboards: the search bar, type "API keys".)`,
           `Copy the **Publishable key** (\`pk_test_...\`) and click **Reveal** to copy the **Secret key** (\`sk_test_...\`).`,
-          `Open \`.env.local\` in VS Code, add the lines below with your values, and save. Leave the other two empty for now.`,
+          `Open \`.env.local\` in VS Code, add the lines below with your values, and save. Leave the other two empty for now. Restart \`npm run dev\`.`,
         ),
         code('pay-env', '.env.local (add these lines)', 'env', `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=\nSTRIPE_SECRET_KEY=\nSTRIPE_PRICE_ID=\nSTRIPE_WEBHOOK_SECRET=`),
         keys(stripeRows('.env.local', false)),
@@ -1629,7 +1761,7 @@ function paymentsPhase(app: AppDef): Phase {
           `In Stripe a product is the thing you sell (${name}) and a price is how you charge for it ($${m} every month). Your code never types the amount: it asks for the price by its ID, so you can change prices later without touching code.`,
         ),
         steps(
-          `Stripe (test mode) > **Product catalogue** (left sidebar) > **+ Add product**.`,
+          `Stripe (test mode) > **Product catalog** (left sidebar) > **+ Add product**.`,
           `**Name:** \`${name}\`. **Description:** \`${app.oneLiner}\``,
           `Under pricing pick **Recurring**. **Amount:** \`${m}.00\` **USD**. **Billing period:** **Monthly**.`,
           `Leave the free trial box empty here. The trial is set in code at checkout so you can change it without touching Stripe.`,
@@ -1637,7 +1769,7 @@ function paymentsPhase(app: AppDef): Phase {
           `Open the product. In the **Pricing** section, click the **...** next to the price > **Copy price ID**. It starts with \`price_\`.`,
           `Paste it after \`STRIPE_PRICE_ID=\` in \`.env.local\` and save. Restart \`npm run dev\`.`,
         ),
-        p(`**Check it worked:** Product catalogue shows ${name} at $${m}.00 / month, and \`.env.local\` has a \`price_...\` value.`),
+        p(`**Check it worked:** Product catalog shows ${name} at $${m}.00 / month, and \`.env.local\` has a \`price_...\` value.`),
         tip('Annual plan later', `Once people pay monthly, add a second price on the same product (Yearly, about 10 months' worth). Do not add it now: one price keeps launch simple.`),
       ],
       checklist: [`Create the ${name} product at $${m}/month`, 'Copy the price ID', 'Paste it into STRIPE_PRICE_ID in .env.local'],
@@ -1667,11 +1799,17 @@ only). Read @CLAUDE.md security rules first.
    not exist, write a migration that creates it (id text primary key, type text,
    received_at timestamptz default now()) with RLS enabled and no policies, and wait
    for my approval before applying it.
-2. lib/stripe.ts with import "server-only": a Stripe client from STRIPE_SECRET_KEY.
+2. npm install stripe. lib/stripe.ts with import "server-only": a Stripe client
+   from STRIPE_SECRET_KEY. Use the API version the installed SDK pins by default
+   and tell me which one it is.
 3. app/api/stripe/checkout/route.ts (POST):
    - Get the user with supabase.auth.getClaims(). 401 if none.
-   - Find or create a Stripe customer for the user (store stripe_customer_id on the
-     user's subscriptions row via the admin client, or reuse the existing one).
+   - If the user already has a subscription with status trialing or active, do not
+     create a second one: return the /billing URL instead.
+   - Find or create a Stripe customer for the user (email from the claims,
+     metadata.user_id; store stripe_customer_id on the user's subscriptions row via
+     the admin client, or reuse the existing one). Pass an idempotency key
+     (customer-<user_id>) so a double click never creates two customers.
    - stripe.checkout.sessions.create with:
        mode: 'subscription',
        customer: <stripe customer id>,
@@ -1699,6 +1837,12 @@ Run npm run build and show me the output.
           `You come back to /app showing "Setting up your trial...". It stays like that until the webhook exists (next task). That is correct.`,
           `In Stripe > **Customers**, your test user is listed with a **Trialing** subscription.`,
         ),
+        mistakes([
+          { mistake: 'Error "No such price"', fix: 'STRIPE_PRICE_ID is wrong, from another sandbox, or live while your keys are test. Copy the price_ ID again from the same sandbox and restart npm run dev.' },
+          { mistake: 'Error "Invalid API Key provided"', fix: 'STRIPE_SECRET_KEY must start sk_test_ and be on one line. Paste it again, save, restart npm run dev.' },
+          { mistake: 'Checkout opens but shows no trial', fix: 'The trial is set in code. Ask Claude to show you the subscription_data part of the checkout route: trial_period_days must be there.' },
+          { mistake: 'Cancel or success brings you to localhost:3001 or a 404', fix: 'NEXT_PUBLIC_SITE_URL in .env.local must be http://localhost:3000 and the dev server must run on 3000.' },
+        ]),
       ],
       checklist: [
         ['Run the checkout prompt in plan mode', 'copy:pay-checkout-prompt'],
@@ -1728,19 +1872,27 @@ Plan mode. Build the Stripe webhook at app/api/stripe/webhook/route.ts.
    stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET).
    Return 400 on a bad signature.
 2. Idempotency: insert event.id and event.type into public.stripe_events with the
-   admin client (lib/supabase/admin.ts). If the insert hits a duplicate key, return
-   200 and stop.
+   admin client (lib/supabase/admin.ts). If the insert hits a duplicate key (23505),
+   return 200 and stop. If handling the event throws after the insert, delete that
+   stripe_events row and return 500, so Stripe's retry is processed instead of
+   skipped.
 3. Handle these events. For every subscription-related event, retrieve the latest
    subscription from the Stripe API (events can arrive out of order) and upsert
    public.subscriptions by user_id (from subscription.metadata.user_id, or the
    customer lookup) with status, stripe_customer_id, stripe_subscription_id,
-   price_id, trial_end, current_period_end and cancel_at_period_end:
-   - checkout.session.completed
+   price_id, trial_end, current_period_end and cancel_at_period_end.
+   Stripe API 2025-03-31 and later: current_period_end is on
+   subscription.items.data[0].current_period_end (not on the subscription), and an
+   invoice's subscription id is invoice.parent?.subscription_details?.subscription.
+   Check the installed SDK's types and use whichever fields exist.
+   - checkout.session.completed (only when mode is 'subscription')
    - customer.subscription.created
    - customer.subscription.updated
    - customer.subscription.deleted
    - invoice.payment_failed (also send a "card failed" email with a link to /billing)
    - customer.subscription.trial_will_end (send the trial-ending email, built later)
+   Ignore any other event type with 200. If an event has no user_id and no known
+   customer (the Stripe CLI's fake test events), log "skipped: no user" and return 200.
 4. Return 200 within a few seconds. Log event type and id only, never the payload.
 5. Make sure proxy.ts / middleware.ts does not run on /api/stripe/webhook.
 6. Only this route writes public.subscriptions. Check there is no RLS insert or
@@ -1786,14 +1938,15 @@ limit 5;
           `Stripe cannot phone localhost: it is not on the internet. The Stripe CLI is a tunnel. It listens to Stripe for you and forwards each message to your laptop, so you can test the webhook before the site is live.`,
         ),
         steps(
-          `**Mac:** if you do not have Homebrew, install it with the first line of the Stripe CLI block below, then run \`brew install stripe/stripe-cli/stripe\`.`,
+          `**Mac:** if \`brew --version\` says "command not found", install Homebrew with the first line of the Stripe CLI block below. It asks for your Mac password (nothing shows as you type). At the end it prints **Next steps** with two or three lines to run: copy and run them, or \`brew\` will not be found. Then run \`brew install stripe/stripe-cli/stripe\`.`,
           `**Windows:** go to github.com/stripe/stripe-cli/releases/latest, download the file ending \`windows_x86_64.zip\`, and unzip it to \`C:\\stripe\`. In the commands below, type \`C:\\stripe\\stripe.exe\` wherever you see \`stripe\` (for example \`C:\\stripe\\stripe.exe login\`).`,
           `Run \`stripe login\`, press Enter, click **Allow access** in the browser.`,
           `Open a **third terminal window** and run the listen command. It prints \`Ready! Your webhook signing secret is whsec_...\`.`,
           `Copy that \`whsec_...\` into \`STRIPE_WEBHOOK_SECRET=\` in \`.env.local\`, save, and restart \`npm run dev\`.`,
-          `Keep the listen window open. In another window run the trigger command. The listen window shows \`--> checkout.session.completed\` and \`<-- [200]\`.`,
+          `Keep the listen window open. In another window run the trigger commands. The listen window shows lines like \`--> checkout.session.completed\` and \`<-- [200]\`. These are fake events with no ${name} user attached, so they only prove the signature check works: your handler logs "skipped: no user" and returns 200.`,
           `Now do a full real test: sign up a new test user, go through Checkout with \`4242 4242 4242 4242\`, and you should land in /app with access.`,
         ),
+        p(`You now have three terminal windows open: Claude Code, \`npm run dev\`, and \`stripe listen\`. All three stay open while you test payments locally.`),
         code(
           'pay-cli-cmds',
           'Stripe CLI',
@@ -1828,10 +1981,15 @@ stripe trigger customer.subscription.trial_will_end
             ['4000 0000 0000 9995', 'Declined for insufficient funds'],
           ],
         ),
-        tip('Skip the wait for trial end', `Stripe > Customers > your test customer > subscription > **...** > **End trial now** (or **Update subscription > Trial end**). It fires the same webhooks as a real day ${d}.`),
+        p(`**Skip the wait for trial end:** copy the subscription id (\`sub_...\`) from Stripe > Customers > your test customer, then run the command below with \`stripe listen\` still running. It ends the trial now and charges the test card, firing the same webhooks as a real day ${d}.`),
+        code('pay-cli-endtrial', 'End a test trial now', 'bash', `stripe subscriptions update sub_paste_id_here --trial-end=now`),
         mistakes([
-          { mistake: 'Listen window shows [400]', fix: 'STRIPE_WEBHOOK_SECRET does not match the whsec_ that stripe listen printed. Copy it again and restart npm run dev. It changes when you log in again.' },
+          { mistake: 'Listen window shows [400]', fix: 'STRIPE_WEBHOOK_SECRET does not match the whsec_ that stripe listen printed. Copy it again, save .env.local and restart npm run dev.' },
           { mistake: 'Listen window shows [307] or [308]', fix: 'The proxy/middleware is redirecting the webhook. Ask Claude to exclude /api/stripe/webhook from the matcher.' },
+          { mistake: 'Listen window shows [500]', fix: 'Your handler crashed. Look at the npm run dev window for the red error, paste it into Claude Code and ask for the fix. Stripe retries the event once it returns 200.' },
+          { mistake: 'Listen shows connection refused or nothing at all', fix: 'npm run dev is not running, or it is on port 3001. Start it and check it says localhost:3000.' },
+          { mistake: 'Mac: "brew: command not found" right after installing Homebrew', fix: 'Run the lines Homebrew printed under Next steps (they start with echo and eval), or close the terminal and open a new one.' },
+          { mistake: 'Windows: "stripe is not recognized"', fix: 'Use the full path, for example C:\\stripe\\stripe.exe listen --forward-to localhost:3000/api/stripe/webhook.' },
           { mistake: 'Row not created after checkout', fix: 'Paste the npm run dev window output into Claude Code and ask it to find why the upsert failed.' },
         ]),
       ],
@@ -1840,6 +1998,7 @@ stripe trigger customer.subscription.trial_will_end
         'Paste the whsec_ from stripe listen into .env.local',
         ['Fire the test events', 'copy:pay-cli-trigger'],
         'Complete a full checkout and see a trialing row',
+        ['End a test trial early and see the row turn active', 'copy:pay-cli-endtrial'],
       ],
     }),
     task({
@@ -1878,8 +2037,12 @@ Run npm run build. Then tell me how to test each status with the Stripe CLI or S
         steps(
           `Log in as a user who never went through Checkout. Visit /app: you land on /paywall.`,
           `Log in as your trialing test user: /app works and the banner shows the days left.`,
-          `In Supabase SQL Editor run \`update public.subscriptions set status = 'canceled' where user_id = '<your test user id>';\` then refresh /app: you land on /paywall. Run \`stripe trigger customer.subscription.updated\` or set it back to \`trialing\` afterwards.`,
+          `In Supabase SQL Editor run \`update public.subscriptions set status = 'canceled' where user_id = '<your test user id>';\` then refresh /app: you land on /paywall. Set it back afterwards with the same command using \`'trialing'\` instead of \`'canceled'\`.`,
         ),
+        mistakes([
+          { mistake: 'A trialing user is still sent to /paywall', fix: 'Ask Claude: "Use the Supabase MCP to show my subscriptions row, then check the RLS select policy lets a user read their own row." A missing select policy makes the row invisible, so the app thinks there is no subscription.' },
+          { mistake: '/billing or /settings is also blocked', fix: 'They must stay open so people can pay or fix their card. Ask Claude to exclude them from the paywall check in the proxy file.' },
+        ]),
       ],
       checklist: [['Run the paywall prompt', 'copy:pay-paywall-prompt'], 'Check a user with no subscription sees /paywall', 'Check a trialing user can use /app'],
     }),
@@ -1895,11 +2058,11 @@ Run npm run build. Then tell me how to test each status with the Stripe CLI or S
           `It is a billing page Stripe hosts for you. Your customer clicks "Manage billing", Stripe shows their card, invoices and a cancel button, and sends them back when done. You write zero billing screens.`,
         ),
         steps(
-          `Stripe (test mode) > **Settings** (gear, top right) > **Billing** > **Customer portal**.`,
+          `Stripe (sandbox or test mode) > **Settings** (gear, top right) > **Billing** > **Customer portal** (direct link: dashboard.stripe.com/settings/billing/portal).`,
           `Turn on: **Customers can update payment methods**, **View invoice history**, **Cancel subscriptions** (choose **At end of billing period**).`,
           `Under **Cancellation reasons** turn on the reason survey. You read these every week.`,
           `**Business information:** add your headline ("${name} billing"), and links to your privacy and terms pages (localhost URLs are fine for now).`,
-          `Click **Save changes**.`,
+          `Click **Save changes**. Saving once is required: until you do, Stripe refuses to open the portal in test mode.`,
         ),
         prompt(
           'pay-portal-prompt',
@@ -1920,8 +2083,13 @@ Run npm run build. Then tell me how to test cancel and update card.
         steps(
           `At localhost:3000/billing click **Manage billing**. The Stripe portal opens in test mode.`,
           `Click **Cancel subscription** and confirm. Come back: the billing page shows "Cancels on <date>" (the webhook updated it).`,
-          `In the portal, click **Renew subscription** to undo it.`,
+          `In the portal, click **Renew subscription** (or **Don't cancel**) to undo it. The "Cancels on" line disappears.`,
         ),
+        mistakes([
+          { mistake: 'Error "No configuration provided and your test mode default configuration has not been created"', fix: 'You have not saved the Customer portal settings in this sandbox. Open the settings page above and click Save changes.' },
+          { mistake: 'Error "No such customer"', fix: 'The stripe_customer_id belongs to another sandbox or to live mode. Sign up a fresh test user and go through checkout again.' },
+          { mistake: 'The billing page does not change after cancelling', fix: 'The webhook did not arrive. Check the stripe listen window is still running and shows customer.subscription.updated with [200].' },
+        ]),
       ],
       checklist: ['Turn on the Customer Portal in Stripe settings', ['Run the portal prompt', 'copy:pay-portal-prompt'], 'Cancel and renew a test subscription from the portal'],
     }),
@@ -1948,13 +2116,21 @@ lib/email.ts. Look up the user's email with the admin client
 (auth.admin.getUserById). If sending fails, still return 200 to Stripe.
 Also build emails/payment-failed.tsx for invoice.payment_failed with a button to /billing.
 Run npm run build, then run stripe trigger customer.subscription.trial_will_end and
-show me the npm run dev log line that confirms the send.
+show me the listen line with [200] (the fake event has no user, so it is skipped).
+Then write scripts/send-test-emails.ts that sends both emails once to my own
+test user (look them up by the email I give you) using the real code path, run it
+with npx tsx --env-file=.env.local scripts/send-test-emails.ts, and show me the
+Resend response ids. Never print keys.
 `,
         ),
         steps(
-          `Run the prompt with \`stripe listen\` still running in its window.`,
-          `**Check it worked:** Resend > **Emails** shows "Your ${name} trial ends in 3 days" as Delivered (with test events it goes to the test customer's email, so check the Resend log rather than your inbox).`,
+          `Run the prompt with \`stripe listen\` still running in its window. Give Claude the email of your test user (the one you signed up to Resend with).`,
+          `**Check it worked:** both emails arrive in your inbox, and Resend > **Emails** shows "Your ${name} trial ends in 3 days" as Delivered.`,
         ),
+        mistakes([
+          { mistake: 'Resend returns 403 "testing emails to your own email address"', fix: 'While you send from onboarding@resend.dev, the "to" address must be your Resend login email. Use that address for the test user.' },
+          { mistake: 'The trial email never sends for real customers', fix: 'Stripe sends trial_will_end only to endpoints subscribed to it. Check the event is ticked on your webhook destination in Deployment.' },
+        ]),
       ],
       checklist: [['Run the trial email prompt', 'copy:pay-trial-email-prompt'], 'Trigger trial_will_end with the Stripe CLI', 'See the email in the Resend log'],
     }),
@@ -1968,12 +2144,13 @@ show me the npm run dev log line that confirms the send.
         warn('Do this after the Deployment phase', `You need your live domain first. Come back here when ${name} is on its own domain and the test-mode checkout works there.`),
         steps(
           `Stripe > top left > **Activate payments** (or **Complete your profile**). Fill in business type, address, bank account for payouts and the statement descriptor (\`${name.toUpperCase().slice(0, 22)}\`).`,
-          `Switch Test mode **off**. Recreate the product: Product catalogue > **+ Add product** > \`${name}\`, Recurring, $${m}.00 USD, Monthly. Copy the new live \`price_...\`.`,
+          `Leave the sandbox: account menu top left > your main account (or switch Test mode **off**). The banner disappears: you are live. Recreate the product: Product catalog > **+ Add product** > \`${name}\`, Recurring, $${m}.00 USD, Monthly. Copy the new live \`price_...\`.`,
           `Settings > Billing > **Customer portal**: turn on the same options as test mode (live mode has its own settings) and save.`,
-          `Developers > **Webhooks** > **+ Add destination** > events: checkout.session.completed, customer.subscription.created, customer.subscription.updated, customer.subscription.deleted, invoice.payment_failed, customer.subscription.trial_will_end > **Webhook endpoint** > URL \`https://yourdomain.com/api/stripe/webhook\` > **Create destination**.`,
-          `Open the new endpoint and click **Reveal** under **Signing secret**. Copy the live \`whsec_...\`. This is a different secret from test mode.`,
-          `Developers > **API keys**: copy the live \`pk_live_...\` and \`sk_live_...\`.`,
-          `Vercel > your project > **Settings > Environment Variables**: edit the four Stripe variables for **Production** only with the live values. Then **Deployments** > the latest > **...** > **Redeploy**.`,
+          `Developers > **Webhooks** > **+ Add destination** > **Your account** > select events: checkout.session.completed, customer.subscription.created, customer.subscription.updated, customer.subscription.deleted, invoice.payment_failed, customer.subscription.trial_will_end > **Continue** > **Webhook endpoint** > **Continue** > URL \`https://yourdomain.com/api/stripe/webhook\` > **Create destination**.`,
+          `Open the new destination and click **Reveal** under **Signing secret**. Copy the live \`whsec_...\`. This is a different secret from test mode.`,
+          `Developers > **API keys**: copy the live \`pk_live_...\` and click **Reveal** for \`sk_live_...\`. (Stripe may ask you to confirm with your password or a code.)`,
+          `Vercel > your project > **Settings > Environment Variables**. For each of the four Stripe variables: click **...** > **Edit**, untick **Production** so the test value stays on Preview and Development, and save. Then **Add New** with the same name, the live value, and **Production** ticked only.`,
+          `Vercel > **Deployments** > the latest Production one > **...** > **Redeploy**. Live values only reach a new deployment.`,
           `Buy ${name} yourself on the live site with your own card. Check public.subscriptions shows \`trialing\`. Then cancel in the portal and refund any charge in Stripe > Payments.`,
         ),
         keys(stripeRows('Vercel env (Production only)', true)),
@@ -1981,6 +2158,8 @@ show me the npm run dev log line that confirms the send.
           { mistake: 'Live checkout works but users never get access', fix: 'STRIPE_WEBHOOK_SECRET in Vercel still holds the test whsec_. Copy the live endpoint secret, save, redeploy.' },
           { mistake: 'Checkout says "No such price"', fix: 'STRIPE_PRICE_ID is still the test price. Use the live price_ ID.' },
           { mistake: 'Changed env vars but nothing changed', fix: 'Vercel only applies env changes to new deployments. Redeploy.' },
+          { mistake: 'Customer portal says it is not configured', fix: 'Live mode has its own portal settings. Settings > Billing > Customer portal in live mode, turn the options on and Save.' },
+          { mistake: 'Vercel says a variable with that name already exists', fix: 'The old one still has Production ticked. Edit it, untick Production, save, then add the live one.' },
         ]),
       ],
       checklist: ['Activate your Stripe account', 'Recreate the product and price in live mode', 'Create the live webhook endpoint and copy its whsec_', 'Swap Production env vars on Vercel and redeploy', 'Make one real purchase and refund it'],
@@ -2038,22 +2217,33 @@ function deployPhase(app: AppDef): Phase {
     }),
     task({
       id: 'dep-git',
-      title: 'Install git',
-      outcome: 'git --version prints a version number.',
+      title: 'Install git and set your name',
+      outcome: 'git --version prints a version number and git knows who you are.',
       minutes: 5,
       xp: 10,
       blocks: [
-        eli5('What is git?', `git is the save-history tool on your computer. GitHub is where those saves get uploaded. Claude Code runs git for you, it only needs to be installed.`),
+        eli5('What is git?', `git is the save-history tool on your computer. GitHub is where those saves get uploaded. Claude Code runs git for you, it only needs to be installed and told your name once.`),
         steps(
-          `**Mac:** run the command below. A pop-up asks to install the command line developer tools. Click **Install** and wait (5 to 15 minutes).`,
+          `**Mac:** run the command below. A pop-up asks to install the command line developer tools. Click **Install** and wait (5 to 15 minutes). If it says "already installed", you are done with this step.`,
           `**Windows:** you installed Git for Windows in Setup. If you skipped it, download it from git-scm.com/downloads/win and click Next through the installer.`,
           `Open a new terminal and run \`git --version\`.`,
+          `Tell git your name and email (use the email you will use for GitHub). Without this, the first commit fails with "Please tell me who you are".`,
         ),
         code('dep-git-mac', 'Mac only', 'bash', `xcode-select --install`),
         code('dep-git-check', 'Check it worked', 'bash', `git --version`),
         p(`You should see something like \`git version 2.47.0\`.`),
+        code(
+          'dep-git-identity',
+          'Terminal (Mac and Windows): put your own name and email in the quotes',
+          'bash',
+          `
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git config --global init.defaultBranch main
+`,
+        ),
       ],
-      checklist: [['Install git for your system', 'copy:dep-git-mac'], ['Run git --version', 'copy:dep-git-check']],
+      checklist: [['Install git for your system', 'copy:dep-git-mac'], ['Run git --version', 'copy:dep-git-check'], ['Set your git name and email', 'copy:dep-git-identity']],
     }),
     task({
       id: 'dep-push',
@@ -2067,11 +2257,12 @@ function deployPhase(app: AppDef): Phase {
           `.gitignore is a "do not pack" list. Files on it never leave your computer. \`.env.local\` (your keys) is on it, so your secrets never reach GitHub even though everything else does.`,
         ),
         steps(
-          `Install the GitHub CLI so Claude can log in for you. **Mac:** \`brew install gh\`. **Windows:** \`winget install --id GitHub.cli\`. Open a new terminal afterwards.`,
-          `Run \`gh auth login\`. Choose **GitHub.com** > **HTTPS** > **Yes** (authenticate git) > **Login with a web browser**. Copy the one-time code it shows, press Enter, paste the code in the browser and click **Authorize**.`,
-          `Back in Claude Code, paste the prompt below with your repo URL.`,
+          `Install the GitHub CLI so git can log in for you. **Mac:** \`brew install gh\` (you installed Homebrew in the Payments phase). **Windows:** \`winget install --id GitHub.cli\`. Close the terminal and open a new one afterwards.`,
+          `Run \`gh auth login\` in a normal terminal (not inside Claude Code). Choose **GitHub.com** > **HTTPS** > **Yes** (authenticate Git with your GitHub credentials) > **Login with a web browser**. Copy the one-time code it shows, press Enter, paste the code in the browser and click **Authorize**.`,
+          `Run \`gh auth status\`. It should say **Logged in to github.com account <your username>**.`,
+          `Back in Claude Code, paste the prompt below.`,
         ),
-        code('dep-gh-login', 'Terminal', 'bash', `gh auth login`),
+        code('dep-gh-login', 'Terminal', 'bash', `gh auth login\ngh auth status`),
         prompt(
           'dep-push-prompt',
           'Commit and push',
@@ -2084,11 +2275,14 @@ Put this project on GitHub.
 3. Run git status and show me the list of files that will be committed. Stop and
    warn me if .env.local, any file containing sb_secret_, sk_test_, sk_live_,
    whsec_ or re_ keys is in the list.
-4. Search the files to be committed for those prefixes with grep and show me the
-   command and the result (it must be empty).
+4. Search the files to be committed for real keys with
+   git grep -nE "sb_secret_[A-Za-z0-9_]{10,}|sk_(test|live)_[A-Za-z0-9]{10,}|whsec_[A-Za-z0-9]{10,}|re_[A-Za-z0-9]{20,}"
+   (after git add, with --cached) and show me the command and the result. It must
+   be empty. Names of variables are fine, values are not.
 5. git add -A, then commit with the message "Initial ${name} build".
 6. git remote add origin https://github.com/<my-username>/${slug}.git
-   (ask me for my username if you cannot get it from gh api user).
+   (get my username with gh api user --jq .login, or ask me). If origin already
+   exists, use git remote set-url instead.
 7. git push -u origin main and show me the output.
 `,
         ),
@@ -2097,8 +2291,15 @@ Put this project on GitHub.
           `**Check it worked:** there is NO \`.env.local\` file in the list on GitHub. If there is, tell Claude immediately: it must remove it from git and you must create new keys in every service.`,
         ),
         tip('From now on', `After every finished task say: "Commit with a clear message and push". That is your save button.`),
+        mistakes([
+          { mistake: '"Please tell me who you are"', fix: 'Run the git config lines from "Install git and set your name", then ask Claude to commit again.' },
+          { mistake: '"remote origin already exists"', fix: 'Ask Claude: "Run git remote set-url origin <my repo URL> and push again."' },
+          { mistake: '"Updates were rejected" or "failed to push some refs"', fix: 'The GitHub repo is not empty (a README was added). Ask Claude: "Pull with --rebase --allow-unrelated-histories from origin main, keep my files, then push."' },
+          { mistake: '"Permission denied" or "Authentication failed"', fix: 'Run gh auth login again and answer Yes to "Authenticate Git with your GitHub credentials". Then gh auth setup-git, and push again.' },
+          { mistake: 'Mac: "brew: command not found"', fix: 'Homebrew is not installed or not on your PATH. Install it from brew.sh and run the Next steps lines it prints, then open a new terminal.' },
+        ]),
       ],
-      checklist: [['Log in with gh auth login', 'copy:dep-gh-login'], ['Run the commit and push prompt', 'copy:dep-push-prompt'], 'See your code on GitHub', 'Confirm .env.local is NOT on GitHub'],
+      checklist: [['Log in with gh auth login and check gh auth status', 'copy:dep-gh-login'], ['Run the commit and push prompt', 'copy:dep-push-prompt'], 'See your code on GitHub', 'Confirm .env.local is NOT on GitHub'],
     }),
     task({
       id: 'dep-vercel',
@@ -2117,8 +2318,8 @@ Put this project on GitHub.
           `Under **Import Git Repository**, click **Install** or **Adjust GitHub App Permissions** if \`${slug}\` is not listed. Give Vercel access to the \`${slug}\` repo only.`,
           `Click **Import** next to \`${slug}\`.`,
           `**Framework Preset** shows **Next.js** automatically. Leave Root Directory, Build and Output settings as they are.`,
-          `Open **Environment Variables**. Open your \`.env.local\` in VS Code, select everything, copy, and paste it into the first **Key** box: Vercel splits it into one row per variable. Check every row in the table below is there.`,
-          `Change \`NEXT_PUBLIC_SITE_URL\` to \`https://${slug}.vercel.app\` (you fix it after the first deploy if Vercel gives a different URL).`,
+          `Open **Environment Variables**. Open your \`.env.local\` in VS Code, select everything, copy, and paste it into the first **Key** box: Vercel splits it into one row per variable. Check every row in the table below is there, with no quotes around values.`,
+          `Change \`NEXT_PUBLIC_SITE_URL\` to \`https://${slug}.vercel.app\` (you fix it after the first deploy if Vercel gives a different URL). \`NEXT_PUBLIC_\` values are baked in at build time, so a wrong one needs a redeploy, not only a save.`,
           `Click **Deploy**. Wait two to four minutes for the confetti.`,
           `Click **Continue to Dashboard**, then the **Visit** button. Your landing page loads on a \`.vercel.app\` address.`,
         ),
@@ -2127,7 +2328,9 @@ Put this project on GitHub.
         mistakes([
           { mistake: 'Build failed', fix: 'Vercel > Deployments > the failed one > Build Logs. Copy the red lines into Claude Code: "My Vercel build failed with this. Fix it, run npm run build locally, commit and push."' },
           { mistake: 'Page loads but signup errors', fix: 'An env var is missing or misspelt. Compare Vercel > Settings > Environment Variables with the table above.' },
-          { mistake: 'URL is different from what you typed in NEXT_PUBLIC_SITE_URL', fix: 'Copy the real URL from the project dashboard, edit the variable, then Deployments > ... > Redeploy.' },
+          { mistake: 'URL is different from what you typed in NEXT_PUBLIC_SITE_URL', fix: 'Copy the real URL from the project dashboard (the shortest .vercel.app one under Domains), edit the variable, then Deployments > ... > Redeploy.' },
+          { mistake: 'Vercel does not list your repo', fix: 'Click Adjust GitHub App Permissions, pick your GitHub account, choose Only select repositories, add the repo, Save. Back in Vercel, refresh.' },
+          { mistake: 'Build works locally but Vercel says a module is missing', fix: 'A file was never committed, or a filename differs only in capital letters (Mac ignores case, Vercel does not). Ask Claude to check git status and the import names, then push.' },
         ]),
         links([{ label: 'Vercel sign up', url: 'https://vercel.com/signup' }]),
       ],
@@ -2141,8 +2344,8 @@ Put this project on GitHub.
       xp: 30,
       blocks: [
         steps(
-          `**Supabase:** Authentication > **URL Configuration** > Redirect URLs > **Add URL** > \`https://${slug}.vercel.app/**\` (use your real Vercel URL). Save. Leave the Site URL as localhost until you have a domain.`,
-          `**Stripe (test mode):** Developers > **Webhooks** > **+ Add destination**. Select the events: checkout.session.completed, customer.subscription.created, customer.subscription.updated, customer.subscription.deleted, invoice.payment_failed, customer.subscription.trial_will_end. Choose **Webhook endpoint**, URL \`https://${slug}.vercel.app/api/stripe/webhook\`, click **Create destination**.`,
+          `**Supabase:** Authentication > **URL Configuration** > Redirect URLs > **Add URL** > \`https://${slug}.vercel.app/**\` (use your real Vercel URL). Save. Leave the Site URL as localhost until you have a domain (reset-password emails use the Site URL, so on the live site they point at localhost until the domain step. If you are not buying a domain, set Site URL to your Vercel URL now).`,
+          `**Stripe (sandbox):** Developers > **Webhooks** > **+ Add destination** > **Your account**. Select the events: checkout.session.completed, customer.subscription.created, customer.subscription.updated, customer.subscription.deleted, invoice.payment_failed, customer.subscription.trial_will_end > **Continue**. Choose **Webhook endpoint** > **Continue**, URL \`https://${slug}.vercel.app/api/stripe/webhook\` (your real Vercel URL), click **Create destination**.`,
           `Open that endpoint, click **Reveal** under **Signing secret**, copy the \`whsec_...\`.`,
           `**Vercel:** project > **Settings** > **Environment Variables** > \`STRIPE_WEBHOOK_SECRET\` > **Edit** > paste > **Save**.`,
           `Vercel > **Deployments** > the top one > **...** > **Redeploy**. Env changes only apply to new deployments.`,
@@ -2156,6 +2359,8 @@ Put this project on GitHub.
         mistakes([
           { mistake: 'Webhook endpoint shows 401 or 307', fix: 'The proxy/middleware is catching /api/stripe/webhook. Ask Claude to exclude it from the matcher, push, and click Resend on the failed event in Stripe.' },
           { mistake: 'Login on the live URL sends you to localhost', fix: 'NEXT_PUBLIC_SITE_URL in Vercel is still localhost, or the Vercel URL is missing from Supabase Redirect URLs.' },
+          { mistake: 'Webhook endpoint shows 400 "No signatures found"', fix: 'STRIPE_WEBHOOK_SECRET in Vercel is still the stripe listen one. Paste the endpoint\'s own whsec_ and redeploy.' },
+          { mistake: 'Webhook endpoint shows 404', fix: 'The URL has a typo or the latest deploy failed. Open https://<your-url>/api/stripe/webhook in a browser: a 405 Method Not Allowed means the route exists (good), a 404 means the path is wrong.' },
         ]),
       ],
       checklist: ['Add the Vercel URL to Supabase Redirect URLs', 'Create the Stripe test webhook for the Vercel URL', 'Paste the new whsec_ into Vercel and redeploy', 'Complete a test checkout on the live URL'],
@@ -2193,27 +2398,30 @@ Put this project on GitHub.
         ),
         steps(
           `**Vercel:** project > **Settings** > **Domains** > type \`yourdomain.com\` > **Add**. If asked, pick the recommended option that adds both \`yourdomain.com\` and \`www.yourdomain.com\` and redirects one to the other.`,
-          `Vercel shows **Invalid Configuration** and the records it wants. Keep the tab open.`,
-          `**Porkbun:** Account > **Domain Management** > hover your domain > **DNS**.`,
-          `Delete the default parked records: every **ALIAS**, **A** or **CNAME** row pointing at \`pixie.porkbun.com\` or a \`porkbun\` address (click the trash icon on each).`,
-          `Add record 1: **Type** \`A\`, **Host** leave empty (that means the bare domain, \`@\`), **Answer** \`76.76.21.21\`, TTL default. Click **Add**.`,
-          `Add record 2: **Type** \`CNAME\`, **Host** \`www\`, **Answer** \`cname.vercel-dns.com\`. Click **Add**.`,
-          `Back on Vercel > Domains, click **Refresh** every few minutes. It usually turns to **Valid Configuration** within 5 to 30 minutes (rarely up to a few hours).`,
-          `**Check it worked:** open \`https://yourdomain.com\` in a private window. ${name} loads with a padlock in the address bar.`,
+          `Vercel shows **Invalid Configuration** and, for each domain, the exact record it wants (Type, Name, Value). Keep the tab open. **Use the values Vercel shows you.** Many projects get \`76.76.21.21\` and \`cname.vercel-dns.com\`; newer ones may show a different IP (such as \`216.198.79.1\`) or a longer project-specific CNAME. Both kinds work.`,
+          `**Porkbun:** Account > **Domain Management** > find your domain > click **DNS** (under the domain name, or in the **Details** drop-down).`,
+          `Delete Porkbun's default parked records: the **ALIAS** record on the bare domain and the **CNAME** record on \`*\` (both point at \`pixie.porkbun.com\`, Porkbun's "parked" page). Click the trash icon on each and confirm. Leave any **MX** or **TXT** rows alone (they handle email forwarding).`,
+          `Add record 1: **Type** \`A\`, **Host** leave empty (that means the bare domain, \`@\`), **Answer** the IP Vercel showed (usually \`76.76.21.21\`), TTL default. Click **Add**.`,
+          `Add record 2: **Type** \`CNAME\`, **Host** \`www\`, **Answer** the value Vercel showed (usually \`cname.vercel-dns.com\`). Click **Add**.`,
+          `Back on Vercel > Domains, click **Refresh** every few minutes. It usually turns to **Valid Configuration** within 5 to 30 minutes (rarely up to a few hours). Vercel then issues the free SSL certificate by itself.`,
+          `**Check it worked:** open \`https://yourdomain.com\` and \`https://www.yourdomain.com\` in a private window. Both load ${name} (one redirects to the other) with a padlock in the address bar.`,
         ),
         table(
           ['Type', 'Host (Porkbun)', 'Answer', 'Why'],
           [
-            ['A', '(empty, means @)', '76.76.21.21', 'yourdomain.com goes to Vercel'],
-            ['CNAME', 'www', 'cname.vercel-dns.com', 'www.yourdomain.com goes to Vercel'],
+            ['A', '(empty, means @)', '76.76.21.21 (or the IP Vercel shows)', 'yourdomain.com goes to Vercel'],
+            ['CNAME', 'www', 'cname.vercel-dns.com (or the value Vercel shows)', 'www.yourdomain.com goes to Vercel'],
           ],
         ),
         mistakes([
-          { mistake: 'Still Invalid Configuration after an hour', fix: 'A parked Porkbun record is still there. Delete every record pointing at porkbun, keep only your two new ones (and any Resend ones later).' },
+          { mistake: 'Still Invalid Configuration after an hour', fix: 'A parked Porkbun record is still there. Delete the ALIAS and wildcard (*) CNAME rows pointing at pixie.porkbun.com, keep only your two new ones (and any MX/TXT rows).' },
+          { mistake: 'Porkbun says a record already exists for that host', fix: 'You cannot have an ALIAS and an A on the bare domain, or two CNAMEs on www. Delete the old one first, then add yours.' },
           { mistake: 'Typed yourdomain.com in the Host box', fix: 'Porkbun adds the domain itself. Host is empty for the A record and www for the CNAME.' },
+          { mistake: 'Put https:// or a trailing dot in the Answer box', fix: 'Answer is only the IP (76.76.21.21) or the host name (cname.vercel-dns.com). Edit the record and remove the extra.' },
+          { mistake: 'Your browser still shows the Porkbun parked page', fix: 'Your computer remembers the old answer. Try a private window or your phone on mobile data, or wait an hour.' },
         ]),
       ],
-      checklist: ['Add the domain in Vercel > Settings > Domains', 'Delete the Porkbun parked records', 'Add A @ 76.76.21.21 and CNAME www cname.vercel-dns.com', 'See Valid Configuration in Vercel'],
+      checklist: ['Add the domain in Vercel > Settings > Domains', 'Delete the Porkbun parked ALIAS and * CNAME records', 'Add the A record for @ and the CNAME for www with Vercel\'s values', 'See Valid Configuration in Vercel'],
     }),
     task({
       id: 'dep-domain-urls',
@@ -2234,7 +2442,7 @@ Put this project on GitHub.
         steps(
           `**Vercel:** Settings > Environment Variables > \`NEXT_PUBLIC_SITE_URL\` > Edit > \`https://yourdomain.com\` (no slash at the end) > Save.`,
           `**Supabase:** Authentication > URL Configuration > **Site URL** \`https://yourdomain.com\` > Save. Add Redirect URL \`https://yourdomain.com/**\`. Keep the localhost one for building.`,
-          `**Stripe (test):** Developers > Webhooks > your Vercel endpoint > **...** > **Update details** > change the URL to \`https://yourdomain.com/api/stripe/webhook\` > Save. (The signing secret stays the same.)`,
+          `**Stripe (test):** Developers > Webhooks > your Vercel endpoint > **...** > **Edit destination** (older dashboards: **Update details**) > change the URL to \`https://yourdomain.com/api/stripe/webhook\` > Save. (The signing secret stays the same.)`,
           `**Stripe:** Settings > Billing > Customer portal > update the privacy and terms links to your domain.`,
           `**Vercel:** Deployments > top one > **...** > **Redeploy**.`,
           `**Check it worked:** on https://yourdomain.com sign up, reset your password (the email link must open yourdomain.com, not localhost), and do a test checkout.`,
@@ -2260,9 +2468,12 @@ Put this project on GitHub.
           `In Porkbun > Domain Management > DNS, add each one. Copy **Host** and **Value** from Resend with the copy buttons. In Porkbun's Host box enter only the part before your domain (\`send\`, \`resend._domainkey\`, \`_dmarc\`). For the MX record set **Priority** to \`10\`.`,
           `Back in Resend click **Verify DNS Records**. Wait until every row shows **Verified** (minutes to an hour).`,
           `In Vercel, edit \`EMAIL_FROM\` to \`${name} <hello@yourdomain.com>\`, save, redeploy.`,
-          `In Supabase > Authentication > Emails > **SMTP Settings**, change **Sender email** to \`hello@yourdomain.com\` and save.`,
-          `**Check it worked:** sign up on the live site with an address that is NOT your Resend login (a friend's or a second Gmail). The welcome email arrives in the inbox, from hello@yourdomain.com.`,
+          `Resend > **API Keys** > **Create API Key**: name \`${slug}-supabase-smtp\`, **Sending access**, domain \`yourdomain.com\`. Copy the \`re_...\` key. (A separate key means you can rotate one without breaking the other.)`,
+          `Supabase > **Authentication > Emails** > **SMTP Settings** tab. Turn on **Enable Custom SMTP** and fill in: **Sender email** \`hello@yourdomain.com\`, **Sender name** \`${name}\`, **Host** \`smtp.resend.com\`, **Port** \`465\`, **Username** \`resend\`, **Password** the \`re_...\` key you made in the step above. Click **Save changes**.`,
+          `Supabase > **Authentication > Rate Limits**: custom SMTP starts at 30 emails per hour. Raise **Rate limit for sending emails** to 100 or more and save.`,
+          `**Check it worked:** sign up on the live site with an address that is NOT your Resend login (a friend's or a second Gmail). The welcome email arrives in the inbox, from hello@yourdomain.com. Then click **Forgot password?** with that address: the reset email arrives too, also from hello@yourdomain.com, and shows in Resend > **Emails**.`,
         ),
+        keys([{ name: 'SMTP password', where: 'Resend > API Keys > the re_ key you made for Supabase', pasteInto: 'Supabase > Authentication > Emails > SMTP Settings', secret: true }]),
         table(
           ['Type', 'Porkbun Host', 'Value', 'Job'],
           [
@@ -2273,8 +2484,14 @@ Put this project on GitHub.
           ],
         ),
         tip('Copy, do not type', `Always copy values from Resend's screen, the table above shows the shape only. One missing character in the DKIM key and it fails.`),
+        mistakes([
+          { mistake: 'Resend shows "send.yourdomain.com.yourdomain.com" or never verifies', fix: 'You pasted the full host into Porkbun. Edit the record so Host is only send, resend._domainkey or _dmarc.' },
+          { mistake: 'The MX record will not save', fix: 'Porkbun wants the priority in its own box (10) and only the server name in Answer, without the number in front.' },
+          { mistake: 'You already have an SPF TXT record on send', fix: 'A host can only have one SPF record. Merge them into one line, or delete the old one if you never set up email on that subdomain.' },
+          { mistake: 'Supabase reset emails stop arriving after turning on SMTP', fix: 'Check the Sender email is on your verified domain, the password is a re_ key (not your Resend login password), port 465, user resend. Supabase > Logs > Auth shows the SMTP error.' },
+        ]),
       ],
-      checklist: ['Add your domain in Resend', 'Add the MX, SPF, DKIM (and DMARC) records in Porkbun', 'See Verified on every Resend record', 'Switch EMAIL_FROM and Supabase SMTP sender to your domain'],
+      checklist: ['Add your domain in Resend', 'Add the MX, SPF, DKIM (and DMARC) records in Porkbun', 'See Verified on every Resend record', 'Switch EMAIL_FROM to your domain and turn on Supabase custom SMTP via Resend'],
     }),
     task({
       id: 'dep-autodeploy',
@@ -2338,8 +2555,10 @@ argument-hint: "[optional table name]"
    uses \`for all\`, \`true\`, or raw_user_meta_data, whether UPDATE policies have
    both using and with check, and whether filtered columns are indexed.
 3. Run the Supabase security advisor (get_advisors) and include its findings.
-4. Test as an anonymous visitor: query each table over REST with only the
-   publishable key and report row counts. Anything other than 0 is a finding,
+4. Test as an anonymous visitor: query each table over REST at
+   https://<ref>.supabase.co/rest/v1/<table>?select=* with the headers
+   "apikey: <publishable key>" and "Authorization: Bearer <publishable key>" (the
+   same key in both, as supabase-js sends it) and report row counts. Anything other than 0 is a finding,
    unless the table is meant to be public.
 5. Output a table: table | issue | severity | fix. Write fixes as a new migration
    file but do not apply it.
@@ -2466,7 +2685,12 @@ npm run build after each fix, and show me the output.
           `Rerun both advisors.`,
         ),
         links([{ label: 'Supabase database advisors docs', url: 'https://supabase.com/docs/guides/database/database-advisors' }]),
-        p(`**Check it worked:** Security Advisor shows **0 errors**. Warnings like "Leaked password protection disabled" can be fixed in Authentication > Sign In / Providers > Email if your plan allows it.`),
+        p(`**Check it worked:** Security Advisor shows **0 errors**. Warnings like "Leaked password protection disabled" are a toggle (Authentication > Attack Protection, or inside the Email provider settings on older dashboards), not a migration.`),
+        mistakes([
+          { mistake: 'You cannot find Advisors in the sidebar', fix: 'Collapse and expand the left sidebar, or open the project home: the Advisors section is also linked from there. Direct link: supabase.com/dashboard/project/<ref>/advisors/security.' },
+          { mistake: 'A fix migration makes the app break', fix: 'Paste the error into Claude Code: "This advisor fix broke <page>. Write a follow-up migration that keeps the security fix and makes the page work."' },
+          { mistake: 'The same finding comes back after you fixed it', fix: 'Click Rerun linter. Results are cached until you rerun.' },
+        ]),
       ],
       checklist: ['Run the Security Advisor', 'Fix every error with Claude', 'Run the Performance Advisor and fix its items', 'Rerun until 0 errors'],
     }),
@@ -2489,7 +2713,8 @@ Use the Supabase MCP to list every table in the public schema. For each table,
 write me two curl commands I can run myself (do not run them, and use the
 placeholders <ref> and <publishable-key> instead of real values):
 1. Anonymous read: GET https://<ref>.supabase.co/rest/v1/<table>?select=*
-   with headers apikey: <publishable-key>
+   with headers apikey: <publishable-key> and Authorization: Bearer <publishable-key>
+   (the same publishable key in both; never a secret key)
 2. Logged in as user B, reading user A's rows: same URL with
    &user_id=eq.<user-A-id> (or the table's owner column), headers apikey and
    Authorization: Bearer <user-B-access-token>.
@@ -2507,17 +2732,37 @@ curl -X POST "https://<ref>.supabase.co/auth/v1/token?grant_type=password" \\
   -H "apikey: <publishable-key>" \\
   -H "Content-Type: application/json" \\
   -d '{"email":"userB@example.com","password":"userB-password"}'
-# Copy the long "access_token" value from the reply.
+# Copy the long "access_token" value from the reply (starts eyJ).
+`,
+        ),
+        code(
+          'sec-hack-token-win',
+          'Windows PowerShell: get the token and run attack 1 (one block, paste it whole)',
+          'bash',
+          `
+$ref = "<ref>"
+$key = "<publishable-key>"
+$body = @{ email = "userB@example.com"; password = "userB-password" } | ConvertTo-Json
+$auth = Invoke-RestMethod -Method Post -Uri "https://$ref.supabase.co/auth/v1/token?grant_type=password" -Headers @{ apikey = $key } -ContentType "application/json" -Body $body
+$token = $auth.access_token
+$token
+
+# Attack 1: stranger read. Expect an empty result
+Invoke-RestMethod -Uri "https://$ref.supabase.co/rest/v1/<table>?select=*" -Headers @{ apikey = $key; Authorization = "Bearer $key" }
+
+# Attack 2: user B reads user A's rows. Expect an empty result
+Invoke-RestMethod -Uri "https://$ref.supabase.co/rest/v1/<table>?select=*&user_id=eq.<user-A-id>" -Headers @{ apikey = $key; Authorization = "Bearer $token" }
 `,
         ),
         code(
           'sec-hack-curl',
-          'The attacks (Mac/Linux). Windows: use curl.exe and put each command on one line',
+          'The attacks (Mac/Linux). Windows: use the PowerShell block above, or ask Claude for Invoke-RestMethod versions of 3 and 4',
           'bash',
           `
 # 1. Stranger with only the publishable key. Expect: []
 curl "https://<ref>.supabase.co/rest/v1/<table>?select=*" \\
-  -H "apikey: <publishable-key>"
+  -H "apikey: <publishable-key>" \\
+  -H "Authorization: Bearer <publishable-key>"
 
 # 2. User B asking for user A's rows. Expect: []
 curl "https://<ref>.supabase.co/rest/v1/<table>?select=*&user_id=eq.<user-A-id>" \\
@@ -2548,6 +2793,10 @@ curl -X POST "https://<ref>.supabase.co/rest/v1/subscriptions" \\
         ),
         mistakes([
           { mistake: 'Testing with the secret key', fix: 'The secret key ignores RLS on purpose, so every test passes. Always attack with the publishable key.' },
+          { mistake: 'Every command returns 401 "Invalid API key" or "No API key found"', fix: 'The apikey header is missing or has the < > brackets still in it. Paste the sb_publishable_ key with nothing around it.' },
+          { mistake: '401 "Invalid JWT" on the user B tests', fix: 'The access token expired (they last about an hour) or was cut short when copying. Run the token command again and copy the whole eyJ... value.' },
+          { mistake: 'Windows: curl prints a big red error about parameters', fix: 'In Windows PowerShell, curl is a different tool. Use the PowerShell block, or type curl.exe instead of curl.' },
+          { mistake: 'A read returns 404 or "relation does not exist"', fix: 'The table name is wrong or it lives outside the public schema. Copy the exact name from Table Editor.' },
           { mistake: 'Seeing [] and assuming the table is safe for writes', fix: 'Reads and writes have separate policies. Run the POST tests too.' },
           { mistake: 'Trusting the success page for access', fix: 'Type /app?checkout=success into the address bar as an unpaid user. You must still hit the paywall.' },
           { mistake: 'Leaving a policy with using (true) on a private table', fix: 'That means "everyone". Replace it with (select auth.uid()) = user_id.' },
@@ -2556,7 +2805,7 @@ curl -X POST "https://<ref>.supabase.co/rest/v1/subscriptions" \\
       ],
       checklist: [
         ['Generate the attack commands', 'copy:sec-hack-prompt'],
-        ['Get user B\'s access token', 'copy:sec-hack-token'],
+        ['Get user B\'s access token (Mac/Linux block or the Windows block)', 'copy:sec-hack-token'],
         ['Run every anonymous and cross-user attack', 'copy:sec-hack-curl'],
         'Do the two-browser URL test',
         'Fix anything that returned data',
@@ -2620,8 +2869,9 @@ Add per-user rate limiting to ${name} using Supabase (no new services).
    enabled and no policies, plus a security definer function
    public.hit_rate_limit(p_bucket text, p_limit int, p_window_seconds int)
    returns boolean that uses auth.uid(), upserts the counter for the current
-   window and returns false when over the limit. Set search_path = '' on it and
-   revoke execute from anon. Show me the migration and wait for approval.
+   window and returns false when over the limit (and false when auth.uid() is null).
+   Set search_path = '' on it, revoke execute from public and anon, and grant
+   execute to authenticated only. Show me the migration and wait for approval.
 2. List every API route, server action and edge function that costs money or
    sends email (third-party API calls${app.apis.length ? ' to ' + app.apis.map((a) => a.name).join(', ') : ''}, Resend sends,
    Stripe checkout/portal creation, file uploads). Propose a limit for each
@@ -2672,12 +2922,31 @@ Then search the code for getPublicUrl and list each use.
         ),
         steps(
           `Run the prompt and approve the fixes.`,
-          `**Check it worked:** upload a file as user A. In Supabase > **Storage** > the bucket, click the file > **Get URL**. Open that URL in a private window with no login: it must fail (400 or "Object not found").`,
-          `Log in as user B and try to open user A's file link from the app: it must fail.`,
+          `Upload a file as user A in the app. In Supabase > **Storage** > the bucket, open user A's folder and note the file path (\`<user-A-id>/<filename>\`).`,
+          `**Check it worked (stranger):** run the first two commands below. Both must fail with 400 or 404 ("Object not found" or "Bucket not found"), never download the file. Do not use the dashboard's **Get URL** button for this test: it makes a signed link that is meant to work for anyone who has it.`,
+          `**Check it worked (user B):** run the third command with user B's access token from Hack yourself. It must fail too. Then log in as user B in the app and paste a link to user A's file: it must fail.`,
+        ),
+        code(
+          'sec-storage-curl',
+          'Storage attacks (Mac/Linux). Windows: replace curl with curl.exe and put each on one line',
+          'bash',
+          `
+# 1. Public link to a private file. Expect 400/404
+curl -i "https://<ref>.supabase.co/storage/v1/object/public/<bucket>/<user-A-id>/<filename>"
+
+# 2. Stranger with the publishable key. Expect 400/404
+curl -i "https://<ref>.supabase.co/storage/v1/object/<bucket>/<user-A-id>/<filename>" \\
+  -H "apikey: <publishable-key>"
+
+# 3. User B asking for user A's file. Expect 400/404
+curl -i "https://<ref>.supabase.co/storage/v1/object/authenticated/<bucket>/<user-A-id>/<filename>" \\
+  -H "apikey: <publishable-key>" \\
+  -H "Authorization: Bearer <user-B-access-token>"
+`,
         ),
         tip('No uploads in your app?', `If ${name} has no storage buckets, Claude says so. Tick this task off.`),
       ],
-      checklist: [['Run the storage audit prompt', 'copy:sec-storage-prompt'], 'Test a private file link in a logged-out window', 'Test user B cannot open user A\'s file'],
+      checklist: [['Run the storage audit prompt', 'copy:sec-storage-prompt'], ['Run the stranger storage attacks and see them fail', 'copy:sec-storage-curl'], 'Test user B cannot open user A\'s file'],
     }),
     task({
       id: 'sec-headers',
@@ -2701,7 +2970,8 @@ Then search the code for getPublicUrl and list each use.
           'Add headers',
           `
 Add security headers to ${name} in next.config (headers() for all routes):
-Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+Strict-Transport-Security: max-age=63072000; includeSubDomains (no "preload": it is
+hard to undo)
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
 Referrer-Policy: strict-origin-when-cross-origin
@@ -2711,12 +2981,21 @@ Content-Security-Policy: start in Content-Security-Policy-Report-Only mode with
 default-src 'self', and allow exactly what the app uses: the Supabase project URL
 (https and wss), js.stripe.com, checkout.stripe.com, api.stripe.com, the analytics
 script domain, fonts, and every third-party domain the app calls from the browser.
+Next.js injects inline scripts, so script-src needs 'unsafe-inline' unless you set
+up nonces in the proxy file; allow 'unsafe-eval' only in development. Add
+form-action 'self' https://checkout.stripe.com https://billing.stripe.com and
+frame-ancestors 'none'.
 List every domain you added and why.
 Run npm run build, commit and push. After I confirm nothing broke, switch the CSP
 from Report-Only to enforced in a second commit.
 `,
         ),
         links([{ label: 'securityheaders.com', url: 'https://securityheaders.com' }]),
+        mistakes([
+          { mistake: 'Grade did not change after the push', fix: 'Vercel had not finished deploying, or the scan used a cached result. Wait for Ready in Vercel > Deployments, then rescan.' },
+          { mistake: 'Checkout or the billing portal button stops working after enforcing CSP', fix: 'Copy the red Console line into Claude Code. Usually form-action or connect-src is missing a stripe.com domain.' },
+          { mistake: 'Login stops working on the live site', fix: 'connect-src must include your https://<ref>.supabase.co URL and wss://<ref>.supabase.co. Ask Claude to add them.' },
+        ]),
       ],
       checklist: ['Scan your domain on securityheaders.com', ['Run the headers prompt', 'copy:sec-headers-prompt'], 'Click through the live site for CSP errors', 'Rescan and get an A'],
     }),
@@ -2860,8 +3139,8 @@ function launchPhase(app: AppDef): Phase {
           'launch-landing-prompt',
           'Conversion pass on the landing page',
           `
-Do a conversion pass on the ${name} landing page (app/page.tsx and
-components/landing/). Check each item, show me pass/fail, then fix every fail:
+Do a conversion pass on the ${name} landing page (app/(marketing)/page.tsx or
+app/page.tsx, whichever exists, and components/landing/). Check each item, show me pass/fail, then fix every fail:
 1. Hero headline states the customer's outcome in under 10 words, not the feature.
    Sub-line says who it is for (${app.idealFor}).
 2. A demo video or GIF of the real product sits above the fold on desktop and
@@ -3021,12 +3300,21 @@ Goals to fire (once each, never twice for the same user action):
 - trial_started: on the success_url page once the subscription row is trialing.
 - paid: server side from the webhook when a subscription first becomes active
   (DataFast: connect Stripe revenue instead; PostHog: posthog-node capture).
+DataFast revenue attribution: in /api/stripe/checkout read the datafast_visitor_id
+and datafast_session_id cookies and add them to the Checkout Session metadata
+(check the current DataFast "Stripe Checkout API" docs for the exact key names).
+Update the CSP from the Security Sweep to allow the analytics script and its
+endpoint.
 - core_action: the first time a user completes the main ${name} action from the PRD.
 Do not send emails, names or any personal data as properties.
 Run npm run build, commit and push.
 `,
         ),
         tip('Add the new env vars', `Using PostHog? Add \`NEXT_PUBLIC_POSTHOG_KEY\` and \`NEXT_PUBLIC_POSTHOG_HOST\` to \`.env.local\` and Vercel, then redeploy.`),
+        mistakes([
+          { mistake: 'The dashboard shows no visits', fix: 'Ad blockers block analytics. Test in a private window with extensions off, or on your phone. Also check DevTools > Console for a Content Security Policy error on the script.' },
+          { mistake: 'Goals fire twice', fix: 'React runs effects twice in development. Check on the live site, and ask Claude to fire goals from the action that succeeded, not from a page load.' },
+        ]),
       ],
       checklist: ['Add your site in DataFast or PostHog', ['Run the analytics prompt', 'copy:launch-analytics-prompt'], 'Connect Stripe revenue (DataFast)', 'See signup and trial_started goals fire'],
     }),
