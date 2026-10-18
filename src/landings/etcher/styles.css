@@ -1,0 +1,565 @@
+/* Etcher landing. Quiet Precision marketing rules (white, hairlines, square boxes, a 1180px rail)
+   with the Etcher twist: a faint 24px square grid, slate ink, sage accent as soft fill plus edge,
+   dense data tiles and Inter Tight for big numbers. Every selector is scoped under .lp-etcher. */
+
+.lp-etcher {
+  --surface: #ffffff; --row-hover: #fafafb; --hover: #f5f5f6;
+  --hairline: #e6e6e9; --divider: #efeff1; --btn-edge: #dcdde0; --firm-edge: #9aa0a8;
+  /* slate ink */
+  --ink: #0f1623; --body: #3a4352; --muted: #5b6472; --faint: #6f7682; --ghost: #b4b8bf;
+  /* Etcher sage accent */
+  --accent: #3f9a6e; --accent-soft: #eef7f2; --accent-edge: #bfe0cd; --accent-ink: #1f5a3e;
+  --success: #27a644; --warning: #d18b0f; --danger: #eb5757; --danger-ink: #c03a3a;
+  --grid-line: rgba(15, 22, 35, 0.045);
+  --radius-box: 6px; --radius-pill: 4px;
+  --shadow-float: 0 4px 16px rgba(8, 9, 10, 0.08), 0 0 0 1px rgba(8, 9, 10, 0.04);
+  --shadow-app: 0 1px 2px rgba(15, 22, 35, 0.04), 0 12px 32px -12px rgba(15, 22, 35, 0.10);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-morph: cubic-bezier(0.2, 0, 0, 1);
+  --font: Geist, ui-sans-serif, system-ui, sans-serif;
+  --num: 'Inter Tight', Geist, ui-sans-serif, system-ui, sans-serif;
+  --mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --pad-x: 48px;
+
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: center top;
+  color: var(--body);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+  min-height: 100vh;
+}
+.lp-etcher *, .lp-etcher *::before, .lp-etcher *::after { box-sizing: border-box; }
+.lp-etcher h1, .lp-etcher h2, .lp-etcher h3, .lp-etcher p, .lp-etcher ul, .lp-etcher ol, .lp-etcher dl, .lp-etcher dd, .lp-etcher figure, .lp-etcher pre { margin: 0; padding: 0; }
+.lp-etcher ul, .lp-etcher ol { list-style: none; }
+.lp-etcher em { font-style: normal; }
+.lp-etcher a { color: inherit; text-decoration: none; }
+.lp-etcher button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; padding: 0; letter-spacing: inherit; }
+.lp-etcher :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lp-etcher section { scroll-margin-top: 72px; }
+.lp-etcher .et-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: -1px; }
+.lp-etcher .et-skip { position: absolute; left: 16px; top: -48px; z-index: 100; padding: 8px 12px; background: var(--surface); border: 1px solid var(--hairline); transition: top 0.2s; }
+.lp-etcher .et-skip:focus { top: 12px; }
+.lp-etcher .et-num { font-variant-numeric: tabular-nums; }
+.lp-etcher .et-faint { color: var(--faint); }
+.lp-etcher .et-ghost { color: var(--ghost); }
+
+/* ---------- Rail ---------- */
+.lp-etcher .et-rail { max-width: 1180px; margin: 0 auto; border-left: 1px solid var(--hairline); border-right: 1px solid var(--hairline); }
+.lp-etcher .et-wrap { width: 100%; padding: 0 var(--pad-x); }
+.lp-etcher .et-wrap > *, .lp-etcher .et-rail > * { min-width: 0; }
+
+/* ---------- Type ---------- */
+.lp-etcher .et-display { font-size: 52px; line-height: 1.04; font-weight: 500; letter-spacing: -0.045em; color: var(--ink); text-wrap: balance; }
+.lp-etcher .et-h2 { font-size: 35px; line-height: 1.12; font-weight: 500; letter-spacing: -0.035em; color: var(--ink); text-wrap: balance; }
+.lp-etcher .et-h3 { font-size: 20px; line-height: 26px; font-weight: 500; letter-spacing: -0.025em; color: var(--ink); text-wrap: balance; }
+.lp-etcher .et-lead { font-size: 16px; line-height: 26px; color: var(--body); max-width: 34em; text-wrap: pretty; }
+.lp-etcher .et-sub { font-size: 16px; line-height: 26px; color: var(--muted); max-width: 40em; text-wrap: pretty; }
+.lp-etcher .et-body { font-size: 14px; line-height: 22px; color: var(--muted); letter-spacing: -0.01em; max-width: 65ch; text-wrap: pretty; }
+.lp-etcher .et-small { font-size: 13px; line-height: 18px; color: var(--muted); }
+.lp-etcher .et-micro { font-size: 13px; line-height: 18px; color: var(--muted); letter-spacing: -0.014em; }
+.lp-etcher .et-kicker { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--accent-ink); letter-spacing: -0.014em; }
+.lp-etcher .et-bignum { font-family: var(--num); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; color: var(--ink); }
+.lp-etcher .et-head { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 40px; max-width: 680px; }
+.lp-etcher .et-head-center { align-items: center; text-align: center; margin-left: auto; margin-right: auto; }
+
+/* ---------- Pills, dots ---------- */
+.lp-etcher .et-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; height: 26px; padding: 0 10px; border-radius: var(--radius-pill);
+  background: var(--accent-soft); border: 1px solid var(--accent-edge); color: var(--accent-ink); font-size: 13px; font-weight: 500; letter-spacing: -0.014em;
+}
+.lp-etcher .et-pill { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 500; line-height: 1; border: 1px solid; white-space: nowrap; letter-spacing: -0.01em; }
+.lp-etcher .et-pill-green { background: #eef7f2; border-color: #bfe0cd; color: #1f5a3e; }
+.lp-etcher .et-pill-accent { background: var(--accent-soft); border-color: var(--accent-edge); color: var(--accent-ink); height: 24px; font-size: 12px; padding: 0 8px; }
+.lp-etcher .et-dot { position: relative; display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--accent); }
+.lp-etcher .et-dot-accent::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: var(--accent); opacity: 0; animation: et-pulse 1.4s var(--ease-out) infinite; }
+.lp-etcher .et-dot-danger { background: var(--danger); }
+.lp-etcher .et-dot-ghost { background: var(--ghost); }
+@keyframes et-pulse { 0% { transform: scale(0.6); opacity: 0.4; } 100% { transform: scale(1.9); opacity: 0; } }
+
+/* stage hues: pastel fill, darker edge, readable ink */
+.lp-etcher .et-hue-blue { --h-fill: #eef3fd; --h-edge: #c4d4f5; --h-ink: #2f4f9e; }
+.lp-etcher .et-hue-teal { --h-fill: #ecf7f7; --h-edge: #bfe3e3; --h-ink: #1f6262; }
+.lp-etcher .et-hue-green { --h-fill: #eef7f2; --h-edge: #bfe0cd; --h-ink: #1f5a3e; }
+.lp-etcher .et-hue-amber { --h-fill: #fdf6e7; --h-edge: #f1dba6; --h-ink: #7a5208; }
+.lp-etcher .et-hue-violet { --h-fill: #f3effd; --h-edge: #d5c9f3; --h-ink: #4d3a8f; }
+.lp-etcher .et-stage { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 500; background: var(--h-fill); border: 1px solid var(--h-edge); color: var(--h-ink); white-space: nowrap; }
+.lp-etcher .et-swatch { width: 10px; height: 10px; border-radius: 2px; background: var(--h-fill); border: 1px solid var(--h-edge); flex: none; }
+
+/* ---------- Buttons: white with an edge; primary has the firmer edge ---------- */
+.lp-etcher .et-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-box);
+  font-weight: 500; letter-spacing: -0.014em; white-space: nowrap; background: var(--surface); color: var(--ink);
+  border: 1px solid var(--btn-edge); transition: background 120ms, transform 120ms var(--ease-morph), box-shadow 120ms;
+}
+.lp-etcher .et-btn:hover { background: var(--hover); transform: translateY(-1px); }
+.lp-etcher .et-btn:active { transform: scale(0.98); }
+.lp-etcher .et-btn-lg { height: 46px; padding: 0 20px; font-size: 16px; }
+.lp-etcher .et-btn-md { height: 36px; padding: 0 14px; font-size: 14px; }
+.lp-etcher .et-btn-sm { height: 32px; padding: 0 10px; font-size: 13px; gap: 6px; }
+.lp-etcher .et-btn-primary { border-color: var(--firm-edge); box-shadow: 0 1px 0 rgba(15, 22, 35, 0.06); }
+.lp-etcher .et-btn-secondary { color: var(--body); }
+.lp-etcher .et-btn-arrow { color: var(--accent-ink); }
+.lp-etcher .et-cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.lp-etcher .et-cta-center { justify-content: center; }
+.lp-etcher .et-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent-ink); font-weight: 500; font-size: 14px; }
+.lp-etcher .et-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.lp-etcher .et-icon-btn { width: 32px; height: 32px; display: inline-grid; place-items: center; border-radius: var(--radius-box); border: 1px solid var(--btn-edge); background: var(--surface); color: var(--ink); }
+.lp-etcher .et-icon-btn:hover { background: var(--hover); }
+
+/* ---------- Wordmark ---------- */
+.lp-etcher .et-wordmark { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; letter-spacing: -0.03em; color: var(--ink); }
+.lp-etcher .et-mark { display: block; flex: none; }
+
+/* ---------- Nav ---------- */
+.lp-etcher .et-nav { position: sticky; top: 0; z-index: 90; height: 56px; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid transparent; transition: border-color 200ms; }
+.lp-etcher .et-nav.scrolled { border-bottom-color: var(--hairline); }
+.lp-etcher .et-nav-inner { max-width: 1180px; margin: 0 auto; height: 55px; padding: 0 var(--pad-x); display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.lp-etcher .et-nav-brand { display: inline-flex; align-items: center; height: 32px; }
+.lp-etcher .et-nav-links { display: flex; gap: 2px; }
+.lp-etcher .et-nav-link { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px; border-radius: var(--radius-box); font-size: 14px; color: var(--body); transition: background 120ms, color 120ms; }
+.lp-etcher .et-nav-link:hover, .lp-etcher .et-nav-link[aria-expanded='true'] { background: var(--hover); color: var(--ink); }
+.lp-etcher .et-chev { transition: transform 160ms var(--ease-morph); }
+.lp-etcher [aria-expanded='true'] > .et-chev, .lp-etcher [aria-expanded='true'] .et-chev { transform: rotate(180deg); }
+.lp-etcher .et-menu-wrap { position: relative; }
+.lp-etcher .et-menu { position: absolute; top: 38px; left: 0; z-index: 93; width: 180px; padding: 4px; background: var(--surface); border-radius: var(--radius-box); box-shadow: var(--shadow-float); transform-origin: top left; }
+.lp-etcher .et-menu a { display: flex; align-items: center; height: 32px; padding: 0 10px; border-radius: var(--radius-box); font-size: 13px; color: var(--body); }
+.lp-etcher .et-menu a:hover { background: var(--hover); color: var(--ink); }
+.lp-etcher .et-nav-right { display: flex; align-items: center; gap: 12px; }
+.lp-etcher .et-nav-login { font-size: 14px; color: var(--body); padding: 0 8px; }
+.lp-etcher .et-nav-login:hover { color: var(--ink); }
+.lp-etcher .et-nav-cta-sm { display: none; }
+.lp-etcher .et-burger { display: none; width: 32px; height: 32px; border-radius: var(--radius-box); border: 1px solid var(--btn-edge); place-items: center; background: var(--surface); color: var(--ink); }
+.lp-etcher .et-sheet { position: absolute; left: 0; right: 0; top: 56px; z-index: 93; background: var(--surface); border-bottom: 1px solid var(--hairline); box-shadow: 0 12px 24px -12px rgba(8, 9, 10, 0.12); padding: 8px 12px 12px; }
+.lp-etcher .et-sheet a { display: flex; align-items: center; height: 44px; padding: 0 12px; border-radius: var(--radius-box); font-size: 16px; color: var(--ink); }
+.lp-etcher .et-sheet a:hover { background: var(--hover); }
+
+/* ---------- Sections ---------- */
+.lp-etcher .et-section { padding: 80px 0; border-bottom: 1px solid var(--hairline); }
+
+/* ---------- Hero ---------- */
+.lp-etcher .et-hero { padding: 80px 0; border-bottom: 1px solid var(--hairline); overflow: hidden; position: relative; }
+.lp-etcher .et-hero::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 70% at 28% 40%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 70%); }
+.lp-etcher .et-hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); gap: 40px; align-items: center; }
+.lp-etcher .et-hero-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+.lp-etcher .et-hero-copy .et-cta-row { margin-top: 8px; }
+.lp-etcher .et-hero-visual { position: relative; padding: 28px 0 72px; }
+.lp-etcher .et-board-wrap { position: relative; }
+.lp-etcher .et-float-timeline {
+  position: absolute; top: 0; left: -20px; z-index: 3; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px 0 8px;
+  background: var(--surface); border-radius: var(--radius-box); box-shadow: var(--shadow-float); font-size: 13px; color: var(--muted); white-space: nowrap;
+}
+.lp-etcher .et-float-timeline strong { color: var(--ink); font-weight: 500; }
+.lp-etcher .et-play { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--accent-edge); background: var(--accent-soft); color: var(--accent-ink); flex: none; }
+.lp-etcher .et-float-dock { position: absolute; right: -16px; bottom: 0; z-index: 3; width: 300px; }
+
+/* ---------- App mock: board ---------- */
+.lp-etcher .et-app { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-box); box-shadow: var(--shadow-app); overflow: hidden; font-size: 12px; line-height: 16px; letter-spacing: -0.01em; color: var(--body); text-align: left; }
+.lp-etcher .et-app-bar { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 10px; border-bottom: 1px solid var(--hairline); }
+.lp-etcher .et-select, .lp-etcher .et-search, .lp-etcher .et-mini-btn { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border: 1px solid var(--btn-edge); border-radius: var(--radius-box); white-space: nowrap; }
+.lp-etcher .et-select { color: var(--ink); font-weight: 500; }
+.lp-etcher .et-search { color: var(--faint); border-color: var(--hairline); margin-left: auto; min-width: 0; }
+.lp-etcher .et-mini-btn { color: var(--ink); border-color: var(--firm-edge); font-weight: 500; }
+.lp-etcher .et-seg { display: inline-flex; height: 26px; padding: 2px; border: 1px solid var(--hairline); border-radius: var(--radius-box); }
+.lp-etcher .et-seg i { font-style: normal; padding: 0 8px; display: inline-flex; align-items: center; border-radius: 4px; color: var(--muted); }
+.lp-etcher .et-seg i.on { background: var(--accent-soft); color: var(--accent-ink); font-weight: 500; }
+.lp-etcher .et-forecast { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); height: 44px; border-bottom: 1px solid var(--hairline); }
+.lp-etcher .et-forecast > span { display: flex; flex-direction: column; justify-content: center; padding: 0 10px; border-right: 1px solid var(--divider); min-width: 0; }
+.lp-etcher .et-forecast > span:last-child { border-right: 0; }
+.lp-etcher .et-forecast em { font-size: 11px; line-height: 14px; color: var(--faint); white-space: nowrap; }
+.lp-etcher .et-forecast b { font-family: var(--num); font-size: 14px; line-height: 18px; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.lp-etcher .et-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 0.82fr); gap: 8px; padding: 10px; background: var(--row-hover); min-height: 318px; }
+.lp-etcher .et-col { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.lp-etcher .et-col-head { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 2px; }
+.lp-etcher .et-col-count { color: var(--faint); font-size: 11px; }
+.lp-etcher .et-col-total { margin-left: auto; font-family: var(--num); font-weight: 600; font-size: 12px; color: var(--ink); }
+.lp-etcher .et-col-body { display: flex; flex-direction: column; gap: 6px; }
+.lp-etcher .et-card { position: relative; display: flex; flex-direction: column; gap: 2px; min-height: 70px; padding: 8px 8px 8px 10px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-box); overflow: hidden; }
+.lp-etcher .et-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--h-edge); }
+.lp-etcher .et-edge-blue { --h-edge: #9db6ee; } .lp-etcher .et-edge-amber { --h-edge: #e7c06a; }
+.lp-etcher .et-edge-violet { --h-edge: #b5a3ea; } .lp-etcher .et-edge-green { --h-edge: #8cc7a6; }
+.lp-etcher .et-card strong { font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-etcher .et-card-co { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-etcher .et-card-foot { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 4px; font-size: 11px; color: var(--faint); }
+.lp-etcher .et-card-foot b { margin-left: auto; font-family: var(--num); font-weight: 600; color: var(--ink); font-size: 12px; }
+.lp-etcher .et-card-won { font-family: var(--num); font-weight: 600; color: var(--ink); margin-top: auto; }
+.lp-etcher .et-col-won .et-card { min-height: 56px; }
+.lp-etcher .et-late { color: var(--danger-ink); }
+.lp-etcher .et-ava { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #f3f4f6; border: 1px solid var(--btn-edge); font-style: normal; font-size: 9px; font-weight: 600; color: var(--body); flex: none; letter-spacing: 0; }
+.lp-etcher .et-ava-lg { width: 32px; height: 32px; font-size: 12px; background: var(--accent-soft); border-color: var(--accent-edge); color: var(--accent-ink); }
+
+/* ---------- Softphone dock ---------- */
+.lp-etcher .et-dock { background: var(--surface); border-radius: var(--radius-box); box-shadow: var(--shadow-float); padding: 12px; font-size: 13px; line-height: 18px; letter-spacing: -0.014em; color: var(--body); text-align: left; }
+.lp-etcher .et-dock-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 22px; }
+.lp-etcher .et-dock-state { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; color: var(--ink); }
+.lp-etcher .et-rec { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: var(--radius-pill); border: 1px solid #f3c4c4; background: #fdeeee; color: #8f2a2a; font-size: 12px; font-weight: 500; }
+.lp-etcher .et-dock-who { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+.lp-etcher .et-dock-who > span:nth-child(2) { display: flex; flex-direction: column; min-width: 0; }
+.lp-etcher .et-dock-who strong { font-weight: 500; color: var(--ink); white-space: nowrap; }
+.lp-etcher .et-dock-who em { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-etcher .et-timer { margin-left: auto; font-family: var(--num); font-size: 24px; line-height: 28px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+.lp-etcher .et-timer.et-ghost { color: var(--ghost); }
+.lp-etcher .et-dock-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.lp-etcher .et-dock-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 8px; border-radius: var(--radius-box); border: 1px solid var(--btn-edge); background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 500; white-space: nowrap; }
+.lp-etcher .et-danger { color: var(--danger-ink); border-color: #f0b4b4; }
+.lp-etcher .et-dock-morph { overflow: hidden; padding: 0; }
+.lp-etcher .et-dock-idle { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; color: var(--ink); font-weight: 500; }
+.lp-etcher .et-dock-idle .et-faint { margin-left: auto; font-weight: 400; font-size: 12px; }
+.lp-etcher .et-mini-meter { width: 40px; height: 4px; border-radius: 2px; background: var(--divider); overflow: hidden; flex: none; }
+.lp-etcher .et-mini-meter i { display: block; height: 100%; background: var(--accent); }
+.lp-etcher .et-dock-active { padding: 12px; }
+.lp-etcher .et-dock-active .et-dock-who { margin: 0 0 12px; }
+.lp-etcher .et-dock-status { display: flex; align-items: center; gap: 8px; height: 32px; font-size: 12px; color: var(--muted); }
+.lp-etcher .et-dock-hang { margin-left: auto; }
+
+/* ---------- Logo strip ---------- */
+.lp-etcher .et-logos { padding: 32px var(--pad-x); border-bottom: 1px solid var(--hairline); background: rgba(255, 255, 255, 0.7); }
+.lp-etcher .et-logos-cap { text-align: center; font-size: 13px; line-height: 18px; color: var(--muted); margin-bottom: 16px; }
+.lp-etcher .et-logos-row { display: flex; justify-content: center; }
+.lp-etcher .et-logos-row li { padding: 4px 20px; font-size: 15px; font-weight: 500; letter-spacing: -0.02em; color: var(--faint); white-space: nowrap; border-left: 1px solid var(--hairline); }
+.lp-etcher .et-logos-row li:first-child { border-left: 0; }
+
+/* ---------- Problem ---------- */
+.lp-etcher .et-pains { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--hairline); background: var(--surface); }
+.lp-etcher .et-pain { padding: 28px; border-left: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.lp-etcher .et-pain:first-child { border-left: 0; }
+.lp-etcher .et-pain p { font-size: 14px; line-height: 22px; color: var(--muted); }
+.lp-etcher .et-pain-t { font-size: 16px; line-height: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+.lp-etcher .et-icon-box { display: inline-grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--hairline); border-radius: var(--radius-box); color: var(--ink); background: var(--surface); margin-bottom: 6px; }
+.lp-etcher .et-stat { margin-top: 24px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 24px; padding: 24px 28px; background: var(--accent-soft); border: 1px solid var(--accent-edge); }
+.lp-etcher .et-stat-num { font-size: 48px; line-height: 1; color: var(--accent-ink); min-width: 3.4ch; }
+.lp-etcher .et-stat p { color: var(--ink); font-size: 18px; line-height: 26px; letter-spacing: -0.02em; text-wrap: balance; }
+.lp-etcher .et-stat strong { font-weight: 500; }
+
+/* ---------- Demo player ---------- */
+.lp-etcher .et-player { max-width: 980px; margin: 0 auto; background: var(--surface); border: 1px solid var(--hairline); }
+.lp-etcher .et-player-stage { position: relative; height: 540px; overflow: hidden; background-color: var(--row-hover); background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px); background-size: 24px 24px; }
+.lp-etcher .et-poster, .lp-etcher .et-scene { position: absolute; inset: 0; display: grid; place-items: center; padding: 32px 32px 76px; }
+.lp-etcher .et-poster { padding-bottom: 32px; }
+.lp-etcher .et-poster > .et-app { width: min(760px, 100%); opacity: 0.9; }
+.lp-etcher .et-scene-inner { width: min(480px, 100%); }
+.lp-etcher .et-scene-move, .lp-etcher .et-scene-forecast { width: min(760px, 100%); }
+.lp-etcher .et-scene-call { width: min(420px, 100%); }
+@media (min-width: 901px) { .lp-etcher .et-scene-import, .lp-etcher .et-scene-call, .lp-etcher .et-scene-wrap { transform: scale(1.22); } }
+.lp-etcher .et-caption { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); max-width: calc(100% - 32px); width: max-content; padding: 6px 12px; background: var(--surface); border: 1px solid var(--btn-edge); border-radius: var(--radius-box); font-size: 14px; line-height: 20px; color: var(--ink); text-align: center; }
+.lp-etcher .et-bigplay { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--firm-edge); color: var(--ink); box-shadow: var(--shadow-float); transition: transform 120ms var(--ease-morph); }
+.lp-etcher .et-bigplay:hover { transform: scale(1.04); }
+.lp-etcher .et-bigplay svg { margin-left: 3px; }
+.lp-etcher .et-player-bar { display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 8px; border-top: 1px solid var(--hairline); }
+.lp-etcher .et-time { font-size: 13px; color: var(--muted); min-width: 84px; }
+.lp-etcher .et-scrub { flex: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.lp-etcher .et-scrub span { height: 4px; border-radius: 2px; background: var(--divider); overflow: hidden; }
+.lp-etcher .et-scrub i { display: block; height: 100%; background: var(--accent); transform-origin: left; }
+.lp-etcher .et-chapters { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.lp-etcher .et-chapter { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-radius: var(--radius-pill); border: 1px solid var(--btn-edge); background: var(--surface); font-size: 13px; color: var(--body); transition: background 120ms; }
+.lp-etcher .et-chapter span { color: var(--faint); font-size: 12px; }
+.lp-etcher .et-chapter:hover { background: var(--hover); }
+.lp-etcher .et-chapter.on { background: var(--accent-soft); border-color: var(--accent-edge); color: var(--accent-ink); }
+.lp-etcher .et-chapter.on span { color: var(--accent-ink); }
+
+/* ---------- Feature bento ---------- */
+.lp-etcher .et-bento { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); }
+.lp-etcher .et-tile { background: var(--surface); min-width: 0; }
+.lp-etcher .et-tile-wide, .lp-etcher .et-tile-small { grid-column: span 1; }
+.lp-etcher .et-tile-full { grid-column: 1 / -1; }
+.lp-etcher .et-tile-inner { height: 100%; padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+.lp-etcher .et-tile-full .et-tile-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.1fr); align-items: start; }
+.lp-etcher .et-tile-copy { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.lp-etcher .et-tile-copy .et-ticks { margin-top: 6px; }
+.lp-etcher .et-tile-vis { min-width: 0; padding: 14px; border: 1px solid var(--hairline); border-radius: var(--radius-box); background-color: var(--row-hover); background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px); background-size: 12px 12px; }
+.lp-etcher .et-tile-wide .et-tile-vis, .lp-etcher .et-tile-small .et-tile-vis { margin-top: auto; }
+
+.lp-etcher .et-ticks { display: flex; flex-direction: column; gap: 8px; }
+.lp-etcher .et-ticks li { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 20px; color: var(--body); }
+.lp-etcher .et-tick { display: inline-grid; place-items: center; width: 16px; height: 16px; margin-top: 2px; border-radius: var(--radius-pill); background: var(--accent-soft); border: 1px solid var(--accent-edge); color: var(--accent-ink); flex: none; }
+
+.lp-etcher .et-vis { font-size: 12px; line-height: 16px; letter-spacing: -0.01em; color: var(--body); text-align: left; }
+.lp-etcher .et-panel { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-box); padding: 12px; min-width: 0; }
+.lp-etcher .et-panel-label { display: block; font-size: 11px; line-height: 14px; color: var(--faint); margin-bottom: 6px; }
+
+/* calling */
+.lp-etcher .et-vis-call { display: flex; flex-direction: column; gap: 10px; }
+.lp-etcher .et-record { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-box); }
+.lp-etcher .et-record-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--hairline); }
+.lp-etcher .et-record-head span { display: flex; flex-direction: column; min-width: 0; }
+.lp-etcher .et-record-head strong { font-size: 13px; font-weight: 500; color: var(--ink); }
+.lp-etcher .et-record-head em { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-etcher .et-fields > div { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: center; height: 32px; padding: 0 12px; border-bottom: 1px solid var(--divider); transition: background 160ms; }
+.lp-etcher .et-fields > div:last-child { border-bottom: 0; }
+.lp-etcher .et-fields dt { color: var(--faint); }
+.lp-etcher .et-fields dd { display: flex; align-items: center; gap: 8px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-etcher .et-call-ico { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: var(--radius-box); border: 1px solid var(--accent-edge); background: var(--accent-soft); color: var(--accent-ink); opacity: 0; transition: opacity 160ms; }
+.lp-etcher .et-field-hover { background: var(--row-hover); }
+.lp-etcher .et-field-hover .et-call-ico { opacity: 1; }
+.lp-etcher .et-dock-slot { height: 128px; display: flex; justify-content: flex-end; align-items: flex-start; }
+.lp-etcher .et-dock-slot .et-dock { width: 100%; max-width: 320px; }
+
+/* wrap-up */
+.lp-etcher .et-vis-wrap { display: flex; flex-direction: column; gap: 8px; }
+.lp-etcher .et-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+.lp-etcher .et-chip { display: flex; align-items: center; height: 28px; padding: 0 8px; border-radius: var(--radius-box); border: 1px solid var(--btn-edge); background: var(--surface); color: var(--body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background 160ms, border-color 160ms, color 160ms; }
+.lp-etcher .et-chip.on { background: var(--accent-soft); border-color: var(--accent-edge); color: var(--accent-ink); font-weight: 500; }
+.lp-etcher .et-note { height: 44px; padding: 6px 8px; border: 1px solid var(--btn-edge); border-radius: var(--radius-box); color: var(--ink); margin-bottom: 10px; }
+.lp-etcher .et-follow { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.lp-etcher .et-follow b { color: var(--ink); font-weight: 500; }
+.lp-etcher .et-timeline-slot { height: 44px; }
+.lp-etcher .et-tl-item { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-box); }
+.lp-etcher .et-tl-text { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.lp-etcher .et-tl-text b { color: var(--ink); font-weight: 500; white-space: nowrap; }
+.lp-etcher .et-tl-item > .et-faint { margin-left: auto; white-space: nowrap; }
+
+/* pipelines */
+.lp-etcher .et-vis-pipe { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 10px; }
+.lp-etcher .et-stage-editor { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-box); padding: 10px; }
+.lp-etcher .et-stage-editor ul { display: flex; flex-direction: column; gap: 4px; }
+.lp-etcher .et-stage-editor li { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px 0 4px; border: 1px solid var(--divider); border-radius: var(--radius-box); background: var(--surface); }
+.lp-etcher .et-stage-editor li.et-row-drag { border-color: var(--accent-edge); background: var(--accent-soft); }
+.lp-etcher .et-stage-name { color: var(--ink); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-etcher .et-pipe-right { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.lp-etcher .et-bignum-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-box); }
+.lp-etcher .et-bignum-row > span:first-child { display: flex; flex-direction: column; gap: 2px; }
+.lp-etcher .et-bignum-row em { font-size: 11px; color: var(--faint); }
+.lp-etcher .et-bignum-row .et-bignum { font-size: 26px; line-height: 30px; }
+.lp-etcher .et-delta { display: inline-flex; align-items: center; gap: 2px; height: 20px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--accent-soft); border: 1px solid var(--accent-edge); color: var(--accent-ink); font-size: 11px; font-weight: 500; min-width: 66px; justify-content: center; }
+.lp-etcher .et-mini-board { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.lp-etcher .et-mini-col { display: flex; flex-direction: column; gap: 6px; padding: 6px; min-height: 148px; border: 1px dashed transparent; border-radius: var(--radius-box); background: rgba(255, 255, 255, 0.6); transition: border-color 200ms; }
+.lp-etcher .et-mini-col.et-target { border-color: var(--accent-edge); }
+.lp-etcher .et-mini-col .et-stage { align-self: flex-start; }
+.lp-etcher .et-mini-card { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-box); }
+.lp-etcher .et-mini-card b { font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-etcher .et-mini-card span { font-family: var(--num); font-weight: 600; color: var(--muted); }
+.lp-etcher .et-mini-moving { border-color: var(--accent-edge); }
+
+/* import */
+.lp-etcher .et-import-file { display: flex; align-items: center; gap: 6px; color: var(--ink); padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--divider); }
+.lp-etcher .et-import-file .et-faint { margin-left: auto; }
+.lp-etcher .et-import-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; color: var(--ink); font-weight: 500; }
+.lp-etcher .et-import-line > span:first-child { min-width: 168px; }
+.lp-etcher .et-live { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 400; }
+.lp-etcher .et-bar { height: 8px; border-radius: 4px; background: var(--divider); overflow: hidden; margin-bottom: 12px; }
+.lp-etcher .et-bar i { display: block; height: 100%; background: var(--accent); transform-origin: left; border-radius: 4px; }
+.lp-etcher .et-counters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--divider); border-radius: var(--radius-box); }
+.lp-etcher .et-counters > div { padding: 6px 8px; border-left: 1px solid var(--divider); min-width: 0; }
+.lp-etcher .et-counters > div:first-child { border-left: 0; }
+.lp-etcher .et-counters dt { font-size: 11px; color: var(--faint); }
+.lp-etcher .et-counters dd { font-family: var(--num); font-weight: 600; font-size: 15px; line-height: 20px; color: var(--ink); }
+
+/* reports */
+.lp-etcher .et-vis-reports { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 10px; }
+.lp-etcher .et-reps table { width: 100%; border-collapse: collapse; }
+.lp-etcher .et-reps th, .lp-etcher .et-reps td { height: 32px; padding: 0 6px; text-align: right; border-bottom: 1px solid var(--divider); white-space: nowrap; font-weight: 400; }
+.lp-etcher .et-reps thead th { height: 26px; font-size: 11px; color: var(--faint); }
+.lp-etcher .et-reps th:first-child { text-align: left; padding-left: 0; }
+.lp-etcher .et-reps tbody th { color: var(--ink); }
+.lp-etcher .et-reps tbody tr:last-child > * { border-bottom: 0; }
+.lp-etcher .et-cellbar { display: inline-block; width: 44px; height: 6px; margin-right: 6px; border-radius: 3px; background: var(--divider); overflow: hidden; vertical-align: middle; }
+.lp-etcher .et-cellbar i { display: block; height: 100%; background: #9db6ee; transform-origin: left; }
+.lp-etcher .et-rev { display: flex; flex-direction: column; }
+.lp-etcher .et-rev-head { display: flex; align-items: flex-start; justify-content: space-between; }
+.lp-etcher .et-bignum-sm { font-size: 20px; line-height: 22px; }
+.lp-etcher .et-bars { flex: 1 0 auto; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; align-items: end; height: 140px; padding-top: 8px; border-bottom: 1px solid var(--hairline); }
+.lp-etcher .et-bar-col { position: relative; display: flex; align-items: flex-end; height: 100%; padding-bottom: 0; }
+.lp-etcher .et-bar-col i { display: block; width: 100%; background: #c4d4f5; border-radius: 2px 2px 0 0; transform-origin: bottom; }
+.lp-etcher .et-bar-col i.now { background: var(--accent); }
+.lp-etcher .et-bar-col em { position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 10px; color: var(--faint); }
+.lp-etcher .et-rev { padding-bottom: 26px; }
+
+/* ---------- How it works ---------- */
+.lp-etcher .et-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-bottom: 40px; }
+.lp-etcher .et-step { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.lp-etcher .et-step-top { display: flex; align-items: center; gap: 12px; height: 40px; margin-bottom: 8px; }
+.lp-etcher .et-step-n { display: inline-grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--accent-edge); background: var(--accent-soft); color: var(--accent-ink); font-family: var(--num); font-weight: 600; font-size: 18px; flex: none; }
+.lp-etcher .et-connector { flex: 1; height: 1px; background: var(--hairline); transform-origin: left; margin-right: -24px; }
+.lp-etcher .et-ascii-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
+.lp-etcher .et-ascii { background: var(--surface); border: 1px solid var(--hairline); padding: 24px; overflow: hidden; }
+.lp-etcher .et-ascii pre { font-family: var(--mono); font-size: 13px; line-height: 20px; color: var(--body); white-space: pre; letter-spacing: 0; }
+.lp-etcher .et-ascii-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+
+/* ---------- Comparison ---------- */
+.lp-etcher .et-swipe { display: none; }
+.lp-etcher .et-table-wrap { overflow-x: auto; border: 1px solid var(--hairline); background: var(--surface); }
+.lp-etcher .et-table { width: 100%; min-width: 900px; border-collapse: collapse; font-size: 14px; line-height: 20px; }
+.lp-etcher .et-table th, .lp-etcher .et-table td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--divider); font-weight: 400; }
+.lp-etcher .et-table thead th { font-weight: 500; color: var(--ink); font-size: 14px; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+.lp-etcher .et-table tbody tr:last-child > * { border-bottom: 0; }
+.lp-etcher .et-table tbody th { color: var(--ink); width: 23%; position: sticky; left: 0; background: var(--surface); z-index: 1; }
+.lp-etcher .et-table thead td { position: sticky; left: 0; background: var(--surface); z-index: 1; }
+.lp-etcher .et-table td { color: var(--muted); }
+.lp-etcher .et-table .et-us { background: var(--accent-soft); color: var(--ink); font-weight: 500; width: 15%; border-left: 1px solid transparent; border-right: 1px solid transparent; transition: border-color 300ms; }
+.lp-etcher .et-table-wrap.revealed .et-us { border-left-color: var(--accent-edge); border-right-color: var(--accent-edge); }
+.lp-etcher .et-us-head { display: inline-flex; align-items: center; gap: 8px; color: var(--accent-ink); }
+.lp-etcher .et-mark-sm { width: 8px; height: 8px; border-radius: 2px; background: var(--accent); }
+.lp-etcher .et-yes { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); }
+.lp-etcher .et-yes svg { color: var(--accent); }
+.lp-etcher .et-no, .lp-etcher .et-na { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.lp-etcher .et-no svg, .lp-etcher .et-na svg { color: var(--ghost); }
+.lp-etcher .et-foot-note { margin-top: 16px; font-size: 13px; line-height: 18px; color: var(--muted); max-width: 80ch; }
+
+/* ---------- Pricing ---------- */
+.lp-etcher .et-toggle { display: inline-flex; padding: 3px; margin-top: 12px; border: 1px solid var(--hairline); border-radius: var(--radius-box); background: var(--hover); }
+.lp-etcher .et-toggle button { position: relative; height: 34px; padding: 0 16px; border-radius: 4px; font-size: 14px; color: var(--muted); min-width: 120px; }
+.lp-etcher .et-toggle button.on { color: var(--ink); }
+.lp-etcher .et-toggle b { font-weight: 500; color: var(--accent-ink); }
+.lp-etcher .et-toggle-pill { position: absolute; inset: 0; background: var(--surface); border: 1px solid var(--btn-edge); border-radius: 4px; box-shadow: 0 1px 2px rgba(15, 22, 35, 0.06); }
+.lp-etcher .et-toggle-label { position: relative; }
+.lp-etcher .et-plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 880px; margin: 0 auto; border: 1px solid var(--hairline); background: var(--surface); }
+.lp-etcher .et-plan { display: flex; flex-direction: column; gap: 20px; padding: 32px; min-width: 0; border-left: 1px solid var(--hairline); }
+.lp-etcher .et-plan:first-child { border-left: 0; }
+.lp-etcher .et-plan-firm { box-shadow: inset 0 0 0 1px var(--firm-edge); border-left-color: transparent; }
+.lp-etcher .et-plan-head { display: flex; align-items: center; justify-content: space-between; height: 26px; }
+.lp-etcher .et-price-box { position: relative; height: 82px; }
+.lp-etcher .et-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px; }
+.lp-etcher .et-price-num { font-size: 52px; line-height: 56px; letter-spacing: -0.04em; }
+.lp-etcher .et-price-unit { font-size: 16px; color: var(--muted); }
+.lp-etcher .et-price-note { flex-basis: 100%; font-size: 13px; line-height: 18px; color: var(--muted); }
+.lp-etcher .et-plan-for { font-size: 16px; color: var(--ink); }
+.lp-etcher .et-plan .et-btn { align-self: stretch; }
+.lp-etcher .et-plans-notes { max-width: 880px; margin: 20px auto 0; display: flex; flex-direction: column; gap: 6px; text-align: center; font-size: 14px; line-height: 22px; color: var(--body); text-wrap: balance; }
+
+/* ---------- FAQ ---------- */
+.lp-etcher .et-faq-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 40px; align-items: start; }
+.lp-etcher .et-faq { border-top: 1px solid var(--hairline); }
+.lp-etcher .et-faq-item { border-bottom: 1px solid var(--hairline); }
+.lp-etcher .et-faq-item h3 { font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: -0.016em; color: var(--ink); }
+.lp-etcher .et-faq-item button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 56px; padding: 14px 0; text-align: left; }
+.lp-etcher .et-faq-item button:hover span { color: var(--accent-ink); }
+.lp-etcher .et-faq-item .et-chev { color: var(--faint); flex: none; }
+.lp-etcher .et-faq-a { overflow: hidden; }
+.lp-etcher .et-faq-a p { padding: 0 32px 18px 0; font-size: 15px; line-height: 24px; color: var(--muted); max-width: 65ch; }
+
+/* ---------- Final CTA ---------- */
+.lp-etcher .et-final-inner { display: flex; flex-direction: column; align-items: center; gap: 40px; }
+.lp-etcher .et-final .et-head { margin-bottom: 0; }
+.lp-etcher .et-final .et-cta-row { margin-top: 12px; }
+.lp-etcher .et-final-dock { width: 100%; max-width: 320px; }
+.lp-etcher .et-dock-wrap .et-dock-top { margin-bottom: 12px; }
+.lp-etcher .et-dock-wrap .et-panel-label { font-size: 12px; }
+.lp-etcher .et-dock-foot { display: flex; align-items: center; justify-content: space-between; }
+.lp-etcher .et-dock-save { border-color: var(--firm-edge); min-width: 88px; }
+
+/* ---------- Footer ---------- */
+.lp-etcher .et-footer { padding: 56px 0 96px; background: rgba(255, 255, 255, 0.7); }
+.lp-etcher .et-foot-cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; padding-bottom: 40px; border-bottom: 1px solid var(--hairline); }
+.lp-etcher .et-foot-col h2 { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--ink); margin-bottom: 12px; }
+.lp-etcher .et-foot-col h2 button { display: none; }
+.lp-etcher .et-foot-col ul { display: flex; flex-direction: column; gap: 8px; }
+.lp-etcher .et-foot-col a { font-size: 14px; line-height: 20px; color: var(--muted); }
+.lp-etcher .et-foot-col a:hover { color: var(--ink); }
+.lp-etcher .et-foot-bottom { display: flex; align-items: center; gap: 16px; padding-top: 24px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.lp-etcher .et-foot-line { margin-left: auto; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .lp-etcher .et-hero-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .lp-etcher .et-hero-visual { max-width: 760px; }
+  .lp-etcher .et-float-dock { right: 16px; }
+  .lp-etcher .et-float-timeline { left: 16px; }
+  .lp-etcher .et-tile-full .et-tile-inner { grid-template-columns: minmax(0, 1fr); }
+  .lp-etcher .et-bento { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .lp-etcher { --pad-x: 20px; }
+  .lp-etcher .et-nav-links, .lp-etcher .et-nav-login, .lp-etcher .et-nav-cta { display: none; }
+  .lp-etcher .et-nav-cta-sm { display: inline-flex; }
+  .lp-etcher .et-burger { display: inline-grid; }
+  .lp-etcher .et-section, .lp-etcher .et-hero { padding: 56px 0; }
+  .lp-etcher .et-display { font-size: 36px; line-height: 1.08; }
+  .lp-etcher .et-h2 { font-size: 28px; line-height: 1.15; }
+  .lp-etcher .et-h3 { font-size: 18px; line-height: 24px; }
+  .lp-etcher .et-head { margin-bottom: 28px; }
+
+  .lp-etcher .et-hero-visual { display: flex; flex-direction: column; gap: 12px; padding: 0; }
+  .lp-etcher .et-float-timeline, .lp-etcher .et-float-dock { position: static; width: 100%; }
+  .lp-etcher .et-float-timeline { order: -1; align-self: flex-start; width: auto; }
+  .lp-etcher .et-board-wrap { margin-right: calc(-1 * var(--pad-x)); overflow: hidden; -webkit-mask-image: linear-gradient(to right, #000 75%, transparent); mask-image: linear-gradient(to right, #000 75%, transparent); }
+  .lp-etcher .et-board-wrap .et-app { width: 700px; }
+  .lp-etcher .et-board-wrap .et-board { grid-template-columns: repeat(3, 172px) 150px; }
+  .lp-etcher .et-hide-sm { display: none !important; }
+  .lp-etcher .et-forecast { grid-template-columns: repeat(3, 120px); }
+
+  .lp-etcher .et-logos { padding: 24px 0; }
+  .lp-etcher .et-logos-row { justify-content: flex-start; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--pad-x); padding: 0 var(--pad-x); scrollbar-width: none; }
+  .lp-etcher .et-logos-row::-webkit-scrollbar { display: none; }
+  .lp-etcher .et-logos-row li { scroll-snap-align: start; font-size: 14px; padding: 4px 16px; }
+  .lp-etcher .et-logos-row li:first-child { padding-left: 0; }
+
+  .lp-etcher .et-pains { grid-template-columns: minmax(0, 1fr); }
+  .lp-etcher .et-pain { border-left: 0; border-top: 1px solid var(--hairline); padding: 20px; }
+  .lp-etcher .et-pain:first-child { border-top: 0; }
+  .lp-etcher .et-stat { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 20px; }
+  .lp-etcher .et-stat p { font-size: 16px; line-height: 24px; }
+
+  .lp-etcher .et-player-stage { height: 460px; }
+  .lp-etcher .et-poster, .lp-etcher .et-scene { padding: 16px 16px 84px; place-items: center; }
+  .lp-etcher .et-poster { padding-bottom: 16px; }
+  .lp-etcher .et-poster > .et-app, .lp-etcher .et-scene-move { width: 640px; max-width: none; justify-self: start; }
+  .lp-etcher .et-scene-move .et-board { grid-template-columns: repeat(3, 160px) 130px; }
+  .lp-etcher .et-scene-forecast .et-vis-reports { grid-template-columns: minmax(0, 1fr); }
+  .lp-etcher .et-scene-forecast .et-rev { display: none; }
+  .lp-etcher .et-caption { font-size: 13px; line-height: 18px; bottom: 14px; }
+
+  .lp-etcher .et-bento { grid-template-columns: minmax(0, 1fr); }
+  .lp-etcher .et-tile-wide, .lp-etcher .et-tile-full, .lp-etcher .et-tile-small { grid-column: span 1; }
+  .lp-etcher .et-tile-inner, .lp-etcher .et-tile-small .et-tile-inner { display: flex !important; flex-direction: column; align-items: stretch; padding: 20px; gap: 20px; }
+  .lp-etcher .et-tile-vis { order: -1; padding: 10px; }
+  .lp-etcher .et-vis-pipe, .lp-etcher .et-vis-reports { grid-template-columns: minmax(0, 1fr); }
+
+  .lp-etcher .et-steps { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .lp-etcher .et-step { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 16px; row-gap: 4px; padding-bottom: 24px; position: relative; }
+  .lp-etcher .et-step-top { grid-row: span 2; height: auto; margin: 0; flex-direction: column; align-items: center; }
+  .lp-etcher .et-step:not(:last-child)::before { content: ''; position: absolute; left: 20px; top: 40px; bottom: 0; width: 1px; background: var(--hairline); }
+  .lp-etcher .et-connector { display: none; }
+  .lp-etcher .et-ascii-row { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .lp-etcher .et-ascii { padding: 16px 12px; }
+  .lp-etcher .et-ascii pre { font-size: 11px; line-height: 17px; }
+
+  .lp-etcher .et-swipe { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 8px; font-size: 12px; color: var(--muted); transition: opacity 300ms; }
+  .lp-etcher .et-swipe.gone { opacity: 0; }
+  .lp-etcher .et-table { min-width: 760px; font-size: 13px; line-height: 18px; }
+  .lp-etcher .et-table tbody th { width: 150px; min-width: 150px; box-shadow: 1px 0 0 var(--hairline); }
+  .lp-etcher .et-table th, .lp-etcher .et-table td { padding: 10px; }
+
+  .lp-etcher .et-plans { grid-template-columns: minmax(0, 1fr); }
+  .lp-etcher .et-plan { border-left: 0; border-top: 1px solid var(--hairline); padding: 24px 20px; }
+  .lp-etcher .et-plan:first-child { border-top: 0; }
+  .lp-etcher .et-plan-firm { border-top-color: transparent; }
+  .lp-etcher .et-plans-notes { text-align: left; }
+  .lp-etcher .et-toggle button { min-width: 0; padding: 0 12px; }
+
+  .lp-etcher .et-faq-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .lp-etcher .et-faq-a p { padding-right: 0; }
+
+  .lp-etcher .et-foot-cols { grid-template-columns: minmax(0, 1fr); gap: 0; padding-bottom: 0; border-bottom: 0; }
+  .lp-etcher .et-foot-col { border-bottom: 1px solid var(--hairline); }
+  .lp-etcher .et-foot-col h2 { margin: 0; }
+  .lp-etcher .et-foot-col h2 button { display: flex; width: 100%; align-items: center; justify-content: space-between; height: 48px; font-size: 14px; }
+  .lp-etcher .et-foot-h { display: none; }
+  .lp-etcher .et-foot-col ul { display: none; padding-bottom: 16px; }
+  .lp-etcher .et-foot-col.open ul { display: flex; }
+  .lp-etcher .et-foot-line { margin-left: 0; flex-basis: 100%; }
+}
+
+@media (max-width: 420px) {
+  .lp-etcher .et-hero-copy .et-cta-row .et-btn, .lp-etcher .et-final .et-cta-row .et-btn, .lp-etcher .et-ascii-copy .et-cta-row, .lp-etcher .et-ascii-copy .et-cta-row .et-btn { width: 100%; }
+  .lp-etcher .et-hero-copy .et-cta-row, .lp-etcher .et-final .et-cta-row { width: 100%; }
+  .lp-etcher .et-btn-lg { white-space: normal; text-align: center; }
+  .lp-etcher .et-display { font-size: 36px; }
+  .lp-etcher .et-price-num { font-size: 44px; line-height: 50px; }
+  .lp-etcher .et-toggle { width: 100%; }
+  .lp-etcher .et-toggle button { flex: 1; font-size: 13px; }
+  .lp-etcher .et-fields > div { grid-template-columns: 88px minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-etcher *, .lp-etcher *::before, .lp-etcher *::after { animation: none !important; transition: none !important; }
+}
+
+.lp-etcher .et-dag { font-size: 0.8em; margin-left: 2px; color: var(--faint); vertical-align: super; line-height: 0; }

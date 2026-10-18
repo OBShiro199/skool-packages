@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Menu, X } from 'lucide-react'
 import { AuditButton, EASE, TrialButton, Wordmark, scrollToId } from './shared'
@@ -71,8 +71,7 @@ function Sheet({ onClose }: { onClose: () => void }) {
   )
 }
 
-function Nav() {
-  const [open, setOpen] = useState(false)
+function Nav({ onOpen, open }: { onOpen: () => void; open: boolean }) {
   return (
     <nav className="fc-nav" aria-label="Main">
       <div className="fc-nav-inner">
@@ -85,17 +84,18 @@ function Nav() {
         <div className="fc-nav-right">
           <a href="/login" className="fc-nav-login" onClick={(e) => e.preventDefault()}>Log in</a>
           <TrialButton location="nav" size="sm" />
-          <button type="button" className="fc-iconbtn fc-burger" aria-expanded={open} aria-label="Open menu" onClick={() => setOpen(true)}>
+          <button type="button" className="fc-iconbtn fc-burger" aria-expanded={open} aria-label="Open menu" onClick={onOpen}>
             <Menu size={18} strokeWidth={1.5} />
           </button>
         </div>
       </div>
-      <AnimatePresence>{open && <Sheet onClose={() => setOpen(false)} />}</AnimatePresence>
     </nav>
   )
 }
 
 export default function FactorieLanding() {
+  const [open, setOpen] = useState(false)
+  const close = useCallback(() => setOpen(false), [])
   useEffect(() => {
     const link = document.createElement('link')
     link.rel = 'stylesheet'
@@ -113,7 +113,8 @@ export default function FactorieLanding() {
   return (
     <div className="lp-factorie">
       <a href="#main" className="fc-skip">Skip to content</a>
-      <Nav />
+      <Nav open={open} onOpen={() => setOpen(true)} />
+      <AnimatePresence>{open && <Sheet onClose={close} />}</AnimatePresence>
       <div className="fc-rail">
         <Hero />
         <main id="main">

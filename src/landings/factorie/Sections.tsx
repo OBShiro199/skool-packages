@@ -29,23 +29,22 @@ function AsciiRank() {
   const inView = useInView(ref, { once: true, amount: 0.4 })
   const p = useCountUp(100, 900, inView) / 100
   const score = useCountUp(30.4, 900, inView, 1)
-  const lines = [
-    'rank  where you appear    score',
-    '────  ──────────────────────────────────',
-    ...RANKS.map(([r, l, v]) => {
-      const blocks = Math.round((v / 5) * p)
-      const bar = v === 0 ? '·' : '█'.repeat(blocks)
-      return `${r}   ${l}${bar.padEnd(20, ' ')} ${String(Math.round(v * p)).padStart(3, ' ')}`
-    }),
-  ]
+  const rows = RANKS.map(([r, l, v]) => {
+    const blocks = Math.round((v / 5) * p)
+    return { lead: `${r.padEnd(5, ' ')}${l} `, bar: v === 0 ? '' : '#'.repeat(blocks), rest: '.'.repeat(20 - blocks), pts: ` ${String(Math.round(v * p)).padStart(3, ' ')}` }
+  })
   return (
     <div className="fc-ascii" ref={ref}>
       <div className="fc-ascii-head">
         <span className="fc-kicker fc-mono">How one answer is scored</span>
-        <span className="fc-mono fc-label">1 block = 5 points</span>
+        <span className="fc-mono fc-label">Same rule on every engine</span>
       </div>
       <pre className="fc-pre" role="img" aria-label="ASCII chart: an answer scores 100 if you are listed first, 85 second, 70 third, 55 fourth, 40 fifth, 25 sixth, 20 seventh or lower, 60 if named outside a list, and 0 if not mentioned.">
-        {lines.join('\n')}
+        <span className="fc-pre-dim">{'rank answer          weight (# = 5 pts)    pts'}</span>{'\n'}
+        <span className="fc-pre-dim">{'─'.repeat(46)}</span>{'\n'}
+        {rows.map((r, i) => (
+          <span key={i}>{r.lead}<span className="fc-pre-bar">{r.bar}</span><span className="fc-pre-dim">{r.rest}</span><span className="fc-pre-pts">{r.pts}</span>{'\n'}</span>
+        ))}
       </pre>
       <div className="fc-ascii-ex">
         <span className="fc-mono fc-label">Worked example · 25 prompts on ChatGPT</span>

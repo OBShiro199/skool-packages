@@ -282,6 +282,7 @@ export function Features() {
   return (
     <section className="et-section" id="product" aria-label="Features">
       <div className="et-wrap">
+        <h2 className="et-sr">Features</h2>
         <div className="et-bento">
           {FEATURES.map((f, i) => (
             <Reveal key={f.id} delay={(i % 2) * 0.04} className={`et-tile et-tile-${f.size}`}>

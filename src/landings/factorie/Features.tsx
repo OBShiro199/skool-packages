@@ -56,6 +56,7 @@ const CHAPTERS: [string, string, string][] = [
   ['1:20', 'Your next page to write', 'One page to write next, with an outline.'],
 ]
 const CHAPTER_MS = 4200
+const STEP_LABELS = ['Website', 'Prompts', 'First check', 'Answers', 'Next page']
 
 function TypeText({ text, active, speed = 55 }: { text: string; active: boolean; speed?: number }) {
   const reduce = useReducedMotion()
@@ -215,6 +216,13 @@ export function Demo() {
           <div className="fc-player" ref={frame}>
             <div className="fc-player-screen" aria-hidden="true">
               <div className="fc-dots fc-dots-soft" />
+              <div className="fc-chrome">
+                <span className="fc-chrome-dots"><i /><i /><i /></span>
+                <span className="fc-mono fc-chrome-url">app.factorie.io/{chapter < 2 ? 'onboarding' : chapter === 2 ? 'runs' : chapter === 3 ? 'prompts' : 'recommendations'}</span>
+                <ol className="fc-chrome-steps fc-mono">
+                  {CHAPTERS.map((c, i) => <li key={c[0]} className={i === chapter && started ? 'is-on' : i < chapter ? 'is-done' : ''}>{STEP_LABELS[i]}</li>)}
+                </ol>
+              </div>
               {started ? (
                 <AnimatePresence mode="wait">
                   <motion.div key={chapter} className="fc-scene-wrap" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.24, ease: EASE }}>
@@ -282,8 +290,9 @@ function Leaderboard() {
   const reduce = useReducedMotion()
   const rows = ENGINES.map((e) => ({ ...e, v: BOARD[e.id][step], d: BOARD[e.id][step] - PREV[e.id] })).sort((a, b) => b.v - a.v)
   return (
-    <div className="fc-board" ref={ref} role="img" aria-label="Engines leaderboard ranking your visibility on each engine: Perplexity, ChatGPT, Claude, Gemini, DeepSeek, Grok.">
-      <div className="fc-board-head fc-mono"><span>#</span><span>Engine</span><span>Visibility</span><span className="fc-board-d">vs last wk</span></div>
+    <div className="fc-viz" ref={ref}>
+    <div className="fc-board" role="img" aria-label="Engines leaderboard ranking your visibility on each engine: Perplexity, ChatGPT, Claude, Gemini, DeepSeek, Grok.">
+      <div className="fc-board-head fc-mono"><span>#</span><span>Engine</span><span>Visibility</span><span className="fc-board-d">Change</span></div>
       <ul>
         {rows.map((r, i) => (
           <motion.li key={r.id} layout={!reduce} transition={{ layout: { duration: 0.6, ease: MORPH } }} className="fc-board-row">
@@ -300,6 +309,7 @@ function Leaderboard() {
           </motion.li>
         ))}
       </ul>
+    </div>
     </div>
   )
 }
@@ -387,7 +397,7 @@ function SourcesTile() {
             const v = n + (reduce ? 0 : ((step * (i + 2)) % 9))
             return (
               <motion.tr key={d} initial={reduce ? false : { opacity: 0, y: 6 }} animate={inView || reduce ? { opacity: 1, y: 0 } : undefined} transition={{ delay: i * 0.025, duration: 0.36, ease: EASE }}>
-                <td><span className="fc-fav" aria-hidden="true">{d[0].toUpperCase()}</span><span className="fc-ellipsis">{d}</span></td>
+                <td><span className="fc-dom"><span className="fc-fav" aria-hidden="true">{d[0].toUpperCase()}</span><span className="fc-ellipsis">{d}</span></span></td>
                 <td><span className="fc-cite"><span className="fc-mono fc-slot-3">{v}</span><span className="fc-bar fc-bar-sm"><motion.i animate={{ scaleX: v / 430 }} transition={{ duration: 0.4, ease: MORPH }} /></span></span></td>
                 <td className="fc-hide-sm">{you ? <Check size={14} strokeWidth={2} className="fc-ok" aria-label="You are cited" /> : <span className="fc-ghost" aria-label="You are not cited">–</span>}</td>
                 <td>{target && <span className="fc-tag fc-tag-amber">Outreach target</span>}</td>

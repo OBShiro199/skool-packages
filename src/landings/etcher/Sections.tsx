@@ -135,11 +135,14 @@ const ROWS: [string, Cell[]][] = [
   ['Custom fields', ['Yes', 'Yes', 'Yes', 'Yes', 'Yes']],
   ['Free migration from HubSpot', ['Yes', 'No', 'n/a', 'No†', 'No†']],
 ]
-function CellView({ v }: { v: string }) {
-  if (v === 'Yes') return <span className="et-yes"><Check size={14} strokeWidth={2} aria-hidden="true" /> Yes</span>
-  if (v === 'No' || v === 'No†') return <span className="et-no"><X size={13} aria-hidden="true" /> {v}</span>
+function CellView({ v: raw }: { v: string }) {
+  const dag = raw.endsWith('†')
+  const v = dag ? raw.slice(0, -1) : raw
+  const mark = dag ? <sup className="et-dag" aria-label="estimate">†</sup> : null
+  if (v === 'Yes') return <span className="et-yes"><Check size={14} strokeWidth={2} aria-hidden="true" /> Yes{mark}</span>
+  if (v === 'No') return <span className="et-no"><X size={13} aria-hidden="true" /> No{mark}</span>
   if (v === 'n/a') return <span className="et-na"><Minus size={13} aria-hidden="true" /> n/a</span>
-  return <span>{v}</span>
+  return <span>{v}{mark}</span>
 }
 export function Compare() {
   const [scrolled, setScrolled] = useState(false)
@@ -263,6 +266,18 @@ export const FAQ: [string, string][] = [
 export function Faq() {
   const [open, setOpen] = useState<number | null>(0)
   const reduce = useReducedMotion()
+  // An open answer above the clicked question collapses as the new one opens; hold the clicked
+  // question still under the cursor by offsetting the scroll for the length of the morph.
+  const pin = (el: HTMLElement) => {
+    const top = el.getBoundingClientRect().top
+    const t0 = performance.now()
+    const step = () => {
+      const d = el.getBoundingClientRect().top - top
+      if (Math.abs(d) > 0.5) window.scrollBy(0, d)
+      if (performance.now() - t0 < 320) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  }
   return (
     <section className="et-section" id="faq" aria-labelledby="et-faq-h">
       <div className="et-wrap et-faq-grid">
@@ -275,7 +290,7 @@ export function Faq() {
             return (
               <div key={q} className={`et-faq-item ${isOpen ? 'open' : ''}`}>
                 <h3>
-                  <button type="button" id={`et-faq-q${i}`} aria-expanded={isOpen} aria-controls={`et-faq-a${i}`} onClick={() => { setOpen(isOpen ? null : i); if (!isOpen) track('faq_open', { index: i }) }}>
+                  <button type="button" id={`et-faq-q${i}`} aria-expanded={isOpen} aria-controls={`et-faq-a${i}`} onClick={(e) => { if (open !== null && open < i) pin(e.currentTarget); setOpen(isOpen ? null : i); if (!isOpen) track('faq_open', { index: i }) }}>
                     <span>{q}</span>
                     <ChevronDown size={16} className="et-chev" aria-hidden="true" />
                   </button>
