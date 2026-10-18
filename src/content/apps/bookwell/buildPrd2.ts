@@ -134,10 +134,11 @@ Shared rules for every function (the kit prompts repeat them):
   (rebuild it from \`TWILIO_WEBHOOK_URL\` plus the query string, because the function sees an internal host)
   followed by every POST field name and value sorted by name. 403 if it does not match.
 - **Inbound:** de-duplicate by \`MessageSid\` in \`inbound_sms\`. Body trimmed and upper-cased:
-  - \`C\` or \`CANCEL\`: find the soonest \`confirmed\` future booking for that phone (across all businesses,
+  - \`C\` (the single letter): find the soonest \`confirmed\` future booking for that phone (across all businesses,
     the one whose latest text went to this phone). Cancel it with \`cancelled_by = 'customer'\` and the
     business refund rule. Reply with TwiML: "Cancelled: <service> at <shop> <day time>. <refund line>".
-  - \`STOP\`, \`STOPALL\`, \`UNSUBSCRIBE\`, \`END\`, \`QUIT\` (or \`OptOutType=STOP\`): upsert \`sms_opt_outs\`. Twilio
+  - \`STOP\`, \`STOPALL\`, \`UNSUBSCRIBE\`, \`CANCEL\`, \`END\`, \`QUIT\` (or \`OptOutType=STOP\`). \`CANCEL\` is a
+    carrier opt-out word, which is why cancelling a booking uses the single letter C. Action: upsert \`sms_opt_outs\`. Twilio
     sends its own reply, so return empty TwiML.
   - \`START\`, \`UNSTOP\` (or \`OptOutType=START\`): delete from \`sms_opt_outs\`.
   - \`HELP\`: Twilio Advanced Opt-Out replies. Return empty TwiML.

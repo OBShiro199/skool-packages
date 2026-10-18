@@ -56,7 +56,7 @@ Contract:
   limit_reached "You have used {used} of {limit} videos this month.", clip_too_long "Your plan takes
   clips up to {limit} seconds.", file_too_big, batch_too_big "Upload up to {limit} clips at a time.".
   Also check each file on its own against max_clip_seconds and return per-file errors so the browser can
-  skip just that file.
+  skip only that file.
 - Insert upload_batches (motion_graphics, clip_count, assets_decision = motionGraphics ? 'pending' :
   'not_needed'). For each file insert videos with status 'uploading', title from the filename without
   extension (dashes and underscores to spaces, max 120), original_filename, raw_size_bytes, declared_duration_ms,

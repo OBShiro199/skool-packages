@@ -112,7 +112,7 @@ Build Queue and Assets:
    video_cards where status <> 'cancelled'. Past cells faded with live links (tiktok_url, instagram_url).
 2. Drag a filled cell to an empty future cell → pass-video { videoId, slotAt } (which calls move_slot).
    Keyboard path: cell menu "Move to..." opens the same slot picker as Review. On 409 slot_taken, toast
-   "That slot was just taken" and refetch.
+   "Someone took that slot a moment ago" and refetch.
 3. List view toggle with the table from @DESIGN.md section 12. Unschedule calls pass-video { unschedule: true }.
 4. Banner when any social_accounts row has status needs_reconnect, linking to Settings > Socials.
 5. Realtime on scheduled_posts filtered by user_id so a handover or a live link updates the cell in place.

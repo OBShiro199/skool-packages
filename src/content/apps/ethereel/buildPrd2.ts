@@ -130,7 +130,7 @@ Flow (task \`revise-video\`):
 
 ### 12.3 Undo
 Undo restores the previous version's edit.json as a new version (reason \`undo\`), re-uses the existing
-render for that version if it still exists (renders are unique per version, so \`current_render_id\` just
+render for that version if it still exists (renders are unique per version, so \`current_render_id\`
 points back), and does not count as a revision.
 
 ## 13. Queue and posting (Zernio)

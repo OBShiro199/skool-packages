@@ -536,6 +536,8 @@ create table public.phone_numbers (
   is_default boolean not null default false,
   monthly_cost_cents int not null default 0,
   purchased_by uuid references auth.users (id) on delete set null,
+  -- A double click on "Buy" sends the same key twice; we buy once.
+  idempotency_key text unique,
   created_at timestamptz not null default now(),
   released_at timestamptz,
   unique (workspace_id, id)
@@ -645,6 +647,8 @@ create index activities_company_idx on public.activities (workspace_id, company_
 create index activities_deal_idx on public.activities (workspace_id, deal_id, occurred_at desc);
 create index activities_call_idx on public.activities (workspace_id, call_id);
 create index activities_actor_idx on public.activities (actor_id);
+-- One "call" timeline entry per call, even if Twilio repeats the callback.
+create unique index activities_one_per_call on public.activities (call_id) where type = 'call';
 create trigger activities_updated_at before update on public.activities
   for each row execute function public.set_updated_at();
 
@@ -891,6 +895,27 @@ begin
   returning count into v_count;
   return v_count <= p_max;
 end;
+$$;
+
+-- Recording worker queue: claim up to n rows that are due, so two
+-- worker runs never download the same file (skip locked). Secret key only.
+create or replace function public.claim_recordings(n int default 10)
+returns setof public.recordings
+language sql
+security definer
+set search_path = ''
+as $$
+  update public.recordings r
+  set attempts = r.attempts + 1,
+      next_attempt_at = now() + interval '5 minutes'
+  where r.id in (
+    select q.id from public.recordings q
+    where q.status = 'pending' and q.next_attempt_at <= now()
+    order by q.next_attempt_at
+    limit n
+    for update skip locked
+  )
+  returning r.*;
 $$;
 
 -- ---------------------------------------------------------------------
@@ -1521,6 +1546,7 @@ revoke execute on function public.minutes_status(uuid) from public, anon;
 grant execute on function public.minutes_status(uuid) to authenticated;
 -- Only edge functions (secret key) may call these.
 revoke execute on function public.try_rate_limit(text, int, int) from public, anon, authenticated;
+revoke execute on function public.claim_recordings(int) from public, anon, authenticated;
 revoke execute on function public.plan_limits(uuid) from public, anon;
 grant execute on function public.plan_limits(uuid) to authenticated;
 revoke execute on function public.usage_this_month(uuid, text) from public, anon, authenticated;

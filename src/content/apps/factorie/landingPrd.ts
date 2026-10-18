@@ -298,22 +298,22 @@ The lead magnet. Same nav and footer as the landing page.
   - "Website" (placeholder "company.com")
   - "Brand name"
   - "What do you sell, in a few words?" (placeholder "AI visibility tracker for SaaS")
-  - Hidden honeypot field \\`company_fax\\` (visually hidden, \\`tabindex="-1"\\`, \\`autocomplete="off"\\`) and a hidden \\`rendered_at\\` timestamp.
+  - Hidden honeypot field \`company_fax\` (visually hidden, \`tabindex="-1"\`, \`autocomplete="off"\`) and a hidden \`rendered_at\` timestamp.
   - Button (primary, full width): "Run my free audit"
   - Under it 13px muted: "One audit per company every 30 days. We do not sign you up for anything."
 - Errors in the reserved line under each field: "Use your work email so we can match it to your domain." / "That does not look like a website address."
-- On submit the box morphs (height only) to "Running your audit" with RunProgress, then the browser goes to \\`/audit/[token]\\`.
+- On submit the box morphs (height only) to "Running your audit" with RunProgress, then the browser goes to \`/audit/[token]\`.
 - Right of the form on desktop (below on mobile): "What you get" list with three Lucide checks: "Your AI visibility score out of 100", "Which competitors each engine names instead", "The sources the engines cite for your category".
 
 ### 20.1 Result page (\`/audit/[token]\`)
-- While running: "Checking 5 questions on 3 engines" with RunProgress. Poll the \\`free-audit\\` GET every 3 seconds; stop after 5 minutes with "This is taking longer than usual. We will email you the result."
+- While running: "Checking 5 questions on 3 engines" with RunProgress. Poll the \`free-audit\` GET every 3 seconds; stop after 5 minutes with "This is taking longer than usual. We will email you the result."
 - Done: H1 shows the score ("Your AI visibility: 18 out of 100") in tabular figures. Below, a square grid: 5 rows (the questions) x 3 columns (engines), each cell a PositionBadge. Then "Brands named most" (top 5 with counts) and "Sources cited most" (top 5 domains).
-- Closing box (violet soft fill, violet edge): H2 **"Track all 25 questions on 5 engines, every week."** Button "Start free trial" to \\`/signup?utm_source=audit\\`.
-- \\`noindex\\` meta on result pages. The token is the only key; never show the email.
+- Closing box (violet soft fill, violet edge): H2 **"Track all 25 questions on 5 engines, every week."** Button "Start free trial" to \`/signup?utm_source=audit\`.
+- \`noindex\` meta on result pages. The token is the only key; never show the email.
 
 ## 21. Comparison pages (\`/vs/[competitor]\`)
 
-One template, four pages: searchable, profound, otterly, peec. Content lives in \\`content/vs.ts\\` so each page is data.
+One template, four pages: searchable, profound, otterly, peec. Content lives in \`content/vs.ts\` so each page is data.
 
 - H1: **"Factorie vs {Competitor}"**. Subhead: "{Competitor} is {one fair sentence about who it suits}. Factorie is for teams who want every major engine included from $99 a month."
 - A two-column square table (Factorie, Competitor) with the rows from section 9 plus "Best for".
@@ -343,9 +343,9 @@ One template, four pages: searchable, profound, otterly, peec. Content lives in 
 
 - One H1 per page. Section headings in order (H2, then H3).
 - Every interactive element has a visible 2px ink focus outline with 2px offset. Skip link "Skip to content" as the first focusable element.
-- Colour contrast 4.5:1 for body text; the violet ink tag (\\`#6249b8\\` on \\`#f5f2fd\\`) passes.
+- Colour contrast 4.5:1 for body text; the violet ink tag (\`#6249b8\` on \`#f5f2fd\`) passes.
 - The video has captions and a text summary under it for screen readers.
-- The pricing toggle is a real radio group; the FAQ uses buttons with \\`aria-expanded\\`.
+- The pricing toggle is a real radio group; the FAQ uses buttons with \`aria-expanded\`.
 
 ## 24. Build order for Claude Code
 
@@ -354,7 +354,7 @@ One template, four pages: searchable, profound, otterly, peec. Content lives in 
 3. Problem, features and how it works with the reveal helper.
 4. Comparison table and pricing with the toggle and the signup links.
 5. FAQ with JSON-LD, final CTA.
-6. \\`/audit\\`, \\`/audit/[token]\\` and the \\`/vs/[competitor]\\` template.
+6. \`/audit\`, \`/audit/[token]\` and the \`/vs/[competitor]\` template.
 7. SEO metadata, OG image, analytics helper and events.
 8. Screenshot at 375px and 1440px and fix anything that overflows or shifts.
 `

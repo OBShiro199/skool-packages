@@ -90,35 +90,37 @@ import leads -> pipeline -> click to call -> wrap-up (disposition + note + task)
 
 ## 5. Architecture
 \`\`\`
-                 Browser (Next.js App Router, React, shadcn/ui, Quiet Precision UI)
-                 |  @supabase/ssr session   |  @twilio/voice-sdk Device (WebRTC audio)
-                 v                          v
-   +--------------------------+     +-------------------------------+
-   | Next.js on Vercel        |     | Twilio (one subaccount per     |
-   | - pages + server actions |     |   workspace, or the customer's |
-   | - /api/stripe/webhook    |     |   own account / SIP trunk)     |
-   | - /api/stripe/checkout   |     | - TwiML App  -> twilio-voice   |
-   +------------+-------------+     | - Numbers    -> twilio-voice   |
-                |                   | - status cb  -> twilio-status- |
-                | supabase-js       |                callback        |
-                v                   | - recording  -> twilio-        |
-   +------------------------------------------+    recording-callback|
-   | Supabase                                  |<---+-----------------+
-   | Postgres + RLS (workspace_id everywhere)  |
-   | Storage: recordings / imports / exports   |
-   | Realtime: deals, calls, jobs, activities  |
-   | Edge functions (Deno):                    |
-   |   twilio-token        twilio-voice        |
-   |   twilio-status-callback                  |
-   |   twilio-recording-callback (+ worker)    |
-   |   buy-number          invite-member       |
-   |   import-leads        export-leads        |
-   |   send-email (Resend, React Email)        |
-   | pg_cron + pg_net: workers and sweeps      |
-   +------------------------------------------+
-                |
-                v
-           Resend (email)          Stripe (Checkout, Portal, webhooks)
+  Browser: Next.js App Router + shadcn/ui (Quiet Precision)
+  - @supabase/ssr session          - @twilio/voice-sdk Device (WebRTC audio)
+        |                                   |
+        v                                   v
+  +---------------------------+     +------------------------------------+
+  | Next.js on Vercel         |     | Twilio                             |
+  | - pages, server actions   |     | one subaccount per workspace       |
+  | - /api/stripe/checkout    |     | (or the customer's own account,    |
+  | - /api/stripe/webhook     |     |  or their carrier via BYOC)        |
+  | - /api/stripe/portal      |     | - TwiML App   -> twilio-voice      |
+  +-------------+-------------+     | - Numbers     -> twilio-voice      |
+                |                   | - status      -> twilio-status-cb  |
+                | supabase-js       | - recordings  -> twilio-recording  |
+                v                   +-----------------+------------------+
+  +-------------------------------------------+       |
+  | Supabase                                  |<------+  signed webhooks
+  | Postgres + RLS (workspace_id everywhere)  |
+  | Storage: recordings / imports / exports   |
+  | Realtime: deals, calls, jobs, activities  |
+  | Edge functions (Deno):                    |
+  |   twilio-token, twilio-voice,             |
+  |   twilio-status-callback,                 |
+  |   twilio-recording-callback (+ worker),   |
+  |   buy-number, invite-member,              |
+  |   import-leads, export-leads, send-email  |
+  | pg_cron + pg_net: workers and sweeps      |
+  +---------------------+---------------------+
+                        |
+            +-----------+-----------+
+            v                       v
+     Resend (email)        Stripe (Checkout, Portal, webhooks)
 \`\`\`
 
 ### 5.1 Why this shape (the trade-offs)

@@ -57,7 +57,7 @@ function WarmupChart({ inboxes, days }: { inboxes: number; days: number }) {
         </div>
       </div>
       <div className="ob-bars ob-bars-x" aria-hidden="true">
-        {weeks.map((w, i) => <span key={w}><span className="ob-mono">W{w}</span><span className="ob-mono ob-cap-x">{rampCap(i * 7)}/day</span></span>)}
+        {weeks.map((w, i) => <span key={w} className={i === 0 || i === 2 || i === 4 ? 'ob-x-step' : undefined}><span className="ob-mono">W{w}</span><span className="ob-mono ob-cap-x">{rampCap(i * 7)}/day</span></span>)}
       </div>
     </figure>
   )
@@ -129,15 +129,15 @@ const SEQ: Seg[][] = [
   [['$ ', 'f'], ['outbounder sequence '], ['sarah@northpeak.studio', 'a']],
   [['']],
   [[' you          outbounder          sarah', 'h']],
-  [['   │               │                │', 'f']],
-  [['   │', 'f'], ['── approve ───▶', 'a'], ['│                │', 'f']],
-  [['   │               │', 'f'], ['── step 1 ─────▶', 'a'], ['│', 'f'], [' day 0', 'd']],
-  [['   │               │', 'f'], ['── step 2 ─────▶', 'a'], ['│', 'f'], [' day 3', 'd']],
-  [['   │               │', 'f'], ['◀───── reply ───', 'i'], ['│', 'f'], [' day 4', 'd']],
-  [['   │               │', 'f'], [' ▸ ', 'f'], ['interested', 'chip'], ['   │', 'f']],
-  [['   │', 'f'], ['◀─── alert ────', 'a'], ['│                │', 'f']],
-  [['   │               │', 'f'], [' x step 3       ', 'x'], ['│', 'f'], [' day 8', 'd']],
-  [['   │               │                │', 'f']],
+  [['   |               |                |', 'f']],
+  [['   |', 'f'], ['-- approve --->', 'a'], ['|                |', 'f']],
+  [['   |               |', 'f'], ['-- step 1 ----->', 'a'], ['|', 'f'], [' day 0', 'd']],
+  [['   |               |', 'f'], ['-- step 2 ----->', 'a'], ['|', 'f'], [' day 3', 'd']],
+  [['   |               |', 'f'], ['<----- reply ---', 'i'], ['|', 'f'], [' day 4', 'd']],
+  [['   |               |', 'f'], [' > ', 'f'], ['interested', 'chip'], ['   |', 'f']],
+  [['   |', 'f'], ['<--- alert ----', 'a'], ['|                |', 'f']],
+  [['   |               |', 'f'], [' x step 3       ', 'x'], ['|', 'f'], [' day 8', 'd']],
+  [['   |               |                |', 'f']],
   [['done ', 'ok'], ['1 reply · sequence stopped', 'f']],
 ]
 

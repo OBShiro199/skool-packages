@@ -259,7 +259,7 @@ select name, storage_path is null as no_path from storage.objects where bucket_i
     minutes: 90,
     xp: 60,
     blocks: [
-      eli5('Where the numbers come from', 'The SQL created "views": saved questions like "how much is in each stage?". They run as the person asking, so a manager only ever sees their own workspace\'s totals. The Reports page just asks those views and draws the answers.'),
+      eli5('Where the numbers come from', 'The SQL created "views": saved questions like "how much is in each stage?". They run as the person asking, so a manager only ever sees their own workspace\'s totals. The Reports page asks those views and draws the answers.'),
       prompt('etc-fe-reports-prompt', 'Paste into Claude Code (plan mode first)', `
 Read @PRD.md sections 4 (manager stories), 6.2, 13, 17 and @DESIGN.md sections 3.9, 3.11 and 3.12.
 

@@ -151,7 +151,7 @@ curl -s https://api.anthropic.com/v1/messages \\
     minutes: 15,
     xp: 25,
     blocks: [
-      eli5('What does Firecrawl do?', 'Websites are messy: menus, cookie banners, scripts. Firecrawl visits a page like a browser would and hands back just the words as tidy text. Factorie gives that text to Claude to understand what the customer sells. Map finds the pages; scrape reads them.'),
+      eli5('What does Firecrawl do?', 'Websites are messy: menus, cookie banners, scripts. Firecrawl visits a page like a browser would and hands back only the words as tidy text. Factorie gives that text to Claude to understand what the customer sells. Map finds the pages; scrape reads them.'),
       table(['Plan (checked Oct 2026)', 'Price', 'Credits', 'Covers about'], [
         ['Free', '$0', '500 one-off [verify]', 'Building and testing'],
         ['Hobby', 'About $16/mo [verify]', 'About 3,000 a month [verify]', '85 customers'],

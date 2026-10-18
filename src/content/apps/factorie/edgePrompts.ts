@@ -178,9 +178,8 @@ refuses jobs not in 'claimed'). Never throw away a job: if the pool is cut short
 stay queued and claimed ones are released by release_stuck_jobs after 10 minutes.
 Log one line per invocation.
 
-Then schedule the jobs with the Supabase MCP (PRD 9.7): store project_url and cron_secret in
-Vault with vault.create_secret, and create fac-run-checks every minute with net.http_post reading
-both from vault.decrypted_secrets. Show me select jobname, schedule, active from cron.job.
+Do not create cron jobs here: the Backend task "Schedule the checks with pg_cron and pg_net"
+does that with Vault. After deploying, show me select jobname, schedule, active from cron.job.
 
 Test:
 curl -i -X POST "$SUPABASE_URL/functions/v1/run-checks" -d '{}'                      # 401
@@ -249,8 +248,8 @@ Steps:
    (sendEmail kind alert, ref brand_id). Body lists the alerts and links to SITE_URL/app.
 4. Return { ok, brands_scored, alerts_sent }.
 
-No paid API calls. Then add the pg_cron job fac-score-day at minute 15 every hour (PRD 9.7)
-with the Supabase MCP.
+No paid API calls. The pg_cron job fac-score-day (minute 15 every hour) is created in the Backend task
+"Schedule the checks".
 
 Test:
 curl -i -X POST "$SUPABASE_URL/functions/v1/score-day" -H "x-cron-secret: $CRON_SECRET" \\
@@ -284,7 +283,7 @@ Steps:
    plus digest_recipients up to the plan's digest_recipients limit.
 6. Return { ok, sent, skipped }.
 
-Then add the pg_cron job fac-send-digest at minute 5 every hour.
+The pg_cron job fac-send-digest (minute 5 every hour) is created in "Schedule the checks".
 
 Test:
 curl -i -X POST "$SUPABASE_URL/functions/v1/send-digest" -H "x-cron-secret: $CRON_SECRET" \\
@@ -348,7 +347,8 @@ Steps per brand:
 7. Set brands.recs_refreshed_at = now(). recordCost(operation recommendations, ref
    "recs-<brand_id>-<date>").
 
-Return { ok, created }. Then add the pg_cron job fac-recommendations at 03:30 UTC daily.
+Return { ok, created }. The pg_cron job fac-recommendations (03:30 UTC daily) is created in
+"Schedule the checks".
 
 Test (browser path):
 curl -i -X POST "$SUPABASE_URL/functions/v1/generate-recommendations" -H "Authorization: Bearer $TOKEN" \\

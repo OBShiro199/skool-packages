@@ -95,7 +95,7 @@ If it is, the free edit is still open.`),
     blocks: [
       eli5('Why their own video works', 'Download one of their public videos (screen record it), run it through Ethereel, and send it back. They see themselves looking edited by a pro. Nothing you could say about the product beats that.'),
       code('eth-mk-out-dm-scripts', 'dm-scripts.txt', 'txt', `Instagram / TikTok DM (after you follow and like 2 posts)
-Hey {{name}}, I ran your {{topic}} video through the editor I am building, just to test it on a real creator.
+Hey {{name}}, I ran your {{topic}} video through the editor I am building, to test it on a real creator.
 Cut the pauses, added captions and one diagram. Want me to send it over?
 
 When they say yes
