@@ -1,7 +1,7 @@
 import confetti from 'canvas-confetti'
 
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
-const colours = ['#2B59FF', '#167A47', '#0F0F0F', '#6E8BFF', '#4CC38A', '#F2C14E']
+const colours = ['#9EB3FF', '#C9D5FF', '#9FD8B7', '#CDEBD9', '#F5D58A', '#D9CCFF']
 
 export function burst(origin?: { x: number; y: number }) {
   if (reduced()) return

@@ -73,8 +73,8 @@ export function CommitModal({ app, open, onClose, onDone }: { app: AppDef; open:
       <Modal open={celebrating} onClose={() => setCelebrating(false)} title="Pledge signed"
         footer={<><button className="btn" onClick={() => setCelebrating(false)}>Stay here</button><button className="btn btn-primary" onClick={() => { setCelebrating(false); onDone() }}>Open my build <ArrowRight size={15} /></button></>}>
         <div className="yourein-modal">
-          <motion.div className="yourein-check" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring', stiffness: 320, damping: 16 }}>
-            <svg viewBox="0 0 24 24" width="30" height="30"><motion.path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" strokeWidth="2.6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.35, duration: 0.4 }} /></svg>
+          <motion.div className="yourein-check" style={{ color: 'var(--ok-ink)' }} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring', stiffness: 320, damping: 16 }}>
+            <svg viewBox="0 0 24 24" width="30" height="30"><motion.path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.35, duration: 0.4 }} /></svg>
           </motion.div>
           <motion.h2 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>You’re in.</motion.h2>
           <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>Let’s start building <b>{app.name}</b>.</motion.p>

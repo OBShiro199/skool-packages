@@ -14,6 +14,7 @@ import { DownloadCodeModal } from '../components/DownloadCodeModal'
 import { CostCalculator } from '../components/CostCalculator'
 import { toast } from '../components/Toasts'
 import { burst, celebrate } from '../lib/confetti'
+import { LOCK_PROGRESSION } from '../lib/flags'
 
 export default function BuildPage() {
   const { slug } = useParams()
@@ -38,17 +39,18 @@ export default function BuildPage() {
   const reqIndex = phases.findIndex((p) => p.id === requested)
   const phaseIndex = reqIndex >= 0 ? reqIndex : unlockedUpTo
   const phase = phases[phaseIndex]
-  const phaseLocked = phaseIndex > unlockedUpTo
+  const phaseLocked = LOCK_PROGRESSION && phaseIndex > unlockedUpTo
 
   // Within a phase, a step unlocks when every step before it is complete.
   const stepStates: StepState[] = useMemo(() => {
     if (!phase) return []
     let blocked = phaseLocked
-    return phase.tasks.map((t) => {
+    let currentSet = false
+    return phase.tasks.map((t): StepState => {
       if (blocked) return 'locked'
       if (taskStats(t, checked).complete) return 'done'
-      blocked = true
-      return 'current'
+      if (!currentSet) { currentSet = true; if (LOCK_PROGRESSION) blocked = true; return 'current' }
+      return 'todo'
     })
   }, [phase, checked, phaseLocked])
   const currentTask = phase?.tasks[stepStates.indexOf('current')]
@@ -96,7 +98,7 @@ export default function BuildPage() {
     const now = readChecked()
     for (const [id, ref] of allItems) {
       if (ref.trigger !== trigger || now[id]) continue
-      if (ref.task.id === currentTask?.id) onToggle(id, true)
+      if (!LOCK_PROGRESSION || ref.task.id === currentTask?.id) onToggle(id, true)
     }
   }, [allItems, currentTask?.id, onToggle]) // eslint-disable-line
 
@@ -124,16 +126,16 @@ export default function BuildPage() {
           <ol className="rail-list">
             {phases.map((p, i) => {
               const s = stats.perPhase[i]
-              const locked = i > unlockedUpTo
+              const locked = LOCK_PROGRESSION && i > unlockedUpTo
               const active = !showCosts && i === phaseIndex
-              const state = s.complete ? 'done' : locked ? 'locked' : 'current'
+              const state = s.complete ? 'done' : locked ? 'locked' : i === unlockedUpTo ? 'current' : 'todo'
               return (
                 <li key={p.id}>
                   <button className={`rail-item ${state} ${active ? 'active' : ''}`} onClick={() => goTab(p.id)}>
                     <span className="rail-dot">{s.complete ? <Check size={13} /> : locked ? <Lock size={11} /> : i + 1}</span>
                     <span className="rail-text">
                       <b>{p.label}</b>
-                      <span>{s.complete ? 'Complete' : locked ? 'Locked' : i === unlockedUpTo && s.tasksDone === 0 && i === 0 ? 'Start here' : `${s.tasksDone} of ${s.tasks} steps`}</span>
+                      <span>{s.complete ? 'Complete' : locked ? 'Locked' : i > unlockedUpTo ? `${s.tasks} steps` : i === unlockedUpTo && s.tasksDone === 0 && i === 0 ? 'Start here' : `${s.tasksDone} of ${s.tasks} steps`}</span>
                     </span>
                   </button>
                 </li>

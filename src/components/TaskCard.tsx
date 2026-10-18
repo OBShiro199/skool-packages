@@ -16,7 +16,7 @@ export function Tick({ on, size = 22 }: { on: boolean; size?: number }) {
   )
 }
 
-export type StepState = 'done' | 'current' | 'locked'
+export type StepState = 'done' | 'current' | 'todo' | 'locked'
 
 /**
  * One step of the journey. Done steps collapse to a ticked row (click to reopen),
