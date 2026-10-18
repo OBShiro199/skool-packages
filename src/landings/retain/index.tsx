@@ -8,7 +8,7 @@ import { Features, Trust } from './Bento'
 import { Compare, FAQ, Faq, FinalCta, Footer, HowItWorks, Pricing, Testimonials } from './Bottom'
 import './styles.css'
 
-const LINKS: [string, string][] = [['How it works', 'how'], ['Features', 'features'], ['Pricing', 'pricing'], ['Compare', 'compare'], ['Docs', 'faq']]
+const LINKS: [string, string][] = [['How it works', 'how'], ['Features', 'features'], ['Pricing', 'pricing'], ['Compare', 'compare'], ['Docs', '/docs']]
 
 const JSON_LD = JSON.stringify([
   {
@@ -38,7 +38,7 @@ function Nav() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
   const go = (id: string) => { setOpen(false); scrollToId(id) }
-  const links = LINKS.map(([l, id]) => <li key={l}><a href={`#${id}`} onClick={(e) => { e.preventDefault(); go(id) }}>{l}</a></li>)
+  const links = LINKS.map(([l, id]) => <li key={l}>{id.startsWith('/') ? <a href={id}>{l}</a> : <a href={`#${id}`} onClick={(e) => { e.preventDefault(); go(id) }}>{l}</a>}</li>)
   return (
     <>
       <nav className={`rt-nav${scrolled ? ' is-scrolled' : ''}`} aria-label="Main">
