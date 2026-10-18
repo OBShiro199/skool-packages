@@ -1026,6 +1026,18 @@ begin
 end;
 $$;
 
+-- A new import row (the browser uploaded a CSV) queues its job.
+create or replace function public.queue_import()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  perform public.enqueue_job(new.workspace_id, null, 'import_csv',
+    jsonb_build_object('import_id', new.id), 'imp:' || new.id::text, 0);
+  return new;
+end;
+$$;
+create trigger imports_queue after insert on public.imports
+  for each row execute function public.queue_import();
+
 -- Only the server (secret key) may call worker functions.
 revoke execute on function public.claim_jobs(public.job_kind[], integer) from public, anon, authenticated;
 revoke execute on function public.enqueue_job(uuid, uuid, public.job_kind, jsonb, text, integer) from public, anon, authenticated;

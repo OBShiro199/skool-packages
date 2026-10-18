@@ -4,7 +4,7 @@ import { Check, CircleDot, Mic2, Send, Type } from 'lucide-react'
 import { Btn, EASE, Pill, Reveal, SectionHead, TrialBtn, scrollToId, useClock, useCountUp } from './shared'
 import { HERO_REEL, HERO_STEPS, Phone, RawClip, Reel } from './reel'
 
-const POSTER = 9.6 // a frame inside the diagram, with a caption showing
+const POSTER = 11 // a frame inside the finished diagram, with a caption showing
 
 function Up({ children, i, className }: { children: ReactNode; i: number; className?: string }) {
   const reduce = useReducedMotion()

@@ -16,7 +16,7 @@ export function Demo() {
   const [muted, setMuted] = useState(true)
   const [side, setSide] = useState<'before' | 'after'>('after')
   const playing = inView && !userPaused
-  const { t, seek, reduce } = useClock(DUR, playing, 19.4, true, !userPlayed)
+  const { t, seek, reduce } = useClock(DUR, playing, 22.6, true, !userPlayed)
   const actuallyPlaying = playing && (!reduce || userPlayed)
   const fired = useRef(false)
   useEffect(() => {

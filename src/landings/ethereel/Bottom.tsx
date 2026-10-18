@@ -97,7 +97,7 @@ function Cell({ v }: { v: string }) {
 
 export function Compare() {
   const ref = useRef<HTMLDivElement>(null)
-  const seen = useInView(ref, { amount: 0.5, once: true })
+  const seen = useInView(ref, { amount: 0.3, once: true })
   const reduce = useReducedMotion()
   useEffect(() => { if (seen) track('comparison_viewed') }, [seen])
   return (
