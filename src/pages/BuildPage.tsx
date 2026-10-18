@@ -85,7 +85,9 @@ export default function BuildPage() {
     window.scrollTo({ top: 0 })
   }
   const next = () => {
-    if (!phase) return
+    if (!phase || !task) return
+    const t = taskStats(task, checked)
+    if (!t.complete && t.total > 0) return
     if (si + 1 < phase.tasks.length) go(pi, si + 1, 1)
     else if (pi + 1 < phases.length) go(pi + 1, 0, 1)
   }
@@ -146,7 +148,8 @@ export default function BuildPage() {
   const stepsDone = stats.perPhase.reduce((n, p) => n + p.tasksDone, 0)
   const globalIndex = phases.slice(0, pi).reduce((n, p) => n + p.tasks.length, 0) + si + 1
   const isLast = pi === phases.length - 1 && si === phase.tasks.length - 1
-  const lockedNext = LOCK_PROGRESSION && !ts.complete
+  // Next unlocks once this step's checklist is ticked off.
+  const lockedNext = !ts.complete && ts.total > 0
   const nextTask = si + 1 < phase.tasks.length ? phase.tasks[si + 1] : phases[pi + 1]?.tasks[0]
   const donePhase = phases.find((p) => p.id === phaseDone)
   const backToStep = { tab: phase.id, step: String(si) }
@@ -203,10 +206,19 @@ export default function BuildPage() {
                 initial={{ opacity: 0, x: dir * 56 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -56 }}
                 transition={{ duration: 0.32, ease: EASE }}>
                 <header className="step-intro">
-                  <div className="row wrap" style={{ gap: 10 }}>
-                    <span className="phase-pill"><PhaseIcon icon={phase.icon} size={13} /> Phase {pi + 1} · {phase.label}</span>
-                    <span className="label">Step {si + 1} of {phase.tasks.length}</span>
-                    {globalIndex === 1 && stepsDone === 0 && <span className="chip chip-signal">Start here</span>}
+                  <div className="step-top">
+                    <div className="row wrap" style={{ gap: 10 }}>
+                      <span className="phase-pill"><PhaseIcon icon={phase.icon} size={13} /> Phase {pi + 1} · {phase.label}</span>
+                      <span className="label">Step {si + 1} of {phase.tasks.length}</span>
+                      {globalIndex === 1 && stepsDone === 0 && <span className="chip chip-signal">Start here</span>}
+                    </div>
+                    <div className="step-top-nav">
+                      <button className="btn btn-sm" onClick={prev} disabled={pi === 0 && si === 0}><ArrowLeft size={14} /> Previous</button>
+                      <button className={`btn btn-sm ${ts.complete ? 'cn-ready' : ''}`} onClick={next} disabled={isLast || lockedNext}
+                        title={lockedNext ? 'Tick the checklist below to continue' : undefined}>
+                        {lockedNext && <Lock size={12} />} Next <ArrowRight size={14} />
+                      </button>
+                    </div>
                   </div>
                   <h1>{task.title}</h1>
                   <p className="muted">{task.outcome}</p>
@@ -268,7 +280,7 @@ export default function BuildPage() {
             </div>
             <button className={`btn cn-btn ${ts.complete ? 'ready' : ''}`} onClick={next} disabled={isLast || lockedNext}
               title={lockedNext ? 'Tick the checklist to continue' : undefined}>
-              Next <ArrowRight size={15} />
+              {lockedNext && <Lock size={13} />} Next <ArrowRight size={15} />
             </button>
           </div></footer>
         )}

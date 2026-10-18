@@ -188,3 +188,10 @@ body:has(.course-nav) .olly-launcher { bottom: 78px; }
 body:has(.course-nav) .olly-panel { bottom: 140px; }
 body:has(.course-nav) .toasts { bottom: 78px; }
 @media (max-width: 900px) { .course-nav-inner { grid-template-columns: 110px 1fr 110px; gap: 8px; } }
+
+/* Previous / Next at the top of each step */
+.step-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.step-top-nav { display: flex; gap: 8px; }
+.step-top-nav .btn { min-width: 104px; justify-content: center; }
+.step-top-nav .btn.cn-ready { border-color: var(--tint-line); background: var(--tint); color: var(--tint-ink); }
+.cn-btn:disabled, .step-top-nav .btn:disabled { cursor: not-allowed; }
