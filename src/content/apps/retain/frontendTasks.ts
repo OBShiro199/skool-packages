@@ -57,7 +57,7 @@ select kind, status, count(*) from public.jobs group by kind, status order by ki
     minutes: 90,
     xp: 60,
     blocks: [
-      { type: 'callout', tone: 'eli5', title: 'A score you can argue with', text: 'Every score is just points added up, like a school report. A failed payment is 35 points, a card running out is 15. Because the panel lists every line, the founder can say "that one is wrong" and know exactly why the number is what it is.' },
+      { type: 'callout', tone: 'eli5', title: 'A score you can argue with', text: 'Every score is points added up, like a school report. A failed payment is 35 points, a card running out is 15. Because the panel lists every line, the founder can say "that one is wrong" and know exactly why the number is what it is.' },
       { type: 'prompt', id: 'rtn-fe-customers-prompt', title: 'Paste into Claude Code', code: `Read @PRD.md sections 8, 10 and 16, @DESIGN.md sections 2.1, 2.2, 7.3, 7.4, 8 and 15.
 
 Build:
@@ -123,7 +123,7 @@ Use only design tokens. Screenshot /u/<token> at 375px and the email preview.` }
         'Within a minute a case appears under Cases. Run the email worker (or wait a minute) and open the email that arrives at the seeded test address (use your own email for one seeded customer).',
         'Click "Update card", pay with 4242 4242 4242 4242, and watch the done page turn to "Paid".',
       ] },
-      { type: 'code', id: 'rtn-fe-recovery-sql', filename: 'check-recovery.sql', lang: 'sql', code: `-- The case you just fixed should be recovered by card_update, with one email per step.
+      { type: 'code', id: 'rtn-fe-recovery-sql', filename: 'check-recovery.sql', lang: 'sql', code: `-- The case you fixed should be recovered by card_update, with one email per step.
 select d.status, d.recovered_by, d.recovered_cents, d.step, i.attempt_count
 from public.dunning_cases d
 join public.invoices_mirror i on i.id = d.invoice_id

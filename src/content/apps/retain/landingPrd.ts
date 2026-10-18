@@ -9,7 +9,7 @@ Marketing rules from the system apply: 1180px max rail with hairlines left and r
 
 ## 0. Goal and audience
 
-- **Visitor:** a SaaS founder at $5k to $100k MRR who just saw their churn number in Stripe and did not like it. Often
+- **Visitor:** a SaaS founder at $5k to $100k MRR who has seen their churn number in Stripe and did not like it. Often
   arrives from X, Indie Hackers, a cold email, or a "Churnkey alternative" search.
 - **One action:** start the 7 day trial ("Start free trial"). Secondary: "See how the score works" (scrolls to demo).
 - **Promise in one line:** see who is about to cancel, and save them, for less than one saved customer a month.
@@ -128,7 +128,7 @@ Alternate text left / visual right, then visual left / text right. Each: eyebrow
 - H2: **The numbers that pay for Retain**
 - Copy: "MRR at risk, saved MRR, recovered payments, won-back MRR and churn reasons on one page, with the exact formula
   behind each number."
-- Bullets: "Weekly digest email on Monday" · "Reasons by MRR, not just by count" · "Export to CSV"
+- Bullets: "Weekly digest email on Monday" · "Reasons by MRR, not only by count" · "Export to CSV"
 - Visual: the dashboard tiles and the saved vs churned chart.
 
 ### 7.6 Trust: what Retain can and can't do in your Stripe

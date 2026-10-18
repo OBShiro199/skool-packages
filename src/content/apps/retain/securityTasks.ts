@@ -119,7 +119,7 @@ from public.workspace_secrets;
 -- Tables with RLS off (must be none).
 select tablename from pg_tables where schemaname = 'public' and not rowsecurity;` },
       { type: 'mistakes', items: [
-        { mistake: 'Test 4 returns data for compute_risk.', fix: 'The revoke lines at the end of section 19 of the migration did not run. Re-run just those revoke and grant lines in the SQL editor.' },
+        { mistake: 'Test 4 returns data for compute_risk.', fix: 'The revoke lines at the end of section 19 of the migration did not run. Re-run only those revoke and grant lines in the SQL editor.' },
         { mistake: 'stripe_connections returns rows to anon.', fix: 'A policy was added "to public" instead of "to authenticated". Drop it and recreate connections_select exactly as in the migration.' },
       ] },
     ],
