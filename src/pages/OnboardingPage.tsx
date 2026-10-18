@@ -6,6 +6,7 @@ import { useStore, useUser } from '../lib/store'
 import { APPS, getApp } from '../content/apps'
 import { AppArt } from '../components/AppArt'
 import { Bar } from '../components/Ring'
+import { KitLogo } from '../components/KitLogo'
 import { celebrate } from '../lib/confetti'
 
 interface Q { id: string; title: string; sub: string; options: { v: string; label: string; hint: string }[] }
@@ -181,7 +182,7 @@ export default function OnboardingPage() {
               <div className="rec-card">
                 <div className="rec-body">
                   <div className="row between wrap">
-                    <b style={{ fontSize: 18 }}>{rec.name}</b>
+                    <b className="kit-name" style={{ fontSize: 18 }}><KitLogo app={rec} size={20} />{rec.name}</b>
                     <span className="chip chip-money">${rec.price.monthly}/mo · {rec.price.trialDays}-day trial</span>
                   </div>
                   <p className="muted">{rec.oneLiner}</p>

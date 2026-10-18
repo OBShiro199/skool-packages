@@ -8,6 +8,7 @@ import { useTotals } from '../components/Shell'
 import { AppCard } from '../components/AppCard'
 import { Bar } from '../components/Ring'
 import { PhaseIcon } from '../components/PhaseIcon'
+import { KitLogo } from '../components/KitLogo'
 
 function greeting() {
   const h = new Date().getHours()
@@ -48,7 +49,7 @@ export default function HomePage() {
         <motion.section className="card continue" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="continue-body">
             <span className="label">Continue building</span>
-            <h2>{active.app.name}</h2>
+            <h2 className="kit-name"><KitLogo app={active.app} size={24} />{active.app.name}</h2>
             <div className="row between"><span className="muted" style={{ fontSize: 14 }}>{active.s.done} of {active.s.total} ticks · {fmtMinutes(active.s.minutesLeft)} left</span><span className="mono" style={{ fontWeight: 600 }}>{Math.round(active.s.pct * 100)}%</span></div>
             <Bar pct={active.s.pct} lg />
             <div className="phase-dots">
@@ -70,7 +71,7 @@ export default function HomePage() {
         <section className="card continue">
           <div className="continue-body">
             <span className="label" style={{ color: 'var(--signal)' }}>Your match from onboarding</span>
-            <h2>{rec.name}</h2>
+            <h2 className="kit-name"><KitLogo app={rec} size={24} />{rec.name}</h2>
             <p className="muted">{rec.oneLiner}</p>
             <p style={{ fontSize: 14 }}>{rec.whyItSells}</p>
             <Link to={`/app/library/${rec.slug}`} className="btn btn-primary" style={{ justifySelf: 'start' }}>See the kit <ArrowRight size={15} /></Link>

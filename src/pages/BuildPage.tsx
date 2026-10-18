@@ -7,6 +7,7 @@ import type { Task } from '../content/types'
 import { useStore, useUser } from '../lib/store'
 import { appStats, fmtMinutes, phaseStats, taskStats } from '../lib/progress'
 import { Bar } from '../components/Ring'
+import { KitLogo } from '../components/KitLogo'
 import { PhaseIcon } from '../components/PhaseIcon'
 import { Tick } from '../components/TaskCard'
 import { BlockView, TriggerContext } from '../components/Blocks'
@@ -171,7 +172,7 @@ export default function BuildPage() {
         <header className="course-head">
           <div className="course-title">
             <span className="label">You are building</span>
-            <b>{app.name}</b>
+            <b className="kit-name"><KitLogo app={app} size={20} />{app.name}</b>
           </div>
           <div className="course-meter">
             <div className="row between"><span className="label">{stepsDone} of {totalSteps} steps done</span><span className="course-pct">{Math.round(stats.pct * 100)}%</span></div>

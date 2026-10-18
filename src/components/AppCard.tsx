@@ -4,6 +4,7 @@ import { Clock, Lock } from 'lucide-react'
 import type { AppDef } from '../content/types'
 import { CATEGORIES } from '../content/catalog'
 import { KitPreview } from './KitPreview'
+import { KitLogo } from './KitLogo'
 import { Bar } from './Ring'
 import { compute, fallbackModel } from './CostCalculator'
 
@@ -33,7 +34,7 @@ export function AppCard({ app, match, progress, index = 0 }: { app: AppDef; matc
             <span className="label">{cat?.label}</span>
             <span className="mono" style={{ fontSize: 13 }}><b>${app.price.monthly}</b><span className="muted">/mo</span></span>
           </div>
-          <h3>{app.name}</h3>
+          <h3 className="kit-name"><KitLogo app={app} size={20} />{app.name}</h3>
           <p className="muted">{app.oneLiner}</p>
           <div className="row wrap" style={{ gap: 6 }}>
             {app.apis.slice(0, 4).map((a) => <span key={a.name} className="chip">{a.name}</span>)}

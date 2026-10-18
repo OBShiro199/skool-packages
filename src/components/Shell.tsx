@@ -6,6 +6,7 @@ import { getApp } from '../content/apps'
 import { appStats, levelFor } from '../lib/progress'
 import { Bar, Ring } from './Ring'
 import { AskOlly } from './AskOlly'
+import { KitLogo } from './KitLogo'
 
 export function useTotals() {
   const user = useUser()!
@@ -46,7 +47,7 @@ export default function Shell() {
         {builds.map(({ app, s }) => (
           <NavLink key={app.slug} to={`/app/build/${app.slug}`} className={({ isActive }) => `nav-link build-link ${isActive ? 'active' : ''}`}>
             <span style={{ flex: 1, minWidth: 0 }}>
-              {app.name}
+              <span className="kit-name"><KitLogo app={app} size={16} /><span className="kit-name-text">{app.name}</span></span>
               <Bar pct={s.pct} />
             </span>
             <span className="count">{Math.round(s.pct * 100)}%</span>

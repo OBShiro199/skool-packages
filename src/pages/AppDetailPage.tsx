@@ -7,6 +7,7 @@ import { CATEGORIES, CORE_STACK } from '../content/catalog'
 import { useUser } from '../lib/store'
 import { fmtMinutes } from '../lib/progress'
 import { Difficulty } from '../components/AppCard'
+import { KitLogo } from '../components/KitLogo'
 import { CommitModal } from '../components/CommitModal'
 import { PhaseIcon } from '../components/PhaseIcon'
 import { CostCalculator } from '../components/CostCalculator'
@@ -39,7 +40,7 @@ export default function AppDetailPage() {
             {app.status === 'full' ? <span className="chip chip-money">Full playbook</span> : <span className="chip">Preview playbook</span>}
             {user.onboarding?.recommended === app.slug && <span className="chip chip-signal">Your match</span>}
           </div>
-          <h1 className="detail-title">{app.name}</h1>
+          <h1 className="detail-title kit-name"><KitLogo app={app} size={48} />{app.name}</h1>
           <p className="detail-tag">{app.tagline}</p>
           <p className="muted" style={{ fontSize: 16 }}>{app.oneLiner}</p>
           <div className="detail-stats">
