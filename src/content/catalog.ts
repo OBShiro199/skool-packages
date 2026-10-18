@@ -11,7 +11,6 @@ export const CATEGORIES: { id: CategoryId; label: string; blurb: string }[] = [
 /** Kits announced but not yet released. Shown locked in the library. */
 export const COMING_SOON: { name: string; oneLiner: string; category: CategoryId }[] = [
   { name: 'Retain', oneLiner: 'Spots Stripe customers about to cancel and wins them back.', category: 'business' },
-  { name: 'Quotient', oneLiner: 'Instant online quotes for tradespeople, turned into booked jobs.', category: 'productivity' },
 ]
 
 export const CORE_STACK = [
