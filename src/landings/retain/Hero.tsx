@@ -9,6 +9,8 @@ const BASE: Row[] = [
   { name: 'Acme Ltd', mrr: 480, score: 78, reason: 'Card expires before renewal' },
   { name: 'Globex', mrr: 149, score: 54, reason: 'Seats cut from 6 to 4' },
   { name: 'Initech', mrr: 99, score: 41, reason: 'Trial ends in 3 days' },
+  { name: 'Stark Labs', mrr: 349, score: 47, reason: 'Downgraded to Starter on 9 Oct' },
+  { name: 'Wayne Studio', mrr: 129, score: 23, reason: 'Usage down 20% this month' },
   { name: 'Umbrella Co', mrr: 640, score: 12, reason: 'No warning signs' },
   { name: 'Hooli', mrr: 199, score: 8, reason: 'No warning signs' },
 ]

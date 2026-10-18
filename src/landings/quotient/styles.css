@@ -374,7 +374,8 @@
 .lp-quotient .qt-table th[scope='row'] { font-weight: 500; color: var(--ink); width: 230px; }
 .lp-quotient .qt-table tr > :first-child { position: sticky; left: 0; background: #fff; z-index: 1; border-right: 1px solid var(--divider); }
 .lp-quotient .qt-table .is-us { background: var(--accent-soft); color: var(--ink); }
-.lp-quotient .qt-cell { display: inline-flex; gap: 6px; align-items: flex-start; flex-wrap: wrap; }
+.lp-quotient .qt-cell { display: inline-flex; gap: 6px; align-items: flex-start; }
+.lp-quotient .qt-cell > span { min-width: 0; }
 .lp-quotient .qt-cell svg { margin-top: 2px; flex: none; }
 .lp-quotient .qt-yes { color: var(--accent-ink); }
 .lp-quotient .qt-no { color: var(--ghost); }
@@ -440,6 +441,7 @@
   .lp-quotient { --pad-x: 24px; }
   .lp-quotient .qt-nav-links, .lp-quotient .qt-nav-login { display: none; }
   .lp-quotient .qt-burger { display: inline-flex; }
+  .lp-quotient .qt-nav-links + .qt-nav-right { margin-left: auto; }
   .lp-quotient h1 { font-size: 50px; }
   .lp-quotient h2 { font-size: 38px; }
   .lp-quotient .qt-hero-browser { right: -24px; }
