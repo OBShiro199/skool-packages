@@ -117,7 +117,7 @@ export default function DossierLanding() {
   useEffect(() => {
     const link = document.createElement('link')
     link.rel = 'stylesheet'
-    link.href = 'https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap'
+    link.href = 'https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400&display=swap'
     document.head.appendChild(link)
     const prevTitle = document.title
     document.title = 'Dossier: security questionnaires answered from your own documents'

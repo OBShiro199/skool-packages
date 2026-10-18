@@ -268,8 +268,8 @@ const ASCII = [
   '               │    your criteria',
   ' ┌─────────────▼──────────────┐',
   ' │ Owns work end to end       │',
-  ' │ Meets   "Led design from…" │',
-  ' │ Quote found in CV ✓        │',
+  ' │ Meets   "Led design..."    │',
+  ' │ Quote found in CV: yes     │',
   ' └─────────────┬──────────────┘',
   '               │ 3  no score,',
   '               │    no rank',
@@ -419,7 +419,6 @@ const PLANS: Plan[] = [
 
 export function Pricing() {
   const [annual, setAnnual] = useState(false)
-  const reduce = useReducedMotion()
   const set = (a: boolean) => { setAnnual(a); track('pricing_toggled', { interval: a ? 'year' : 'month' }) }
   return (
     <section className="sl-section" id="pricing" aria-labelledby="sl-pricing-h">
@@ -441,11 +440,9 @@ export function Pricing() {
                 <p className="sl-plan-line">{p.line}</p>
                 <div className="sl-price" aria-live="polite" aria-label={`$${price.toLocaleString('en-US')} a ${annual ? 'year' : 'month'}, ${p.name}`}>
                   <span className="sl-price-box">
-                    <AnimatePresence mode="popLayout" initial={false}>
-                      <motion.b key={`${p.id}-${annual}`} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.16 }}>
-                        ${price.toLocaleString('en-US')}
-                      </motion.b>
-                    </AnimatePresence>
+                    {[false, true].map((a) => (
+                      <b key={String(a)} className={a === annual ? 'is-on' : ''} aria-hidden={a !== annual}>${(a ? p.y : p.m).toLocaleString('en-US')}</b>
+                    ))}
                   </span>
                   <span className="sl-per">/ {annual ? 'year' : 'month'}</span>
                 </div>

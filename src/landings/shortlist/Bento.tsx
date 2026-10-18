@@ -13,12 +13,12 @@ function Bullets({ items }: { items: string[] }) {
 const QUESTIONS = ['Why this role?', 'Portfolio link', 'Notice period', 'Right to work in the UK']
 function CareersViz() {
   const { ref, step } = useLoopStep(QUESTIONS.length + 2, 1100)
-  const shown = Math.min(step, QUESTIONS.length)
+  const shown = Math.max(1, Math.min(step + 1, QUESTIONS.length))
   return (
     <div ref={ref} className="sl-viz sl-viz-careers" aria-hidden="true">
       <div className="sl-builder">
         <span className="sl-viz-k">Form builder</span>
-        <div className="sl-builder-row is-fixed"><FileText size={12} strokeWidth={1.5} />CV upload · PDF or Word, 10 MB</div>
+        <div className="sl-builder-row is-fixed"><FileText size={12} strokeWidth={1.5} />CV upload · PDF or Word</div>
         {QUESTIONS.map((q, i) => (
           <motion.div
             key={q}
@@ -88,7 +88,7 @@ function AiViz() {
 }
 
 /* 7.3 Board: a card walks along the stages, an interviewer's scorecard stays sealed until submitted. */
-const MINI: Stage[] = ['Applied', 'Screen', 'Interview', 'Offer', 'Hired']
+const MINI: Stage[] = ['Applied', 'Screen', 'Interview', 'Offer']
 function BoardViz() {
   const { ref, step } = useLoopStep(MINI.length, 1300)
   return (
@@ -109,7 +109,7 @@ function BoardViz() {
                   exit={{ opacity: 0, x: 18 }}
                   transition={{ duration: 0.42, ease: LOOP }}
                 >
-                  <b>Priya Nair</b><span className="sl-avatar">JB</span>
+                  <b>Priya</b><span className="sl-avatar">JB</span>
                 </motion.span>
               )}
             </AnimatePresence>

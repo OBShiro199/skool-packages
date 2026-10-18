@@ -204,6 +204,17 @@
 .lp-shortlist .sl-mini-btn { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: var(--box); border: 1px solid var(--btn-edge); font-size: 13px; color: var(--ink); background: var(--surface); }
 .lp-shortlist .sl-mini-btn.is-firm { border-color: var(--firm); }
 
+.lp-shortlist .sl-replies { position: absolute; right: var(--pad-x); top: 64px; width: 300px; display: flex; flex-direction: column; gap: 8px; }
+.lp-shortlist .sl-replies-k { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--faint); margin-bottom: 2px; }
+.lp-shortlist .sl-reply { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--box); box-shadow: var(--shadow-float); }
+.lp-shortlist .sl-reply:nth-child(3) { margin-left: 20px; }
+.lp-shortlist .sl-reply:nth-child(4) { margin-left: 40px; }
+.lp-shortlist .sl-reply-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--s-hired-i); flex: none; }
+.lp-shortlist .sl-reply-txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.lp-shortlist .sl-reply-txt b { font-size: 13px; line-height: 18px; color: var(--ink); font-weight: 500; letter-spacing: -0.014em; }
+.lp-shortlist .sl-reply-txt span { font-size: 12px; line-height: 16px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lp-shortlist .sl-reply-at { font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+
 /* ---------- Logo strip ---------- */
 .lp-shortlist .sl-logos { padding: 36px 0; border-bottom: 1px solid var(--hairline); text-align: center; }
 .lp-shortlist .sl-logos p { font-size: 13px; color: var(--faint); margin-bottom: 18px; }
@@ -223,7 +234,7 @@
 .lp-shortlist .sl-statline p { max-width: 40em; margin: 0 auto; text-wrap: balance; }
 
 /* ---------- Demo player ---------- */
-.lp-shortlist .sl-player { overflow: hidden; max-width: 980px; margin: 0 auto; }
+.lp-shortlist .sl-player { overflow: hidden; max-width: 900px; margin: 0 auto; }
 .lp-shortlist .sl-player-bar { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 8px 0 14px; border-bottom: 1px solid var(--hairline); }
 .lp-shortlist .sl-play { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--box); border: 1px solid var(--btn-edge); color: var(--accent-ink); }
 .lp-shortlist .sl-play:hover { background: var(--hover); }
@@ -243,7 +254,7 @@
 .lp-shortlist .sl-chapter:hover { background: var(--hover); }
 .lp-shortlist .sl-chapter.is-on { background: var(--accent-soft); border-color: var(--accent-edge); color: var(--accent-ink); }
 .lp-shortlist .sl-chapter .sl-num { color: var(--faint); }
-.lp-shortlist .sl-sc { position: relative; width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 10px; }
+.lp-shortlist .sl-sc { position: relative; width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 10px; }
 .lp-shortlist .sl-sc-job, .lp-shortlist .sl-sc-review { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--box); box-shadow: var(--shadow-float); padding: 20px; }
 .lp-shortlist .sl-input { display: flex; align-items: center; height: 40px; padding: 0 12px; border: 1px solid var(--firm); border-radius: var(--box); font-size: 16px; color: var(--ink); letter-spacing: -0.02em; box-shadow: 0 0 0 3px rgba(8, 9, 10, 0.06); }
 .lp-shortlist .sl-caret { width: 1px; height: 18px; background: var(--ink); margin-left: 1px; animation: sl-blink 1s steps(1) infinite; }
@@ -293,7 +304,7 @@
 .lp-shortlist .sl-bullets svg { color: var(--accent-ink); flex: none; }
 .lp-shortlist .sl-viz { position: relative; min-width: 0; }
 .lp-shortlist .sl-viz-careers { display: flex; align-items: flex-end; gap: 14px; flex: none; }
-.lp-shortlist .sl-builder { width: 210px; display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid var(--hairline); border-radius: var(--box); background: var(--tint); }
+.lp-shortlist .sl-builder { width: 220px; display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid var(--hairline); border-radius: var(--box); background: var(--tint); }
 .lp-shortlist .sl-builder-row { display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 8px; border: 1px solid var(--hairline); border-radius: 4px; background: var(--surface); font-size: 12px; color: var(--body); white-space: nowrap; overflow: hidden; }
 .lp-shortlist .sl-builder-row.is-fixed { color: var(--muted); border-style: dashed; }
 .lp-shortlist .sl-builder-n { font-family: var(--mono); font-size: 11px; color: var(--accent-ink); }
@@ -310,8 +321,8 @@
 .lp-shortlist .sl-sweep { background-image: linear-gradient(var(--marker), var(--marker)); background-repeat: no-repeat; background-size: 0% 45%; background-position: 0 90%; transition: background-size 700ms var(--ease-morph), color 300ms; }
 .lp-shortlist .sl-sweep.is-on { background-size: 100% 45%; color: var(--body); }
 .lp-shortlist .sl-no-score { font-size: 11px; color: var(--faint); text-align: center; padding-top: 4px; }
-.lp-shortlist .sl-viz-board { display: flex; flex-direction: column; gap: 10px; flex: 1 1 0; min-width: 0; }
-.lp-shortlist .sl-mini-board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.lp-shortlist .sl-viz-board { display: flex; flex-direction: column; gap: 10px; flex: 1.15 1 0; min-width: 0; }
+.lp-shortlist .sl-mini-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .lp-shortlist .sl-mini-col { display: flex; flex-direction: column; gap: 6px; padding: 6px; min-height: 104px; border: 1px solid var(--divider); border-radius: var(--box); background: var(--row-hover); min-width: 0; }
 .lp-shortlist .sl-mini-col .sl-stage { font-size: 11px; padding: 0 5px; height: 20px; overflow: hidden; max-width: 100%; }
 .lp-shortlist .sl-mini-card { display: flex; align-items: center; justify-content: space-between; gap: 4px; height: 30px; padding: 0 6px; border: 1px solid var(--hairline); border-radius: 4px; background: var(--surface); min-width: 0; }
@@ -366,10 +377,10 @@
 .lp-shortlist .sl-fair-left { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
 .lp-shortlist .sl-fair-lede { font-family: var(--display); font-size: 26px; line-height: 1.25; letter-spacing: -0.03em; color: var(--ink); font-weight: 500; text-wrap: balance; }
 .lp-shortlist .sl-ascii-fig { display: flex; flex-direction: column; gap: 10px; padding: 18px 18px 14px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--tint); max-width: 100%; overflow: hidden; }
-.lp-shortlist .sl-ascii { font-family: var(--mono); font-size: 12.5px; line-height: 17px; color: var(--muted); letter-spacing: 0; white-space: pre; overflow: hidden; }
+.lp-shortlist .sl-ascii { font-family: var(--mono); font-size: 12.5px; line-height: 1.2; color: var(--muted); letter-spacing: 0; white-space: pre; overflow: hidden; }
 .lp-shortlist .sl-ascii span { display: inline; }
 .lp-shortlist .sl-ascii .is-step { color: var(--accent-ink); font-weight: 500; }
-.lp-shortlist .sl-ascii .is-redact { color: var(--accent); }
+.lp-shortlist .sl-ascii .is-redact { color: var(--accent-edge); }
 .lp-shortlist .sl-ascii-fig figcaption { font-size: 12px; color: var(--faint); border-top: 1px solid var(--hairline); padding-top: 10px; }
 .lp-shortlist .sl-fair-list { display: flex; flex-direction: column; border-top: 1px solid var(--hairline); }
 .lp-shortlist .sl-fair-list li { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--hairline); font-size: 16px; line-height: 24px; color: var(--ink); letter-spacing: -0.014em; }
@@ -401,8 +412,9 @@
 .lp-shortlist .sl-popular i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 .lp-shortlist .sl-plan-line { font-size: 14px; line-height: 21px; color: var(--muted); min-height: 42px; }
 .lp-shortlist .sl-price { display: flex; align-items: baseline; gap: 6px; }
-.lp-shortlist .sl-price-box { position: relative; display: inline-block; width: 4.4ch; height: 48px; font-family: var(--display); font-size: 44px; line-height: 48px; letter-spacing: -0.045em; color: var(--ink); font-variant-numeric: tabular-nums; }
-.lp-shortlist .sl-price-box b { position: absolute; left: 0; top: 0; font-weight: 600; white-space: nowrap; }
+.lp-shortlist .sl-price-box { display: inline-grid; height: 48px; font-family: var(--display); font-size: 44px; line-height: 48px; letter-spacing: -0.045em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.lp-shortlist .sl-price-box b { grid-area: 1 / 1; font-weight: 600; white-space: nowrap; opacity: 0; transition: opacity 160ms var(--ease-out); }
+.lp-shortlist .sl-price-box b.is-on { opacity: 1; }
 .lp-shortlist .sl-per { font-size: 14px; color: var(--faint); }
 .lp-shortlist .sl-plan-dl { display: flex; flex-direction: column; border-top: 1px solid var(--divider); }
 .lp-shortlist .sl-plan-dl div { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--divider); font-size: 14px; }
@@ -442,6 +454,7 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
+  .lp-shortlist .sl-replies { display: none; }
   .lp-shortlist .sl-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lp-shortlist .sl-t-careers, .lp-shortlist .sl-t-board { grid-column: span 2; }
   .lp-shortlist .sl-t-ai { grid-column: span 1; grid-row: span 2; }
@@ -485,10 +498,16 @@
   .lp-shortlist .sl-hero-ctas .sl-btn { width: 100%; }
   .lp-shortlist .sl-tile { padding: 20px; }
   .lp-shortlist .sl-builder { width: auto; flex: 1; min-width: 0; }
-  .lp-shortlist .sl-ascii { font-size: 11px; line-height: 15px; }
+  .lp-shortlist .sl-ascii { font-size: 11px; }
   .lp-shortlist .sl-toggle { grid-template-columns: 104px 184px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .lp-shortlist *, .lp-shortlist *::before, .lp-shortlist *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media (max-width: 640px) {
+  .lp-shortlist .sl-mini-col { padding: 4px; }
+  .lp-shortlist .sl-mini-col .sl-stage { padding: 0 4px; }
+  .lp-shortlist .sl-mini-col .sl-stage i { display: none; }
+  .lp-shortlist .sl-mini-card.is-moving .sl-avatar { display: none; }
 }

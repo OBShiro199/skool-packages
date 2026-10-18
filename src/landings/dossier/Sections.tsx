@@ -129,14 +129,17 @@ export function Demo() {
   const [t, setT] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [started, setStarted] = useState(false)
-  const autoplayed = useRef(false)
+  const userPaused = useRef(false)
+  const tRef = useRef(0)
+  tRef.current = t
 
+  // Muted-autoplay behaviour: plays while in view (unless paused by hand or finished), pauses when scrolled away.
   useEffect(() => {
-    if (inView && !reduce && !autoplayed.current) { autoplayed.current = true; setStarted(true); setPlaying(true) }
+    if (inView && !reduce && !userPaused.current && tRef.current < DURATION) { setStarted(true); setPlaying(true) }
     if (!inView) setPlaying(false)
   }, [inView, reduce])
   useEffect(() => {
-    const on = () => { setT(0); setStarted(true); setPlaying(true); autoplayed.current = true; track('lp_demo_played') }
+    const on = () => { setT(0); setStarted(true); setPlaying(true); userPaused.current = false; track('lp_demo_played') }
     window.addEventListener('ds-play-demo', on)
     return () => window.removeEventListener('ds-play-demo', on)
   }, [])
@@ -153,11 +156,12 @@ export function Demo() {
   SCENES.forEach(([at], i) => { if (t >= at) s = i })
   const ended = t >= DURATION
   const toggle = () => {
-    if (ended) { setT(0); setPlaying(true); return }
+    if (ended) { setT(0); setPlaying(true); userPaused.current = false; return }
     if (!playing) track('lp_demo_played'); else track('lp_demo_paused', { seconds_watched: Math.round(t) })
-    setStarted(true); setPlaying((p) => !p)
+    userPaused.current = playing
+    setStarted(true); setPlaying(!playing)
   }
-  const seek = (at: number) => { setT(at); setStarted(true); setPlaying(true) }
+  const seek = (at: number) => { setT(at); setStarted(true); setPlaying(true); userPaused.current = false }
 
   return (
     <Page id="demo" clause="2" note="Sixty seconds, start to finish" band labelledBy="ds-demo-h">
@@ -367,9 +371,8 @@ export function Pricing() {
                   </motion.span>
                 </AnimatePresence>
               </span>
-              <span className="ds-price-per" aria-hidden="true">/mo</span>
             </div>
-            <p className="ds-price-note">{annual ? `${p.annual} billed yearly` : 'Billed monthly'}</p>
+            <p className="ds-price-note">{annual ? `A month, ${p.annual} billed yearly` : 'A month, billed monthly'}</p>
             <Button onClick={() => track('lp_cta_clicked', { location: `pricing_${p.id}`, href: `/signup?plan=${p.id}&interval=${annual ? 'year' : 'month'}` })} href={`/signup?plan=${p.id}&interval=${annual ? 'year' : 'month'}`} variant={p.pop ? 'primary' : 'secondary'}>Start free trial</Button>
             <dl className="ds-plan-rows">
               {p.rows.map(([k, v]) => (

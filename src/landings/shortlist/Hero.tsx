@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { LayoutGroup, motion, useReducedMotion } from 'motion/react'
-import { CircleDashed, Quote, X } from 'lucide-react'
+import { CircleDashed, Mail, Quote, X } from 'lucide-react'
 import { CareersButton, EASE, MORPH, StagePill, TrialButton, VerdictPill, type Stage, type Verdict } from './shared'
 
 /* ------------------------------------------------------------------ 3. Hero */
@@ -118,6 +118,34 @@ function Board() {
   )
 }
 
+const REPLIES: [string, string, string][] = [
+  ['Tom Okafor', 'Application received', '09:12'],
+  ['Kai Müller', 'Rejection, after the 2 hour undo', '11:40'],
+  ['Priya Nair', 'Interview confirmed · Meet link', '14:05'],
+]
+
+function ReplyLog() {
+  const reduce = useReducedMotion()
+  return (
+    <div className="sl-replies" aria-hidden="true">
+      <span className="sl-replies-k"><Mail size={13} strokeWidth={1.5} />Replies sent today</span>
+      {REPLIES.map(([n, t, at], i) => (
+        <motion.div
+          key={n}
+          className="sl-reply"
+          initial={reduce ? false : { opacity: 0, x: 12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.42, delay: 0.5 + i * 0.25, ease: EASE }}
+        >
+          <span className="sl-reply-dot" />
+          <span className="sl-reply-txt"><b>{n}</b><span>{t}</span></span>
+          <span className="sl-reply-at">{at}</span>
+        </motion.div>
+      ))}
+    </div>
+  )
+}
+
 export function Hero() {
   const reduce = useReducedMotion()
   const rise = (d: number, y = 6, dur = 0.36) => ({
@@ -143,6 +171,7 @@ export function Hero() {
           </motion.div>
           <motion.p className="sl-trust" {...rise(0.06)}>7 day free trial · From $29 a month · Cancel any time</motion.p>
         </div>
+        <ReplyLog />
         <motion.figure
           className="sl-shot sl-frame"
           initial={reduce ? false : { opacity: 0, y: 12 }}
