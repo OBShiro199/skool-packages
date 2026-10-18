@@ -232,8 +232,8 @@ Motion for every block: text reveals, then the visual rises 16px 120ms later.
 | Longest episode | 2 hours | 3 hours | 4 hours |
 | Shows | 1 | 5 | 25 |
 | Seats | 1 | 3 | 10 |
-| Audiograms a month | 20 | 60 | 200 |
-| Regenerations a month | 30 | 60 | 150 |
+| Audiograms a month | 20 | 50 | 150 |
+| Regenerations a month | 25 | 50 | 100 |
 | Hide "Made with Echo" badge | | Yes | Yes |
 | Button | Start free trial | Start free trial | Start free trial |
 
@@ -271,7 +271,7 @@ Accordion (one open at a time, height morph 300ms, chevron rotates 180 degrees).
 10. **I run an agency. How do client shows work?** One workspace holds up to 25 shows, each with its own feed,
     voice, colours and public pages. Invite your producers as members; only you see billing.
 11. **What happens to my audio?** Uploaded files are stored privately and deleted 30 days after processing.
-    Transcripts and written assets stay until you delete them.
+    Audiogram files are kept for 90 days, so download the ones you post. Transcripts and written assets stay until you delete them.
 12. **What if I run out of hours?** New RSS episodes still arrive and wait. Upgrade any time from Billing and
     they process straight away, or wait for your monthly reset.
 
@@ -317,7 +317,38 @@ right a phone frame with a still of a Bars audiogram. Under 300 KB.
 - CLS under 0.05: every image and video has width and height, fonts preloaded with \`next/font\`.
 - No client JS for sections that do not need it; FAQ, toggle, RSS field and videos are the only client islands.
 
-## 19. Analytics events (PostHog)
+## 19. Motion summary (one table for Claude Code to check against)
+
+| Section | Trigger | Animation | Duration / easing | Reduced motion |
+|---|---|---|---|---|
+| Nav | Page load | Fade in | 300ms ease-out | Visible at once |
+| Hero copy | Page load | Stagger: eyebrow, H1, subhead, buttons, trust line; rise 12px | 360ms each, 80ms stagger, ease-out | Visible at once |
+| Hero product layers | Page load | Rise 24px at 0, 140, 280ms | 420ms ease-out | Visible at once |
+| Hero chapter rows | 900ms after load | Fill in one by one | 40ms stagger, 200ms fade | All rows shown |
+| Hero phone loop | In view | Muted inline video, pauses out of view | Native | Poster only, play button |
+| Problem numbers | 20% in view | Count up from 0, tabular | 900ms morph curve | Final values |
+| Demo video | 50% in view | Frame rises 12px, video plays muted | 360ms ease-out | Poster, click to play |
+| Feature blocks | 20% in view | Text reveals, visual rises 16px 120ms later | 360ms ease-out | Visible at once |
+| Phone frames (7.4) | In view | Three muted loops | Native | Posters |
+| How it works line | 20% in view | Hairline scales X from 0 to 1 | 600ms morph curve | Drawn |
+| Comparison rows | 20% in view | Fade in | 40ms stagger, 200ms | Visible at once |
+| Pricing toggle | Click | Digits cross-fade, card size fixed | 200ms | Instant swap |
+| FAQ item | Click | Height morph, chevron rotates 180 degrees | 300ms morph curve | Instant open |
+| Final CTA chips | 20% in view | Chips appear one by one | 80ms stagger | Visible at once |
+
+## 20. Accessibility
+
+- One H1, headings in order (H2 per section, H3 per feature). Landmarks: header, nav, main, footer.
+- Every video has a text alternative in the caption below it and is muted; none autoplay with reduced motion.
+- The hero RSS field has a visible label ("Your podcast RSS feed"), an error message in danger ink with
+  \`role=alert\`, and the result panel is a polite live region.
+- The pricing toggle is a real switch (\`role="switch"\`, \`aria-checked\`) and announces the new prices.
+- The comparison table is a real \`<table>\` with \`<th scope>\` so screen readers read it row by row; the sticky
+  first column does not break the reading order.
+- Focus visible on every link and button (2px outline, 2px offset). Contrast 4.5:1 for body text, including the
+  muted line under the hero buttons.
+
+## 21. Analytics events (PostHog)
 | Event | When | Properties |
 |---|---|---|
 | \`lp_viewed\` | Page load | referrer, utm_* |

@@ -191,7 +191,7 @@ parallax on visuals on desktop only, off for reduced motion.
 ## 9. Comparison table
 
 - Eyebrow: "Compare"
-- H2: "Built around the follow-up, not just the invoice"
+- H2: "Built around the follow-up as much as the invoice"
 - Table (horizontal scroll on mobile with the first column sticky). Prices are entry plans, checked Oct 2026 from
   comparison sites; confirm on each vendor's own pricing page before launch and update the [verify] cells.
 
@@ -251,6 +251,21 @@ parallax on visuals on desktop only, off for reduced motion.
 - Wire prices to \`STRIPE_PRICE_SOLO_MONTHLY\`, \`STRIPE_PRICE_SOLO_YEARLY\`, \`STRIPE_PRICE_STUDIO_MONTHLY\`,
   \`STRIPE_PRICE_STUDIO_YEARLY\`, \`STRIPE_PRICE_AGENCY_MONTHLY\`, \`STRIPE_PRICE_AGENCY_YEARLY\`.
 - Motion: cards rise with 80ms stagger; the middle card ends 8px higher on desktop.
+
+### 11.1 Trust strip (directly under the pricing cards)
+
+A single row of four small hairline boxes (two by two on mobile), each with a Lucide icon at 16px, a 13px label in
+ink and one muted line. Fixed height so the row never jumps when fonts load.
+
+| Icon | Label | Line |
+|---|---|---|
+| Landmark | Your money, your Stripe | Clients pay into your own Stripe account. Tally never holds funds. |
+| Mail | Your domain | Invoices and reminders come from your address, verified with DNS. |
+| ShieldCheck | Private by default | Pay links are long random codes. Nobody can browse other invoices. |
+| FileDown | Your data | Export every invoice and payment to CSV whenever you like. |
+
+- Motion: the four boxes fade in together with the pricing cards (no separate stagger).
+- No security badges, logos of certifications or claims you cannot prove. Each line describes how the product works.
 
 ## 12. FAQ
 
@@ -327,6 +342,18 @@ Accordion, one open at a time, all closed at first. Each answer 1 to 3 sentences
 - LCP under 2.0 s on 4G: hero visual as an optimised WebP via \`next/image\` with \`priority\`, sized for 2x.
 - Video loads only on demand. Fonts subset to Latin with \`next/font\` (no layout shift).
 - Total JS on the landing page under 120 KB gzipped. CLS under 0.05.
+
+## 18.1 Accessibility
+
+- One H1, then H2 per section in order; feature headings are H2 tags styled at 36px.
+- Every interactive element is reachable by keyboard with the system focus ring (2px outline, 2px offset).
+- The pricing toggle is a real radio group with "Monthly" and "Annual" labels; the price change is announced politely
+  ("Studio, 32 dollars 50 a month, billed yearly").
+- The comparison table has a caption, column headers with \`scope="col"\` and row headers with \`scope="row"\`; Yes / No
+  cells use words, never only ticks or colours.
+- The demo video has captions burned in and a text transcript under a "Read the transcript" disclosure.
+- Animated visuals have \`aria-hidden="true"\` and a static, described image for screen readers.
+- Contrast: body text uses system body ink on white; the teal accent is never used for text under 18px.
 
 ## 19. Analytics events (PostHog)
 

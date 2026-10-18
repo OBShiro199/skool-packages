@@ -214,6 +214,7 @@ That is 8 items. Above the bottom group sits a compact usage meter (audio hours 
 | \`POST /api/stripe/webhook\` | Stripe events into \`subscriptions\` (built in the shared Stripe tasks) |
 | \`POST /api/stripe/checkout\`, \`/api/stripe/portal\` | Checkout with the chosen plan and interval, Customer Portal |
 | \`POST /api/episodes/[id]/publish\` | Member check, \`status = ready\` check, set \`is_published\`, \`revalidatePath\` |
+| \`POST /api/episodes/import\` | Member check, insert picked feed items as \`imported\` episodes, then process each |
 | \`POST /api/episodes/[id]/process\` | Start processing an imported RSS episode (calls ech-start-transcription server-side) |
 | \`POST /api/help\` | Help form to the founder's inbox, rate limited |
 
@@ -314,8 +315,8 @@ in every edge function that spends money, from \`plan_limits(ws)\` and \`usage_t
 | Longest episode | 2 h | 3 h | 4 h |
 | Shows | 1 | 5 | 25 |
 | Seats | 1 | 3 | 10 |
-| Audiograms a month | 20 | 60 | 200 |
-| Regenerations a month | 30 | 60 | 150 |
+| Audiograms a month | 20 | 50 | 150 |
+| Regenerations a month | 25 | 50 | 100 |
 | RSS auto-import | Yes | Yes | Yes |
 | Public pages and embed | Yes, with "Made with Echo" badge | Yes, badge optional | Yes, badge optional |
 | 7-day trial | 2 audio hours, 5 audiograms, 10 regenerations | same | same |

@@ -139,7 +139,7 @@ All built from DESIGN_SYSTEM.md tokens. No new radii, shadows or sizes.
 ### 4.4 Regenerate popover
 - 320px popover from the Regenerate button (menu pop motion). 3 preset chips ("Shorter", "More playful",
   "More formal") and a 3-line textarea "Tell Echo what to change" with a 300 character counter.
-- Button: "Regenerate (1 of 30 left)". While running, the asset body keeps its height, the text fades to 40% and a
+- Button: "Regenerate (1 of 25 left)". While running, the asset body keeps its height, the text fades to 40% and a
   live dot with "Rewriting" sits in the header. Undo appears in the toast for 8 s.
 
 ### 4.5 Title picker
@@ -147,8 +147,10 @@ Five rows, 48px each, radio on the left, the title, the angle as a grey pill on 
 gets \`--accent-soft\` and the episode title updates. Character count right-aligned, tabular, amber over 60.
 
 ### 4.6 Chapter list
-Rows 40px: start time (tabular, link), title (inline editable), drag handle on hover only (visibility hidden at
-rest so rows do not shift). "+ Add chapter" dashed row at the end. Copy menu: "YouTube format", "Podcast host
+Rows 40px: start time (tabular, link to seek; click the pencil to edit it), title (inline editable). Chapters
+are always in time order: editing a time re-sorts the list once, with rows moving over 300 ms on the morph curve.
+The pencil sits in reserved space (visibility hidden at rest) so rows never shift. "+ Add chapter" dashed row at
+the end adds one at the current playhead. Copy menu: "YouTube format", "Podcast host
 format", "chapters.json URL".
 
 ### 4.7 Quote card
@@ -402,7 +404,7 @@ chapters, 5 quotes, 5 posts, 1 newsletter, 1 blog post") and the top title optio
 | Too long | This episode is 3 h 12 min. Your plan handles episodes up to 2 hours. Upgrade to Studio for 3 hours |
 | Limit | You have used 6 of 6 audio hours this month. Upgrade to Studio for 20, or wait until 1 Nov |
 | Quote verified tooltip | Word for word from the transcript |
-| Regenerate button | Regenerate (12 of 30 left) |
+| Regenerate button | Regenerate (12 of 25 left) |
 | Regenerate placeholder | Tell Echo what to change, for example: shorter, and mention the book |
 | Audiogram render button | Render audiogram (4 of 20 left) |
 | Audio expired | We delete uploaded audio 30 days after processing. Upload the file again or add your RSS feed to make audiograms |
@@ -426,7 +428,7 @@ Every interactive component has these states designed before it is built. Sizes 
 | Tab (asset tabs) | Muted label | Ink label | Ink label, 2px \`--accent\` bottom line | Live dot after the label while generating | Ghost label with "Failed" pill | Coral dot after the label |
 | Transcript row | White | \`--row-hover\` | Playing: \`--accent-soft\` | Not used | Not used | Not used |
 | Selected text range | Not used | Not used | \`--accent-soft\` with the selection bar | Not used | Not used | "Pick 30 to 60 seconds" inline under the bar if outside the range |
-| Chapter row | White | Drag handle visible, \`--row-hover\` | Dragging: 1px \`--accent-edge\` drop line | Not used | Not used | "Chapters must be at least a minute apart" under the row |
+| Chapter row | White | Pencil visible, \`--row-hover\` | Editing: time and title inputs in place, same height | Not used | Not used | "Chapters must be at least a minute apart" under the row |
 | Clip window | \`--accent-soft\` + edges | Handles darken to \`--accent\` | Dragging: label shows length every frame | Not used | Not used | Edges coral and label "Too short" or "Too long" while outside 30 to 60 s |
 | Style tile | White, hairline | \`--hover\` | Selected: \`--accent-soft\`, \`--accent-edge\` | Not used | Not used | Not used |
 | Feed input | White, \`--btn-edge\` | Darker edge | Focus: darker edge + 3px ink halo | "Checking" live dot inside the field, right side | Ghost | Danger text under the field |

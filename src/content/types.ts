@@ -145,7 +145,8 @@ export interface CostLine {
 export interface CostModel {
   /** The main usage driver per customer per month, e.g. minutes of video, tracked prompts, call minutes. */
   usage: { label: string; unit: string; default: number; min: number; max: number; step: number }
-  plans: { id: string; name: string; price: number; interval: 'month' | 'year'; includes: string }[]
+  /** usageCap: the most usage (in usage.unit) the plan includes per month; the calculator never models beyond it. */
+  plans: { id: string; name: string; price: number; interval: 'month' | 'year'; includes: string; usageCap?: number }[]
   lines: CostLine[]
   /** Assumptions behind the model, one line each. */
   notes: string[]

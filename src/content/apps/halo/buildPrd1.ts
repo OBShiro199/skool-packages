@@ -125,8 +125,8 @@ rating, sentiment, or customer attribute."
 Halo only texts a customer when the business has marked that customer as having agreed to receive a text
 (\`sms_consent = true\` on the contact, set by the CSV column, the webhook field, or a checkbox on manual
 send that reads "This customer agreed to receive a text from us"). Every SMS names the business, and the
-first text to a number ends with "Reply STOP to opt out". STOP, UNSUBSCRIBE, CANCEL, END and QUIT opt the
-number out immediately and permanently for that business. Without SMS consent, Halo sends email only.
+initial text ends with "Reply STOP to opt out". STOP, UNSUBSCRIBE, CANCEL, END and QUIT opt the
+number out immediately for that business until they text START. Without SMS consent, Halo sends email only.
 
 ## 5. User stories
 
@@ -270,6 +270,7 @@ The app shell has a left sidebar (DESIGN.md section 6). One level, no nested men
 | \`/app/settings\` | member | Tabs: Profile, Workspace, Team, Notifications. (Integrations live per location) |
 | \`/r/[token]\` | public | The customer rating page. Rate, post on Google, send private feedback |
 | \`/u/[token]\` | public | Email unsubscribe for that business (one click, then a confirmation) |
+| \`/sms-consent/[senderId]\` | public | Static page for the carrier review: how this business collects text consent at booking, with the sample message |
 | \`/join/[slug]\` | public | Optional opt-in form per location (name, mobile, "Text me after my visit" checkbox). Also the opt-in proof URL for toll-free verification |
 | \`/api/google/oauth/start\` | owner/admin | Starts Google OAuth with scope \`https://www.googleapis.com/auth/business.manage\`, \`access_type=offline\`, \`prompt=consent\` |
 | \`/api/google/oauth/callback\` | owner/admin | Exchanges the code, stores the refresh token in Vault through \`store_google_connection()\`, redirects to location picking |

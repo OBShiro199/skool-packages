@@ -63,12 +63,14 @@ export function CostCalculator({ app }: { app: AppDef }) {
   const [annualPct, setAnnualPct] = useState(hasAnnual ? 30 : 0)
   const [planId, setPlanId] = useState(monthlyPlans[0]?.id ?? model.plans[0].id)
   const customers = CUSTOMER_STOPS[stop]
-  const r = compute(model, customers, usage, annualPct / 100, planId)
+  const cap = model.plans.find((p) => p.id === planId)?.usageCap
+  const effUsage = cap !== undefined ? Math.min(usage, cap) : usage
+  const r = compute(model, customers, effUsage, annualPct / 100, planId)
 
   const breakEven = useMemo(() => {
-    for (let c = 1; c <= 5000; c++) if (compute(model, c, usage, annualPct / 100, planId).profit >= 0) return c
+    for (let c = 1; c <= 5000; c++) if (compute(model, c, effUsage, annualPct / 100, planId).profit >= 0) return c
     return null
-  }, [model, usage, annualPct, planId])
+  }, [model, effUsage, annualPct, planId])
 
   return (
     <div className="costs">
@@ -78,8 +80,9 @@ export function CostCalculator({ app }: { app: AppDef }) {
           <input type="range" min={0} max={CUSTOMER_STOPS.length - 1} value={stop} onChange={(e) => setStop(+e.target.value)} aria-label="Paying customers" />
         </div>
         <div className="slider-row">
-          <div className="row between"><span className="label">{model.usage.label}</span><b className="mono">{usage.toLocaleString()} {model.usage.unit}</b></div>
-          <input type="range" min={model.usage.min} max={model.usage.max} step={model.usage.step} value={usage} onChange={(e) => setUsage(+e.target.value)} aria-label={model.usage.label} />
+          <div className="row between"><span className="label">{model.usage.label}</span><b className="mono">{effUsage.toLocaleString()} {model.usage.unit}</b></div>
+          <input type="range" min={model.usage.min} max={cap ?? model.usage.max} step={model.usage.step} value={effUsage} onChange={(e) => setUsage(+e.target.value)} aria-label={model.usage.label} />
+          {cap !== undefined && <span className="muted" style={{ fontSize: 12.5 }}>This plan includes up to {cap.toLocaleString()} {model.usage.unit} a month.</span>}
         </div>
         {hasAnnual && (
           <div className="slider-row">
@@ -106,7 +109,7 @@ export function CostCalculator({ app }: { app: AppDef }) {
         <div className="card stat"><span className="label">Gross margin</span><div className={`v ${r.margin >= 0.75 ? 'money' : r.margin < 0 ? 'loss' : ''}`}>{customers ? `${Math.round(r.margin * 100)}%` : '–'}</div><span className="muted mono" style={{ fontSize: 12 }}>{breakEven ? `Break-even at ${breakEven} customer${breakEven === 1 ? '' : 's'}` : 'No break-even under 5,000'}</span></div>
       </div>
 
-      <ProfitChart model={model} usage={usage} annualShare={annualPct / 100} planId={planId} current={customers} />
+      <ProfitChart model={model} usage={effUsage} annualShare={annualPct / 100} planId={planId} current={customers} />
 
       <div className="blk-table">
         <table>

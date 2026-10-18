@@ -48,7 +48,7 @@ Quality bar: `apps/bookwell.ts`, `apps/helpdeck.ts`.
   click path, plus one end-to-end test task), `securityTasks` 3 to 4 app-specific attacks with exact
   curl, `marketing.outbound` 5 to 6, `marketing.inbound` 5 to 6, `marketing.paid` 3 to 5 (scripts in
   code blocks, numbers, budgets, kill rules), `launchTasks` 1 to 2, `repoTree`, `starterFiles`.
-- `costs` CostModel with researched prices, steps at scale, notes with the maths. If no price is
+- `costs` CostModel with researched prices, steps at scale, notes with the maths. Set `usageCap` on every plan (the usage the plan includes, in `usage.unit`), so the calculator never models a plan beyond its cap. If no price is
   given, set plans so gross margin is 75%+ at the plan's usage cap.
 - `apis` with real signup/docs URLs, pricing, envVars using exact `pasteInto` strings
   ('.env.local', 'Supabase secrets', 'Vercel env', or a named dashboard like 'Trigger.dev env').

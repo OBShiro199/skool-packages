@@ -122,7 +122,7 @@ Build every component from DESIGN_SYSTEM.md section 07. Halo adds:
   location when "All locations" is selected, coloured with the tag hue inks.
 - **RequestTicks:** 6 small 14px Lucide icons in a fixed 120px cell: send, check-check, eye, star, external-link,
   message-square. Reached = ink, not reached = ghost. Tooltip shows the time.
-- **UsageMeter:** the system meter with accent fill, amber under 20% left, coral under 5%. "182 of 250 requests"
+- **UsageMeter:** the system meter with accent fill, amber under 20% left, coral under 5%. "182 of 200 requests"
   in tabular figures, width fixed for four-digit counts.
 - **PhonePreview:** a 280px wide rounded (6px) hairline card that renders the SMS bubble exactly as text will look,
   with a live character count "142 / 160" (tabular) and a segment warning in danger ink if over. Used in templates,
@@ -151,7 +151,7 @@ stroke 1.5. Never mix the two families in one row.
 - **Top group:** Dashboard, Requests, Feedback, Reviews, Locations. Feedback shows a count pill of \`new\` items
   (4px pill, amber, fixed width for "99+"). Reviews shows a count of reviews needing a reply.
 - **Bottom group, always this order:** Documentation, Help, Billing, Settings. Billing is hidden for non-owners.
-- Above the bottom group: a compact UsageMeter for review requests this month ("182 of 250"), linking to Billing.
+- Above the bottom group: a compact UsageMeter for review requests this month ("182 of 200"), linking to Billing.
 - Nav items 32px high, 6px radius, hover fill \`--hover\`, selected fill \`--accent-soft\` with the duotone icon. One
   level only. No nested menus.
 - Every page has a 48px toolbar (no page title, no top bar): left the search or the filter chips, right the count
@@ -225,7 +225,7 @@ bottom of the panel in faint ink: "Reach out to help. Halo never asks customers 
   reply status pill. Filters: Needs reply, Stars, Location. Side panel holds the DraftCard. "Sync now" in the
   toolbar shows "Synced 4 minutes ago" (fixed width) and the live dot while syncing.
 - **Link mode:** the same page shows a 560px card "Draft a reply to any review": star picker (compact 24px), review
-  text area, "Draft reply (1 of 40 this month)". The result appears below in a DraftCard whose primary is "Copy
+  text area, "Draft reply (1 of 30 this month)". The result appears below in a DraftCard whose primary is "Copy
   reply" and a secondary "Open Google reviews" link. Above it, a hairline box: "Connect Google to see every new
   review here and post replies from Halo." with the Connect button.
 - \`needs_attention\` drafts show a warning-ink line above the draft: "Needs your attention: mentions a safety
@@ -406,7 +406,7 @@ Owner emails carry the Halo wordmark. No tracking pixels in customer emails (ope
 | Skip reason: asked_recently | "Asked in the last 90 days, so Halo did not ask again" |
 | Skip reason: no_channel | "No mobile with text consent and no email" |
 | Skip reason: opted_out | "Opted out of texts from this business" |
-| Skip reason: limit_reached | "Your plan's 250 requests this month are used. Upgrade to send more." |
+| Skip reason: limit_reached | "Your plan's 200 requests this month are used. Upgrade to send more." |
 | Skip reason: stale_visit | "Visit was more than 7 days ago" |
 | Template incentive error | "Templates cannot offer anything in exchange for a review. Google and the FTC do not allow it." |
 | Template segment error | "This text is 2 SMS segments. Keep it to 160 characters so it sends as one." |
@@ -415,7 +415,7 @@ Owner emails carry the Halo wordmark. No tracking pixels in customer emails (ope
 | Policy note (Locations > Messages) | "Halo asks every customer the same way and shows everyone the Google button. That keeps you inside Google's review rules." |
 | Reply posted toast | "Reply posted to Google" |
 | Draft check failed | "Check this draft: it mentions a phone number" |
-| Paste drafter button | "Draft reply (1 of 40 this month)" |
+| Paste drafter button | "Draft reply (1 of 30 this month)" |
 
 Never write: "filter out bad reviews", "stop negative reviews", "only send happy customers to Google", "protect your
 rating from unhappy customers". Write instead: "hear from unhappy customers first", "fix problems while you still

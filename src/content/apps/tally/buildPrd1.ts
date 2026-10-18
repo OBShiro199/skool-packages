@@ -25,7 +25,7 @@ this file wins. The look and feel lives in \`@DESIGN_SYSTEM.md\` (the Quiet Prec
 
 Freelancers and small agencies do the work, send the invoice, and then become unpaid debt collectors.
 The invoice goes out on the 1st. Nothing happens. On the 20th they notice, feel awkward, write a careful
-"just checking in" email at 11pm, and the client pays on the 34th. Next month the same thing happens with a
+"checking in on this" email at 11pm, and the client pays on the 34th. Next month the same thing happens with a
 different client.
 
 What they do today:
@@ -145,7 +145,7 @@ waits.
   | Edge functions:                                                                          |
   |  tl-send-invoice   tl-worker   tl-scheduler   tl-public-invoice   tl-create-checkout     |
   |  tl-connect-webhook   tl-resend-webhook   tl-domains   tl-tone-rewrite   tl-start-job     |
-  | pg_cron: tl-worker every minute, tl-scheduler every 15 minutes, FX at 16:30 UTC          |
+  | pg_cron: tl-worker every minute, tl-scheduler every 15 minutes (queues FX daily)        |
   +------+-------------------+--------------------+---------------------+--------------------+
          |                   |                    |                     |
          v                   v                    v                     v
@@ -160,7 +160,7 @@ Flow of one invoice:
 1. The owner builds a draft in \`/app/invoices/new\` (browser writes \`invoices\` and \`invoice_lines\` through RLS;
    a trigger recalculates totals in the database, so the browser never sets a total).
 2. "Send" calls \`tl-send-invoice\`. It checks the plan cap, assigns the next invoice number in a locked
-   transaction, creates the public token (only its hash is stored), freezes the revision, computes the reminder
+   transaction, creates the pay and reply tokens (hashes for lookup, encrypted copies for later emails), freezes the revision, computes the reminder
    schedule, and enqueues \`render_pdf\` then \`send_invoice_email\` jobs.
 3. \`tl-worker\` (every minute) renders the PDF with pdf-lib into \`invoice-pdfs/<ws>/<invoice>/r<rev>.pdf\` and sends
    the email through Resend from the workspace's verified domain with the PDF attached, a "View and pay" button,
@@ -240,7 +240,7 @@ step of the playbook. Summary:
 | \`saved_items\` | id, workspace_id, description, unit_price_cents, currency, tax_rate_id | Quick-add line items |
 | \`clients\` | id, workspace_id, name, company, email, cc_emails[], currency, terms_days, tax_rate_id, address, notes, reminders_enabled, reminder_sequence_id, archived_at | Unique (workspace_id, lower(email)) for live clients |
 | \`client_stripe_customers\` | client_id, stripe_account_id, stripe_customer_id | Customer on the CONNECTED account, made lazily |
-| \`invoices\` | id, workspace_id, client_id, number, kind (standard, deposit, recurring), status, currency, issue_date, due_date, subtotal_cents, discount_cents, tax_cents, late_fee_cents, deposit_credit_cents, total_cents, amount_paid_cents, amount_due_cents, allow_partial, min_partial_cents, allow_card, allow_bank, reminders_enabled, reminder_sequence_id, sequence_state, paused_until, pause_reason, revision, pdf_path, public_token_hash, reply_token_hash, deposit_for_invoice_id, recurring_profile_id, scheduled_send_at, sent_at, first_viewed_at, paid_at, voided_at, notes, terms, fx_rate_to_base, created_by | Totals are written only by triggers and edge functions |
+| \`invoices\` | id, workspace_id, client_id, number, kind (standard, deposit, recurring), status, currency, issue_date, due_date, subtotal_cents, discount_cents, tax_cents, late_fee_cents, deposit_credit_cents, total_cents, amount_paid_cents, amount_due_cents, allow_partial, min_partial_cents, allow_card, allow_bank, reminders_enabled, reminder_sequence_id, sequence_state, paused_until, pause_reason, revision, pdf_path, public_token_hash, reply_token_hash, pay_token_enc, reply_token_enc, deposit_for_invoice_id, recurring_profile_id, scheduled_send_at, sent_at, first_viewed_at, paid_at, voided_at, notes, terms, fx_rate_to_base, created_by | Totals are written only by triggers and edge functions |
 | \`invoice_lines\` | id, invoice_id, workspace_id, position, kind (item, late_fee, deposit_credit), description, quantity, unit_price_cents, tax_rate_id, tax_pct, line_subtotal_cents, line_tax_cents | Locked once any payment exists |
 | \`invoice_events\` | id, workspace_id, invoice_id, kind, data (jsonb), actor, created_at | The timeline. Append only |
 | \`payments\` | id, workspace_id, invoice_id, amount_cents, currency, method, status, source (stripe, manual), stripe_account_id, checkout_session_id, payment_intent_id, received_at, note, recorded_by | Manual payments by members, Stripe payments only by the webhook |
@@ -503,7 +503,10 @@ Research summary (checked Oct 2026, re-check before building):
 3. **Public pages never touch tables.** The anon role has zero grants on invoice tables. \`/i/[token]\` calls
    \`tl-public-invoice\`, which uses the secret key and returns only that invoice's public view.
 4. **Unguessable links.** Pay tokens are 32 random bytes, base64url (43 characters). Reply tokens are 20 random
-   bytes base32. Only SHA-256 hashes are stored. Unknown, voided and rotated tokens return the same 404.
+   bytes base32. Lookups use only their SHA-256 hashes. Reminders sent days later need the raw link, so the raw
+   tokens are also stored AES-GCM encrypted (\`pay_token_enc\`, \`reply_token_enc\`) with \`APP_ENCRYPTION_KEY\`, an
+   edge function secret that never touches the database. A database leak alone gives no working links. Unknown,
+   voided and rotated tokens return the same 404.
 5. **Brute force guard.** \`tl-public-invoice\` allows 60 requests a minute per IP hash and 20 unknown-token lookups
    an hour per IP hash, then 429. \`tl-create-checkout\` allows 10 sessions per invoice per hour.
 6. **Amount bounds.** \`tl-create-checkout\` ignores any amount from the browser except a partial amount, which must

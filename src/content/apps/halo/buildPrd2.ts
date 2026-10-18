@@ -105,16 +105,13 @@ import dialog. Phone numbers are normalised with \`libphonenumber-js\` (default 
 ## 12. Message templates
 
 Placeholders: \`{first_name}\`, \`{business}\` (location.sms_name), \`{link}\`. Rendered SMS must be GSM-7 and
-160 characters or fewer with a 23 character link. The template trigger rejects incentive words (R6),
+160 characters or fewer. The link is 24 characters (\`usehalo.app/r/\` plus the 10 character token; phones turn it
+into a link without \`https://\`). The template trigger rejects incentive words (R6),
 missing \`{link}\`, missing \`{business}\`, and non GSM-7 characters (smart quotes, emoji).
 
-Default SMS (initial, first text to a number):
+Default SMS (initial, always ends with the opt-out line):
 \`\`\`txt
 Hi {first_name}, thanks for visiting {business} today. How did we do? {link} Reply STOP to opt out
-\`\`\`
-Default SMS (initial, number texted before by this business):
-\`\`\`txt
-Hi {first_name}, thanks for choosing {business} again. How did we do? {link}
 \`\`\`
 Default SMS (reminder, only if the first link was never opened):
 \`\`\`txt
@@ -181,6 +178,7 @@ json, CORS), \`log.ts\`, \`retry.ts\`, \`limits.ts\`, \`meter.ts\`, \`tokens.ts\
   - \`click { token }\` > \`{ review_url }\`. Stamps \`google_clicked_at\` once. The page opens the URL itself.
   - \`feedback { token, body (1..2000 chars), wants_reply }\` > \`{ ok }\`. One per request. Queues
     \`feedback_alert\` if rating <= alert_threshold or rating is null.
+  - \`unsubscribe { token, undo? }\` > \`{ ok }\`. Sets the contact's \`email_opted_out_at\` (or clears it within 24 hours on undo).
 - **R1/R2 guard:** \`view\` always returns \`review_url\` when the location has one, whatever the rating. A unit
   test asserts the response shape is identical for ratings 1 to 5.
 
@@ -313,8 +311,8 @@ one AI draft.
 | | Trial (7 days) | Solo $49 | Growth $99 | Agency $299 |
 |---|---|---|---|---|
 | Locations | plan's | 1 | 3 | 10 |
-| Review requests a month | 50 | 250 | 600 | 1,200 |
-| AI reply drafts a month | 10 | 40 | 150 | 400 |
+| Review requests a month | 50 | 200 | 500 | 1,000 |
+| AI reply drafts a month | 10 | 30 | 120 | 300 |
 | Seats | plan's | 2 | 5 | 10 |
 | SMS | after approval | yes | yes | yes, one number per client business |
 | Halo footer on emails | yes | yes | yes | no |

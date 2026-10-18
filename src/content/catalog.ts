@@ -10,16 +10,11 @@ export const CATEGORIES: { id: CategoryId; label: string; blurb: string }[] = [
 
 /** Kits announced but not yet released. Shown locked in the library. */
 export const COMING_SOON: { name: string; oneLiner: string; category: CategoryId }[] = [
-  { name: 'Harvest', oneLiner: 'LinkedIn post engagers turned into a warm lead list every morning.', category: 'sales' },
-  { name: 'Sparring', oneLiner: 'An AI prospect that picks up so reps can practise cold calls and get scored.', category: 'sales' },
-  { name: 'Marquee', oneLiner: 'YouTube thumbnails generated from your face and title, then A/B tested.', category: 'content' },
-  { name: 'Echo', oneLiner: 'Podcast episodes turned into show notes, chapters, quotes and audiograms.', category: 'content' },
   { name: 'Tally', oneLiner: 'Invoices that chase themselves with polite reminders until they are paid.', category: 'business' },
   { name: 'Shortlist', oneLiner: 'Applicant tracking for small teams hiring fewer than ten people.', category: 'business' },
   { name: 'Retain', oneLiner: 'Spots Stripe customers about to cancel and wins them back.', category: 'business' },
   { name: 'Rota', oneLiner: 'Staff rotas built in minutes, with shift swaps and text reminders.', category: 'productivity' },
   { name: 'Quotient', oneLiner: 'Instant online quotes for tradespeople, turned into booked jobs.', category: 'productivity' },
-  { name: 'Halo', oneLiner: 'Asks happy customers for Google reviews and catches unhappy ones first.', category: 'ai-agents' },
   { name: 'Dossier', oneLiner: 'Answers security questionnaires and RFPs from your own documents.', category: 'ai-agents' },
 ]
 

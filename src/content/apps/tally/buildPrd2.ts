@@ -26,15 +26,15 @@ Error body shape for every function: \`{ "error": { "code": "limit_reached", "me
   \`amount_paid_cents = 0\` (409 \`has_payments\`).
 - **Limits:** \`now\`/\`schedule\` run \`checkLimit(ws, 'invoices_sent', 1)\` (402 \`limit_reached\`). \`resend\` is free.
   Rate limit 60 sends per user per hour.
-- **Action (RPC \`issue_invoice(p_invoice, p_pay_hash, p_reply_hash)\` in one transaction):** assigns
+- **Action (RPC \`issue_invoice(p_invoice, p_pay_hash, p_reply_hash, p_pay_enc, p_reply_enc, p_send_at)\` in one transaction):** assigns
   \`number = prefix || lpad(next_value, 4, '0')\` from \`invoice_counters\` (row locked), sets \`issue_date\` (today
   in workspace timezone if empty) and \`due_date\` (issue + terms if empty), stores token hashes, snapshots
   \`fx_rate_to_base\`, writes \`reminder_sends\` from the sequence (section 14.2), sets \`scheduled\` or keeps it for the
   worker to flip to \`sent\`. \`resend\` bumps \`revision\`, cancels and rewrites future \`reminder_sends\`.
 - **After:** enqueue \`render_pdf\` (key \`pdf:<id>:r<rev>\`) and \`send_invoice_email\` (key \`send:<id>:r<rev>\`, with
   \`run_after = scheduled_send_at\` for scheduled sends). Meter \`invoices_sent\` once per invoice (key \`sent:<id>\`).
-- **Output:** \`{ ok: true, number: "INV-0042", status: "scheduled" | "sending", pay_url }\`. The raw pay token is
-  returned once here (the browser shows "Copy link") and never stored.
+- **Output:** \`{ ok: true, number: "INV-0042", status: "scheduled" | "sending", pay_url }\`. The browser shows
+  "Copy link". The raw token is never stored in plain text or logged.
 - **Errors:** 400, 401, 403, 402, 404, 409 as above.
 
 ### 13.2 tl-worker

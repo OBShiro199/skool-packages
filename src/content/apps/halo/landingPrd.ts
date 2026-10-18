@@ -241,8 +241,8 @@ visuals 12px max (desktop only, off for reduced motion).
 | Monthly | $49/month | $99/month | $299/month |
 | Yearly | $490/year ($40.83/month) | $990/year ($82.50/month) | $2,990/year ($249.17/month) |
 | For | One location | Up to 3 locations | Up to 10 client locations |
-| Review requests a month | 250 | 600 | 1,200 |
-| AI reply drafts a month | 40 | 150 | 400 |
+| Review requests a month | 200 | 500 | 1,000 |
+| AI reply drafts a month | 30 | 120 | 300 |
 | Team seats | 2 | 5 | 10 |
 | Includes | SMS from your own verified number, email, private feedback alerts, Zapier and webhook intake, CSV import, dashboard | Everything in Solo, location comparison, daily digest | Everything in Growth, one number per client business, weekly client reports, no Halo branding on emails |
 | Button | "Start free trial" | "Start free trial" | "Start free trial" |
@@ -335,4 +335,46 @@ signup. DataFast is a fine alternative for revenue attribution by channel.
 - LCP under 2.0 s on 4G: hero visual as a static AVIF with the animated phone loaded after first paint.
 - Fonts: Geist subset, \`font-display: swap\`. No third-party scripts above the fold except PostHog (deferred).
 - Lighthouse: 95+ performance, 100 accessibility on mobile.
+
+## 20. Copy rules (policy-safe marketing)
+
+Halo sells into a market where many tools have gated reviews. The landing page must never sound like one of them.
+
+| Never write | Write instead |
+|---|---|
+| "Stop bad reviews before they happen" | "Hear from unhappy customers first, so you can fix it" |
+| "Only send happy customers to Google" | "Ask every customer the same way" |
+| "Filter out negative feedback" | "Private feedback goes straight to you" |
+| "Protect your 5 star rating" | "Grow your reviews inside Google's rules" |
+| "Get 5 star reviews" | "Get more Google reviews" |
+| "Reward customers for reviews" | (nothing: incentives are not allowed) |
+
+- Every number on the page is either a definition ("A request is one customer asked once, plus one reminder") or
+  carries a footnote with its source. Example results ("5 to 10% of visits") are labelled "typical, not guaranteed".
+- Customer quotes need a real name, business and permission. No made-up testimonials, ever.
+- Competitor claims stay to public pricing marked [verify] and feature rows; never say a named competitor gates reviews.
+
+## 21. Supporting pages (same system)
+
+- **\`/google-review-policy\`:** long-form article layout: 720px reading column inside the rail, 16/26 body, H2 every
+  300 to 400 words, a sticky table of contents on desktop (left, 220px, 13px faint links, the current section in
+  ink with a 2px sage bar), the two phone screenshots (5 stars and 2 stars) after "How Halo does it", a CTA box after
+  "How to ask every customer" (hairline frame, H3 "Ask every customer the right way", primary "Start free trial").
+- **\`/compare/[competitor]\`:** H1 "Halo vs {Competitor}", one paragraph summary, the comparison table with only the two
+  columns, "Choose {Competitor} if..." and "Choose Halo if..." in two equal cards, the pricing section, the FAQ items
+  3, 4 and 9, final CTA. A "Prices checked {date}" line in faint ink under the table.
+- **\`/for/[trade]\`:** hero with the trade name ("Google reviews for dentists"), the trade-specific SMS in a PhonePreview,
+  the right moment to ask for that trade, the tools that trade uses with the Zapier note, 3 trade FAQs, pricing, CTA.
+- **\`/tools/review-link\` and \`/tools/review-reply\`:** the tool in a 560px card above the fold, a 300 word how-to
+  under it, then the trial CTA. No email gate before the first result is visible.
+
+## 22. Build checklist for Claude Code
+
+1. Tokens from DESIGN.md and the landing additions in section 1.1; no raw hex outside the token file.
+2. Every section in order with the exact copy above; sentence case everywhere; no em dashes.
+3. Pricing toggle switches all three cards in place with tabular figures; widths never change.
+4. Comparison table scrolls sideways on mobile with a sticky first column.
+5. Reduced motion: no translate, no parallax, no autoplay.
+6. Lighthouse mobile 95+ performance, 100 accessibility; check 320, 375, 430, 768, 1280 and 1440px.
+7. PostHog events from section 18 fire once each (check in PostHog > Activity).
 `

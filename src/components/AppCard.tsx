@@ -72,7 +72,8 @@ export function LockedCard({ name, oneLiner, label }: { name: string; oneLiner: 
 export function kitEconomics(app: AppDef) {
   const model = app.costs ?? fallbackModel(app)
   const plan = model.plans.find((p) => p.interval === 'month') ?? model.plans[0]
-  const r = compute(model, 100, model.usage.default, 0, plan.id)
+  const usage = plan.usageCap !== undefined ? Math.min(model.usage.default, plan.usageCap) : model.usage.default
+  const r = compute(model, 100, usage, 0, plan.id)
   return { profit: r.profit, margin: r.margin, perCustomer: r.perCustomer, researched: !!app.costs }
 }
 

@@ -100,7 +100,7 @@ everywhere: \`{ "error": { "code": "limit_reached", "message": "human sentence" 
   \`processed_at = now()\`, meters \`generations\` 1 with key \`gen:<episode_id>\`, sends \`episode_ready\`.
 - **voice_card:** call D (14.5) when a show's voice sample changes. Meters \`voice_cards\`.
 - **Hourly (minute 0):** delete uploaded audio older than 30 days after \`processed_at\` (storage remove, set
-  \`audio_deleted_at\`); fail audiograms stuck over 15 minutes after checking \`getRenderProgress\`.
+  \`audio_deleted_at\`); delete audiogram MP4s older than 90 days (keep the row, clear \`output_path\`); fail audiograms stuck over 15 minutes after checking \`getRenderProgress\`.
 - **Errors and retries:** on error \`attempts + 1\`, \`run_after = now() + 2^attempts minutes + 0 to 30 s\`. At 5
   attempts \`dead\`: the asset (or episode, for fetch) is marked failed with a human message and \`job_failed\`
   is emailed. A 402 from limits is not retried.
@@ -148,8 +148,17 @@ everywhere: \`{ "error": { "code": "limit_reached", "message": "human sentence" 
   13.1 internally), \`new_episode\` email if off. Three consecutive errors pause the show and email the owner.
 - **Output:** \`{ ok, shows, new_episodes, errors, ms }\`.
 
-### 13.8 ech-voice-card (inside the worker)
-Not a separate function: the Voice page saves \`shows.voice_sample\` and inserts a \`voice_card\` job.
+### 13.8 Voice cards (inside the worker)
+Not a separate function: saving \`shows.voice_sample\` fires a database trigger that queues a \`voice_card\` job.
+
+### 13.9 ech-free-tool
+- **Trigger:** the landing page and \`/tools/show-notes-generator\` (no login).
+- **Input:** POST \`{ url }\` starts a run and returns \`{ run_id }\`; GET \`?run_id=\` polls.
+- **Checks:** 1 run per hashed IP per day, latest episode under 90 minutes, a global cap of 40 audio hours a
+  month metered on a dedicated \`free tool\` workspace you own.
+- **Does:** transcribes the newest feed item, runs one small Claude call for titles and chapters only, returns
+  them. Never returns the transcript. Rows are deleted after 7 days.
+- **Cost ceiling:** 40 h x ($0.23 + about $0.03) = about $10.40 a month, however many people try it.
 
 ## 14. LLM prompts and JSON schemas
 
@@ -362,12 +371,14 @@ transcription, per-client approval links for agencies (later milestone), white-l
 | Voice card | about $0.02 | 4k input + 1k output, once per show |
 
 At each plan's caps (plus Stripe at 2.9% + $0.30 + 0.7% Billing):
-- Creator $29: 6 h x $0.41 = $2.46, 20 audiograms = $1.20, 30 regenerations = $1.50. AI $5.16 + Stripe $1.34 =
-  $6.50. Gross margin 77.6%.
-- Studio $79: 20 h = $8.20, 60 audiograms = $3.60, 60 regenerations = $3.00. AI $14.80 + Stripe $3.14 = $17.94.
-  Margin 77.3%.
-- Agency $199: 50 h = $20.50, 200 audiograms = $12.00, 150 regenerations = $7.50. AI $40.00 + Stripe $7.46 =
-  $47.46. Margin 76.1%.
+- Creator $29: 6 h x $0.41 = $2.46, 20 audiograms = $1.20, 25 regenerations = $1.25. AI $4.91 + Stripe $1.34 =
+  $6.25. Gross margin 78.4%. Yearly $290: 12 x $4.91 + $10.74 Stripe = $69.66, margin 76.0%.
+- Studio $79: 20 h = $8.20, 50 audiograms = $3.00, 50 regenerations = $2.50. AI $13.70 + Stripe $3.14 = $16.84.
+  Margin 78.7%. Yearly $790: 12 x $13.70 + $28.74 = $193.14, margin 75.6%.
+- Agency $199: 50 h = $20.50, 150 audiograms = $9.00, 100 regenerations = $5.00. AI $34.50 + Stripe $7.46 =
+  $41.96. Margin 78.9%. Yearly $1,990: 12 x $34.50 + $71.94 = $485.94, margin 75.6%.
+- The yearly maths is the binding one: if a vendor raises prices, lower the audiogram and regeneration caps
+  before touching the price.
 - A trial that never converts costs at most 2 h ($0.82) + 5 audiograms ($0.30) + 10 regenerations ($0.50) = $1.62.
 
 Re-measure after the first 20 real episodes: \`select kind, sum(cost_micros)/1e6, sum(quantity) from usage_ledger
