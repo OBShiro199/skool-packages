@@ -3,7 +3,7 @@ import type { AppDef } from '../content/types'
 const TONES: Record<AppDef['art']['tone'], { bg: string; bg2: string; fg: string; accent: string; soft: string }> = {
   blue: { bg: '#E8EEFF', bg2: '#D4DFFF', fg: '#14246B', accent: '#2B59FF', soft: '#C9D6FF' },
   green: { bg: '#E3F4EA', bg2: '#CBEBD8', fg: '#0B4A2B', accent: '#16A05C', soft: '#B8E3C9' },
-  ink: { bg: '#EEEEF0', bg2: '#DEDEE3', fg: '#111114', accent: '#111114', soft: '#CFCFD6' },
+  ink: { bg: '#E9F0FB', bg2: '#D6E3F7', fg: '#1D2B45', accent: '#3E6FD8', soft: '#C4D5F0' },
   amber: { bg: '#FBF0DC', bg2: '#F5E1BA', fg: '#5C3A00', accent: '#E08E00', soft: '#F0D39A' },
   violet: { bg: '#EEE9FF', bg2: '#DDD3FF', fg: '#2A1A73', accent: '#6B4BD8', soft: '#CFC2FF' },
 }

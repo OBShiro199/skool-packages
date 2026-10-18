@@ -224,11 +224,11 @@ export default function BuildPage() {
                 <span> {phases.indexOf(donePhase) + 1} of {phases.length} phases done.{nextAfterDone ? ` ${nextAfterDone.label} is unlocked.` : ''}</span>
               </div>
               {nextAfterDone && (
-                <button className="btn btn-sm" style={{ background: '#fff', color: '#0F0F0F' }} onClick={() => { goTab(nextAfterDone.id); setPhaseDone(null) }}>
+                <button className="btn btn-sm btn-primary" onClick={() => { goTab(nextAfterDone.id); setPhaseDone(null) }}>
                   Start {nextAfterDone.label} <ArrowRight size={14} />
                 </button>
               )}
-              <button className="btn btn-sm btn-ghost" style={{ color: '#fff' }} onClick={() => setPhaseDone(null)}>Close</button>
+              <button className="btn btn-sm btn-ghost" onClick={() => setPhaseDone(null)}>Close</button>
             </motion.div>
           )}
         </AnimatePresence>

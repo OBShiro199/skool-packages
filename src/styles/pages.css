@@ -335,3 +335,43 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; background: v
 .yourein-modal .yourein-check { width: 60px; height: 60px; border-radius: 50%; background: var(--money); display: grid; place-items: center; margin-bottom: 6px; }
 .yourein-modal h2 { font-size: 34px; letter-spacing: -0.03em; }
 .yourein-modal p { font-size: 17px; }
+
+/* ---------- No solid black: blue accent + light surfaces ---------- */
+:root { --term-bg: #F5F7FF; --term-ink: #1A2240; --primary: #2B59FF; --primary-hover: #2149E0; }
+:root[data-theme="dark"] { --term-bg: #121726; --term-ink: #DCE3FF; --primary: #5B7BFF; --primary-hover: #6E8BFF; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --term-bg: #121726; --term-ink: #DCE3FF; --primary: #5B7BFF; --primary-hover: #6E8BFF; } }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+.nav-link.cta { background: var(--primary); border-color: var(--primary); color: #fff; }
+.nav-link.cta:hover { background: var(--primary-hover); }
+.brand-mark { background: var(--primary); color: #fff; }
+.pill.on { background: var(--signal-soft); color: var(--signal); border-color: var(--signal); }
+.pill.on .mono { color: var(--signal); }
+.toast { background: var(--surface); color: var(--ink); border: 1px solid var(--line-2); box-shadow: 0 8px 24px rgba(20, 30, 60, .12); }
+.toast .xp { color: var(--money); }
+.phase-done { background: var(--surface); color: var(--ink); border: 1px solid var(--money); box-shadow: 0 8px 24px rgba(20, 30, 60, .12); }
+.phase-done svg { color: var(--amber); }
+.blk-term { background: var(--term-bg); color: var(--term-ink); border: 1px solid color-mix(in srgb, var(--signal) 22%, transparent); }
+.blk-term-head { border-bottom: 1px solid color-mix(in srgb, var(--signal) 18%, transparent); }
+.blk-term-head .muted-t { color: var(--muted); }
+.blk-term-head .btn { background: var(--surface); color: var(--ink); border-color: var(--line-2); }
+.blk-term-head .btn:hover { border-color: var(--signal); }
+.blk-term .caret { color: var(--signal); }
+.olly-launcher { background: var(--primary); border-color: var(--primary); color: #fff; }
+.olly-dot { border-color: var(--primary); }
+.olly-msg.me { background: var(--primary); color: #fff; }
+.chart-tip { background: var(--surface); color: var(--ink); border: 1px solid var(--line-2); box-shadow: 0 6px 18px rgba(20, 30, 60, .1); }
+.diff i.on { background: var(--signal); border-color: var(--signal); }
+.doc-ex { background: var(--term-bg); color: var(--term-ink); }
+.auth-quote { background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.auth-quote .label { color: var(--muted); }
+.agree input { accent-color: var(--primary); }
+input[type="range"]::-webkit-slider-thumb { background: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
+input[type="range"]::-moz-range-thumb { background: var(--primary); }
+.tick.on { background: var(--money); }
+.mini-ledger tr.total td { border-top-color: var(--line-2); }
+.costs-total td { border-top-color: var(--line-2); }
+.heat i.on { background: var(--money); }
+.onb-opt.on .onb-key { background: var(--primary); border-color: var(--primary); }
+.sig-box.signed { border-color: var(--signal); }
+.olly-launcher .olly-avatar { box-shadow: 0 0 0 2px #fff; }
