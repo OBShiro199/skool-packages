@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion } from 'motion/react'
 import { ArrowRight, Eraser, PenLine } from 'lucide-react'
 import type { AppDef } from '../content/types'
 import { useStore, useUser } from '../lib/store'
@@ -71,27 +70,19 @@ export function CommitModal({ app, open, onClose, onDone }: { app: AppDef; open:
         </div>
       </Modal>
 
-      {createPortal(
-        <AnimatePresence>
-          {celebrating && (
-            <motion.div className="yourein" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <motion.div className="yourein-inner" initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} transition={{ type: 'spring', stiffness: 260, damping: 22 }}>
-                <motion.div className="yourein-check" initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 15 }}>
-                  <svg viewBox="0 0 24 24" width="44" height="44"><motion.path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" strokeWidth="2.6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.45, duration: 0.45 }} /></svg>
-                </motion.div>
-                <motion.span className="label" style={{ color: '#7DF0B0' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>Pledge signed · {date}</motion.span>
-                <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>You’re in.</motion.h1>
-                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.85 }}>Let’s start building <span className="serif" style={{ fontSize: '1.3em' }}>{app.name}</span>.</motion.p>
-                <motion.button className="btn btn-lg" style={{ background: '#fff', color: '#0F0F0F', borderColor: '#fff' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
-                  onClick={() => { setCelebrating(false); onDone() }}>
-                  Open my build <ArrowRight size={16} />
-                </motion.button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body,
-      )}
+      <Modal open={celebrating} onClose={() => setCelebrating(false)} title="Pledge signed"
+        footer={<><button className="btn" onClick={() => setCelebrating(false)}>Stay here</button><button className="btn btn-primary" onClick={() => { setCelebrating(false); onDone() }}>Open my build <ArrowRight size={15} /></button></>}>
+        <div className="yourein-modal">
+          <motion.div className="yourein-check" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring', stiffness: 320, damping: 16 }}>
+            <svg viewBox="0 0 24 24" width="30" height="30"><motion.path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" strokeWidth="2.6" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.35, duration: 0.4 }} /></svg>
+          </motion.div>
+          <motion.h2 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>You’re in.</motion.h2>
+          <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>Let’s start building <b>{app.name}</b>.</motion.p>
+          <motion.p className="muted" style={{ fontSize: 14 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+            Signed {date}. Your first step is Setup: about an hour to get Claude Code running.
+          </motion.p>
+        </div>
+      </Modal>
     </>
   )
 }

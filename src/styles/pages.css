@@ -331,3 +331,7 @@ input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; background: v
 .detail-hero { grid-template-columns: 1fr; max-width: 760px; }
 .continue { grid-template-columns: 1fr; }
 .rec-card { grid-template-columns: 1fr; }
+.yourein-modal { display: grid; justify-items: center; text-align: center; gap: 8px; padding: 12px 0 4px; }
+.yourein-modal .yourein-check { width: 60px; height: 60px; border-radius: 50%; background: var(--money); display: grid; place-items: center; margin-bottom: 6px; }
+.yourein-modal h2 { font-size: 34px; letter-spacing: -0.03em; }
+.yourein-modal p { font-size: 17px; }
