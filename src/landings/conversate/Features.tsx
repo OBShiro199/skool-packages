@@ -64,23 +64,24 @@ function HelpCentreTile() {
 
 /* 7.2 A confident answer with sources, then the "not sure" card. */
 function AnswersTile() {
-  const { ref, step } = useLoopStep(5, 1300)
+  // The first exchange stays put. The second loops: shown, cleared, question, typing dots, "not sure" card.
+  const { ref, step: s } = useLoopStep(5, 1300)
+  const q2 = s !== 1
+  const dots = s === 3
+  const card = s === 0 || s === 4
   return (
     <div ref={ref} className="cv-mock cv-answers" role="img" aria-label="Two widget answers: a confident one with sources and a High 0.91 score, and a low confidence one that shows 'I am not sure about this one' with a Talk to a human button.">
       <div className="cv-answers-thread" aria-hidden="true">
         <div className="cv-msg cv-msg-visitor">Can I change my plan mid-month?</div>
+        <div className="cv-msg cv-msg-ai">Yes. Upgrades apply straight away and you pay the difference for the rest of the month.</div>
+        <div className="cv-sources is-on"><span className="cv-src">Changing plans</span><span className="cv-src">Billing FAQ</span><Conf v={0.91} /></div>
+        <div className={`cv-msg cv-msg-visitor cv-fade ${q2 ? 'is-on' : ''}`}>Do you sponsor school events?</div>
         <div className="cv-slot">
-          <div className={`cv-msg cv-msg-ai cv-fade ${step >= 1 ? 'is-on' : ''}`}>Yes. Upgrades apply straight away and you pay the difference for the rest of the month.</div>
-          <div className={`cv-fade cv-dots-abs ${step === 0 ? 'is-on' : ''}`}><span className="cv-msg cv-msg-ai cv-msg-dots"><TypingDots /></span></div>
-        </div>
-        <div className={`cv-sources cv-fade ${step >= 1 ? 'is-on' : ''}`}><span className="cv-src">Changing plans</span><span className="cv-src">Billing FAQ</span><Conf v={0.91} /></div>
-        <div className={`cv-msg cv-msg-visitor cv-fade ${step >= 2 ? 'is-on' : ''}`}>Do you sponsor school events?</div>
-        <div className="cv-slot">
-          <div className={`cv-notsure cv-fade ${step >= 4 ? 'is-on' : ''}`}>
+          <div className={`cv-notsure cv-fade ${card ? 'is-on' : ''}`}>
             <p><TriangleAlert size={14} /> I am not sure about this one, and I would rather not guess.</p>
             <div className="cv-notsure-btns"><span className="cv-wbtn cv-wbtn-primary"><User size={13} /> Talk to a human</span><span className="cv-wbtn">Ask another way</span></div>
           </div>
-          <div className={`cv-fade cv-dots-abs ${step === 3 ? 'is-on' : ''}`}><span className="cv-msg cv-msg-ai cv-msg-dots"><TypingDots /></span></div>
+          <div className={`cv-fade cv-dots-abs ${dots ? 'is-on' : ''}`}><span className="cv-msg cv-msg-ai cv-msg-dots"><TypingDots /></span></div>
         </div>
       </div>
     </div>
@@ -149,10 +150,13 @@ function GapsTile() {
           </span>
         </div>
       ))}
-      <div className={`cv-gaps-draft cv-fade ${step >= 2 ? 'is-on' : ''}`} aria-hidden="true">
+      <div className="cv-gaps-slot" aria-hidden="true">
+      <div className={`cv-gaps-wait cv-fade ${step >= 2 ? '' : 'is-on'}`}>The draft appears here, sourced from your pages</div>
+      <div className={`cv-gaps-draft cv-fade ${step >= 2 ? 'is-on' : ''}`}>
         <span className="cv-tag cv-tag-accent">AI draft</span>
         <b>Paying by invoice</b>
         <span className="cv-muted">Business orders over $300 can pay by invoice with 14-day terms. <span className="cv-gap-fill">[Fill in: who to email]</span></span>
+      </div>
       </div>
     </div>
   )
@@ -165,7 +169,7 @@ function InstallTile() {
   const [copied, setCopied] = useState(false)
   useEffect(() => { if (!copied) return; const id = window.setTimeout(() => setCopied(false), 1600); return () => window.clearTimeout(id) }, [copied])
   const brand = SWATCHES[step]
-  const snippet = '<script src="https://conversate.app/w.js"\n  data-key="pk_live_7Hq2…" defer></script>'
+  const snippet = '<script\n  src="https://conversate.app/w.js"\n  data-key="pk_live_7Hq2…" defer>\n</script>'
   return (
     <div ref={ref} className="cv-mock cv-install">
       <div className="cv-snippet">
@@ -176,6 +180,12 @@ function InstallTile() {
           </button>
         </div>
         <pre className="cv-code"><code>{snippet}</code></pre>
+        <div className="cv-platforms" aria-hidden="true">{['Plain HTML', 'Webflow', 'WordPress', 'Shopify', 'Framer', 'Next.js'].map((p, i) => <span key={p} className={i === 1 ? 'is-on' : ''}>{p}</span>)}</div>
+        <ol className="cv-steps-mini" aria-hidden="true">
+          <li><span>Open <b>Site settings</b> then <b>Custom code</b></span></li>
+          <li><span>Paste the snippet in <b>Head code</b></span></li>
+          <li><span>Click <b>Publish</b></span></li>
+        </ol>
         <div className="cv-snippet-status"><i className="cv-dot cv-dot-ok cv-dot-pulse" /> Live on northwind.coffee · 2m ago</div>
       </div>
       <div className="cv-brand-panel" role="img" aria-label="Branding panel: brand colour swatches with a live widget preview that follows the chosen colour.">

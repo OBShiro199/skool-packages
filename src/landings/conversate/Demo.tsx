@@ -56,14 +56,14 @@ export function VideoPlayer() {
         <div className="cv-video-poster" aria-hidden="true">
           <BuildList lines={VIDEO_LINES} statuses={['done', 'done', 'live', 'wait', 'wait']} progress={0.52} sub="Writing 18 articles" />
         </div>
-        <button type="button" className="cv-play" aria-label={playing ? 'Pause the demo video' : 'Play the demo video'} onClick={() => setPlaying((p) => !p)}>
-          {playing ? <Pause size={18} /> : <Play size={18} />}
-        </button>
-        <div className="cv-video-bar">
-          <span className="cv-tab-num">{fmt(t)} / 1:30</span>
+      </div>
+      <div className="cv-video-bar">
+          <button type="button" className="cv-play" aria-label={playing ? 'Pause the demo video' : 'Play the demo video'} onClick={() => setPlaying((p) => !p)}>
+            {playing ? <Pause size={15} /> : <Play size={15} />}
+          </button>
+          <span className="cv-tab-num cv-video-time">{fmt(t)} / 1:30</span>
           <span className="cv-video-track"><span style={{ transform: `scaleX(${t / 90})`, transition: reduce ? 'none' : undefined }} /></span>
           <span className="cv-video-chapter">{chapter[1]}</span>
-        </div>
       </div>
       <ol className="cv-chapters" aria-label="Chapters">
         {CHAPTERS.map(([s, label]) => (

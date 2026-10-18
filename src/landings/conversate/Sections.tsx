@@ -152,8 +152,8 @@ export function Compare() {
           <Eyebrow>Compare</Eyebrow>
           <h2 className="cv-h2" id="cv-compare-h">Everything in one tool, priced per month, not per answer.</h2>
         </Reveal>
+        <span className={`cv-scroll-hint ${scrolled ? 'is-off' : ''}`} aria-hidden="true">Scroll sideways →</span>
         <Reveal className="cv-frame cv-table-frame">
-          <span className={`cv-scroll-hint ${scrolled ? 'is-off' : ''}`} aria-hidden="true">Scroll</span>
           <div className="cv-table-scroll" tabIndex={0} role="region" aria-label="Comparison table, scrolls sideways" onScroll={() => setScrolled(true)}>
             <table className="cv-table">
               <caption className="cv-sr">Conversate Starter compared with Ferndesk, Intercom, Help Scout and Crisp</caption>
@@ -195,7 +195,7 @@ export function Stats() {
       <div className="cv-wrap">
         <p className="cv-stats-line">
           <i className="cv-dot cv-dot-ok cv-dot-pulse" aria-hidden="true" />
-          This page's assistant answered <b className="cv-tab-num">214</b> questions this month, <b className="cv-tab-num">81%</b> without a human.
+          <span>This page's assistant answered <b className="cv-tab-num">214</b> questions this month, <b className="cv-tab-num">81%</b> without a human.</span>
         </p>
       </div>
     </section>
@@ -243,9 +243,8 @@ export function Pricing() {
                     </motion.span>
                   </AnimatePresence>
                 </span>
-                <span className="cv-price-per">/ month</span>
               </div>
-              <p className="cv-price-sub cv-tab-num">{annual ? `${p.yTotal} / year, billed yearly` : 'Billed monthly'}</p>
+              <p className="cv-price-sub cv-tab-num">{annual ? `per month, ${p.yTotal} billed yearly` : 'per month, billed monthly'}</p>
               <a
                 href={`/signup?plan=${p.id}&interval=${interval}`}
                 className="cv-btn cv-btn-primary cv-btn-block"
@@ -288,6 +287,17 @@ export const FAQ: [string, string][] = [
 export function Faq() {
   const [open, setOpen] = useState<number | null>(0)
   const reduce = useReducedMotion()
+  // One open at a time: when an answer above collapses, hold the clicked question where it was so the page never jumps.
+  const hold = (el: HTMLElement) => {
+    const top0 = el.getBoundingClientRect().top
+    const t0 = performance.now()
+    const tick = () => {
+      const d = el.getBoundingClientRect().top - top0
+      if (Math.abs(d) > 0.5) window.scrollBy(0, d)
+      if (performance.now() - t0 < 360) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }
   return (
     <section className="cv-section cv-band" id="faq" aria-labelledby="cv-faq-h">
       <div className="cv-wrap cv-faq-wrap">
@@ -306,7 +316,7 @@ export function Faq() {
                     id={`cv-faq-q${i}`}
                     aria-expanded={isOpen}
                     aria-controls={`cv-faq-a${i}`}
-                    onClick={() => { setOpen(isOpen ? null : i); if (!isOpen) track('faq_open', { index: i }) }}
+                    onClick={(e) => { if (open !== null && open < i) hold(e.currentTarget); setOpen(isOpen ? null : i); if (!isOpen) track('faq_open', { index: i }) }}
                   >
                     <span>{q}</span>
                     <ChevronDown size={16} aria-hidden="true" className="cv-faq-chev" />

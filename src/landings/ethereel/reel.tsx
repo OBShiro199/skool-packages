@@ -86,6 +86,7 @@ export function Scene({ t, speaking, look, zoom = 1, shift = 0 }: {
   const sway = Math.sin(t * 0.8) * 0.9 + shift
   const tilt = Math.sin(t * 0.55) * 1.4
   const look2 = look === 'raw' && !speaking ? 1.5 : 0
+  const id = useId().replace(/:/g, '')
   return (
     <svg
       className={`er-scene er-scene-${look}`}
@@ -93,18 +94,18 @@ export function Scene({ t, speaking, look, zoom = 1, shift = 0 }: {
       style={{ transform: `scale(${zoom})` }}
     >
       <defs>
-        <linearGradient id="er-wall" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={`er-wall${id}`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#e8dccb" /><stop offset="1" stopColor="#c8b59c" />
         </linearGradient>
-        <radialGradient id="er-glow" cx="0.2" cy="0.25" r="0.6">
+        <radialGradient id={`er-glow${id}`} cx="0.2" cy="0.25" r="0.6">
           <stop offset="0" stopColor="#fff6e6" stopOpacity="0.9" /><stop offset="1" stopColor="#fff6e6" stopOpacity="0" />
         </radialGradient>
-        <linearGradient id="er-jumper" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`er-jumper${id}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#3b4a5e" /><stop offset="1" stopColor="#253244" />
         </linearGradient>
       </defs>
-      <rect width="90" height="160" fill="url(#er-wall)" />
-      <rect width="90" height="160" fill="url(#er-glow)" />
+      <rect width="90" height="160" fill={`url(#er-wall${id})`} />
+      <rect width="90" height="160" fill={`url(#er-glow${id})`} />
       {/* window light and shelf */}
       <rect x="4" y="14" width="22" height="34" fill="#f6efe3" opacity="0.55" />
       <line x1="15" y1="14" x2="15" y2="48" stroke="#d9c9b1" strokeWidth="0.8" />
@@ -119,7 +120,7 @@ export function Scene({ t, speaking, look, zoom = 1, shift = 0 }: {
       <ellipse cx="15" cy="124" rx="5" ry="11" fill="#5c7a4b" transform="rotate(14 15 124)" />
       {/* person */}
       <g transform={`translate(${sway} 0)`}>
-        <path d="M8 160 C10 128 22 118 36 114 L54 114 C68 118 80 128 82 160 Z" fill="url(#er-jumper)" />
+        <path d="M8 160 C10 128 22 118 36 114 L54 114 C68 118 80 128 82 160 Z" fill={`url(#er-jumper${id})`} />
         <path d="M37 113 L45 122 L53 113" fill="none" stroke="#1d2735" strokeWidth="1.2" />
         <rect x="39.5" y="96" width="11" height="18" rx="4" fill="#b98466" />
         <g transform={`rotate(${tilt} 45 84) translate(0 ${look2})`}>
@@ -145,6 +146,7 @@ export function Scene({ t, speaking, look, zoom = 1, shift = 0 }: {
 
 function D({ d, p, at, dur = 0.5, red, w = 1.1 }: { d: string; p: number; at: number; dur?: number; red?: boolean; w?: number }) {
   const k = clamp((p - at) / dur)
+  if (k <= 0) return null
   return (
     <path
       d={d} pathLength={1} fill="none" stroke={red ? 'var(--reel-red)' : '#141414'} strokeWidth={w}
@@ -185,14 +187,15 @@ export function Diagram({ kind, p }: { kind: CutKind; p: number }) {
       <g>
         <W p={p} at={0.1} x={24} y={34} size={7}>by hand</W>
         <W p={p} at={0.3} x={66} y={34} size={7}>Ethereel</W>
-        <D p={p} at={0.2} dur={0.4} d="M45.2 24 C44.6 44 45.4 70 44.8 92" />
+        <D p={p} at={0.2} dur={0.3} d="M45.2 24 C44.8 34 45.3 42 45 50" />
+        <D p={p} at={0.4} dur={0.3} d="M44.9 66 C45.3 76 44.7 86 45.1 94" />
         <W p={p} at={0.6} x={24} y={62} size={15}>60</W>
         <W p={p} at={0.7} x={24} y={73} size={6.5}>min a reel</W>
         <W p={p} at={1.3} x={66} y={62} size={15} red>5</W>
         <W p={p} at={1.4} x={66} y={73} size={6.5}>min of you</W>
         <D p={p} at={1.0} dur={0.4} d="M13 57 C20 54 28 51 35 47" />
         <D p={p} at={1.8} dur={0.5} red w={1.4} d="M54 77 C60 78.4 68 78 78 76.6" />
-        <W p={p} at={2.2} x={45} y={110} size={9}>vs</W>
+        <W p={p} at={0.5} x={45} y={61} size={9}>vs</W>
       </g>
     )
   }
@@ -200,7 +203,7 @@ export function Diagram({ kind, p }: { kind: CutKind; p: number }) {
     <g>
       <D p={p} at={0.1} d="M18 34 C17.6 60 18.4 90 18 112 C36 112.6 56 112.2 76 112.6" />
       <W p={p} at={0.4} x={20} y={30} size={6.5} anchor="start">reels posted</W>
-      <W p={p} at={0.5} x={76} y={122} size={6.5}>weeks</W>
+      <W p={p} at={0.5} x={70} y={120} size={6.5}>weeks</W>
       <D p={p} at={0.7} dur={1} w={1.3} d="M20 108 C28 106 32 104 38 99 C44 93 48 92 54 82 C60 72 64 60 72 48" />
       <D p={p} at={1.8} dur={0.4} red w={1.4} d="M67.5 47 C67.8 42 75.6 41.8 76.2 47.6 C76.6 53 68.2 53.6 67.6 47.6" />
       <W p={p} at={2.1} x={60} y={40} size={7} red>1 a day</W>
@@ -232,7 +235,7 @@ export function Cutaway({ kind, p }: { kind: CutKind; p: number }) {
 
 export function Caption({ text, ink, k }: { text?: string; ink?: boolean; k?: string }) {
   return (
-    <div className="er-cap-zone" aria-hidden="true">
+    <div className={`er-cap-zone${ink ? ' er-cap-zone-low' : ''}`} aria-hidden="true">
       {text && <span key={k ?? text} className={`er-cap${ink ? ' er-cap-ink' : ''}`}>{text}</span>}
     </div>
   )
