@@ -12,7 +12,7 @@ export const outbound: Task[] = [
       { type: 'p', text: 'Your best buyers are B2B SaaS companies with 10 to 300 staff that have started selling upmarket. They show it in public: a SOC 2 badge or a trust page, an "Enterprise" plan with "Contact sales", and job ads for sales engineers or security roles. Each of those means questionnaires are landing on someone\'s desk every week.' },
       { type: 'steps', items: [
         'Open Google Sheets with columns: company, website, staff, contact name, title, email, signal, signal source, tier (1/2/3), status.',
-        'Find companies: Vanta, Drata and Secureframe customer pages and case studies (companies that just got SOC 2 are about to be flooded with questionnaires); Google "trust.<anything>.com" style trust portals and "site:*.com/security SOC 2 Type II" for SaaS; G2 categories you know well filtered to 11 to 200 employees.',
+        'Find companies: Vanta, Drata and Secureframe customer pages and case studies (companies that recently got SOC 2 are about to be flooded with questionnaires); Google "trust.<anything>.com" style trust portals and "site:*.com/security SOC 2 Type II" for SaaS; G2 categories you know well filtered to 11 to 200 employees.',
         'Find the person: under 50 staff, the founder or CTO; 50 to 300 staff, the Head of Sales Engineering, Solutions Consulting, Security or Compliance (LinkedIn search by title + company).',
         'Get the work email with Apollo or Hunter free credits for Tier 1 first, then verify every email with MillionVerifier and delete anything not "ok".',
         'Signal per row, one of: SOC 2 announced in the last 6 months; hiring a sales engineer, solutions consultant or GRC role; an Enterprise plan with "Contact sales"; a public trust page or security page; a LinkedIn post about questionnaires or vendor reviews.',
@@ -194,7 +194,7 @@ export const inbound: Task[] = [
     minutes: 180,
     xp: 60,
     blocks: [
-      { type: 'p', text: 'People search for the exact questionnaire they were just sent. A page that explains it section by section, with example answers, catches them on the worst day of their week.' },
+      { type: 'p', text: 'People search for the exact questionnaire they were sent today. A page that explains it section by section, with example answers, catches them on the worst day of their week.' },
       { type: 'prompt', id: 'dsr-mk-in-guides-prompt', title: 'Paste into Claude Code', code: `Create a Supabase table guide_pages (slug, title, framework, intro, sections jsonb [{ heading, what_they_ask, example_answer, evidence_to_attach }], faq jsonb, updated_at) with RLS on and a public select policy (marketing content only, no customer data).
 Build app/(marketing)/guides/[slug]/page.tsx using @DESIGN_SYSTEM.md marketing rules: H1, a 3 line intro, a table of contents, each section with "What they are asking", "Example answer" and "Evidence to attach", an FAQ with FAQPage JSON-LD, and a CTA box "Upload yours and get every answer drafted from your own policies". Static generation with revalidate 86400. Add them to app/sitemap.ts.
 Seed 10 pages: CAIQ v4, SIG Lite, SIG Core, a generic vendor security questionnaire, HECVAT Lite, a SOC 2 bridge letter request, a GDPR DPA questionnaire, a penetration test questions list, an AI and LLM vendor questionnaire, an RFP security section. Write example answers that are generic and clearly marked "example".` },
@@ -218,7 +218,7 @@ Seed 10 pages: CAIQ v4, SIG Lite, SIG Core, a generic vendor security questionna
     xp: 45,
     blocks: [
       { type: 'prompt', id: 'dsr-mk-in-compare-prompt', title: 'Paste into Claude Code', code: `Build app/(marketing)/compare/[competitor]/page.tsx for loopio, conveyor, responsive and vanta-questionnaires.
-Each page: H1 "Dossier vs <Competitor>", a two-sentence fair summary of who each one is best for, the comparison table rows from @LANDING.md section 9 for just those two products, "When <Competitor> is the better choice" (be honest: bigger teams, RFP-heavy workflows, existing Vanta customers), "When Dossier is the better choice", pricing with the source link and "checked <month year>", FAQ JSON-LD, and the trial CTA.
+Each page: H1 "Dossier vs <Competitor>", a two-sentence fair summary of who each one is best for, the comparison table rows from @LANDING.md section 9 for those two products only, "When <Competitor> is the better choice" (be honest: bigger teams, RFP-heavy workflows, existing Vanta customers), "When Dossier is the better choice", pricing with the source link and "checked <month year>", FAQ JSON-LD, and the trial CTA.
 Keep competitor facts in lib/competitors.ts with a source URL and checked date per fact, and render a small "Last checked" line. Never state a competitor fact without a source.` },
       { type: 'steps', items: [
         'Check each competitor\'s pricing or review pages yourself and paste the numbers with the source link into lib/competitors.ts.',

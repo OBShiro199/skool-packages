@@ -327,4 +327,36 @@ Accordion, one open at a time, 200ms height morph. FAQPage JSON-LD.
 | \`lp_compare_viewed\` | Comparison in view 50% | |
 | \`lp_faq_opened\` | Accordion open | question index |
 | \`lp_security_clicked\` | Any security link | location |
+
+## 20. The /security page
+
+Buyers check this page before they trust a security tool with their policies. It uses the same rail, type and
+square frames as the landing page, with no animation beyond the default reveal.
+
+- H1: "How Dossier handles your data"
+- Intro (2 lines): "Dossier holds some of your most sensitive documents. This page says exactly where they live, who
+  can see them and what is never done with them."
+- **Section: Never used for training.** The data handling statement from PRD 12.2, word for word, in a framed box
+  with a ShieldCheck icon.
+- **Section: Isolation.** "Every workspace is separated at the database level with row-level security. Search runs
+  inside one workspace only. Files sit in private storage under your workspace's folder."
+- **Section: Encryption.** "Encrypted in transit (TLS) and at rest by our database and storage provider."
+- **Section: Access and audit.** Roles (admin, reviewer, contributor, viewer), an append-only audit log, and
+  "Delete a document, a questionnaire or your whole workspace at any time."
+- **Section: Subprocessors.** Table: Vendor, Purpose, Data sent, Location [verify each region], Link. Rows:
+  Supabase, Vercel, Anthropic, Voyage AI, LlamaIndex, Resend, Stripe, PostHog. "Data sent" for PostHog reads
+  "Product events only, never document or answer text".
+- **Section: Contact.** "Security questions or a questionnaire for us? security@dossier.app". Offer: "We will fill
+  in your vendor questionnaire with Dossier, from our own policies."
+- Footer line: "Last updated <date>." Update it every time a vendor changes.
+- SEO: title "Security and data handling | Dossier", meta description "How Dossier stores, isolates and protects
+  your documents. Never used to train AI models."
+
+## 21. Mobile sticky CTA
+
+- Below 768px, after the hero scrolls out of view, a 56px white bar with a top hairline slides up from the bottom
+  (200ms, out curve): "7 days free" on the left, "Start free trial" (primary) on the right.
+- It hides again when the final CTA section is in view, so two CTAs never show at once.
+- Reserve its height with bottom padding on the footer so it never covers the last link.
+- Reduced motion: it appears without sliding.
 `
