@@ -20,11 +20,13 @@ const CSS = `
 .pv-outbounder .po-hr { position:absolute; left:0; right:0; height:1px; background:var(--hair); }
 .pv-outbounder .po-tick { position:absolute; width:9px; height:9px; border:1px solid #c9ccd2; background:#fff; }
 
-.pv-outbounder h1 { position:absolute; left:64px; top:104px; font-size:156px; line-height:.86; letter-spacing:-.065em; font-weight:600; color:var(--ink); }
+.pv-outbounder h1 { position:absolute; left:96px; top:108px; font-size:156px; line-height:.86; letter-spacing:-.065em; font-weight:600; color:var(--ink); }
 .pv-outbounder h1 span { color:var(--accent); }
-.pv-outbounder .po-promise { position:absolute; left:72px; top:270px; font-size:38px; letter-spacing:-.03em; color:var(--muted); }
+.pv-outbounder .po-promise { position:absolute; left:104px; top:272px; font-size:38px; letter-spacing:-.03em; color:var(--muted); }
 .pv-outbounder .po-promise b { color:var(--ink); font-weight:500; }
-.pv-outbounder .po-pipe { position:absolute; right:72px; top:282px; font-family:var(--mono); font-size:18px; color:var(--faint); display:flex; align-items:center; gap:8px; white-space:pre; }
+.pv-outbounder .po-pipe { position:absolute; right:104px; top:284px; font-family:var(--mono); font-size:17px; color:var(--faint); display:flex; align-items:center; gap:8px; white-space:pre; }
+.pv-outbounder .po-meta { position:absolute; right:104px; top:24px; font-family:var(--mono); font-size:16px; color:var(--faint); display:flex; gap:18px; }
+.pv-outbounder .po-meta b { font-weight:500; color:var(--accent-ink); }
 .pv-outbounder .po-pipe .po-on { color:var(--accent-ink); background:var(--accent-soft); border:1px solid var(--accent-edge); padding:2px 8px; }
 .pv-outbounder .po-pipe .po-done { color:var(--body); }
 
@@ -39,11 +41,11 @@ const CSS = `
 .pv-outbounder .po-badge span { display:inline-flex; align-items:center; gap:7px; height:30px; padding:0 10px; border-radius:4px; border:1px solid var(--green-edge); background:var(--green-soft); color:var(--green); }
 .pv-outbounder .po-badge i { width:7px; height:7px; border-radius:50%; background:var(--green); }
 .pv-outbounder .po-sep { grid-column:1 / -1; height:1px !important; background:var(--div); margin:0 -32px; }
-.pv-outbounder .po-body { position:relative; padding:30px 32px 0; }
-.pv-outbounder .po-hi { position:relative; display:block; font-size:36px; line-height:1.22; letter-spacing:-.03em; color:var(--ink); font-weight:500; padding:14px 22px; margin-left:-22px; width:720px;
+.pv-outbounder .po-body { position:relative; padding:30px 32px 0 54px; }
+.pv-outbounder .po-hi { position:relative; display:block; font-size:36px; line-height:1.22; letter-spacing:-.03em; color:var(--ink); font-weight:500; padding:14px 22px; margin-left:-24px; width:720px;
   background:var(--accent-soft); border-left:3px solid var(--accent); transition:background-color .3s; }
 .pv-outbounder .po-rest { margin-top:18px; font-size:24px; line-height:1.45; letter-spacing:-.015em; color:var(--ghost); width:700px; }
-.pv-outbounder .po-note { position:absolute; left:800px; top:34px; width:250px; font-family:var(--mono); font-size:16px; line-height:1.55; color:var(--accent-ink); }
+.pv-outbounder .po-note { position:absolute; left:820px; top:34px; width:250px; font-family:var(--mono); font-size:16px; line-height:1.55; color:var(--accent-ink); }
 .pv-outbounder .po-note b { display:block; font-weight:500; font-size:17px; }
 .pv-outbounder .po-note span { color:var(--faint); }
 .pv-outbounder .po-note svg { position:absolute; left:-58px; top:10px; }
@@ -64,6 +66,7 @@ export default function OutbounderPreview() {
       <span className="po-hr" style={{ top: 72 }} />
       <span className="po-tick" style={{ left: 68, top: 68 }} />
       <span className="po-tick" style={{ left: 1124, top: 68 }} />
+      <p className="po-meta"><span>sequence <b>step 1 of 3</b></span><span>sends Tue 09:12</span></p>
       <h1>outbounder<span>.</span></h1>
       <p className="po-promise"><b>Cold email</b> that reads human.</p>
       <div className="po-pipe">
@@ -82,7 +85,7 @@ export default function OutbounderPreview() {
           <span className="po-k">subject</span><span className="po-v">Wholesale ordering for cafes</span><span />
         </div>
         <div className="po-body">
-          <p className="po-hi">Saw Halden just opened wholesale ordering to independent cafes. Nice launch.</p>
+          <p className="po-hi">Saw Halden just opened wholesale ordering to cafes. Nice launch.</p>
           <p className="po-rest">We help supply teams answer trade enquiries without hiring. Worth a look next week?</p>
           <div className="po-note">
             <svg width="48" height="20" viewBox="0 0 48 20" fill="none" aria-hidden="true"><path d="M46 10H4M10 3 3 10l7 7" stroke="#6a7ee6" strokeWidth="1.6" /></svg>

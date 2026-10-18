@@ -88,5 +88,5 @@ a.app-card:hover .pv-tally .pvt-inv { transform: translateY(-10px); }
 .pv-tally .pvt-copy { position: absolute; left: 700px; right: 60px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
 .pv-tally h1 { margin: 0; font-weight: 600; font-size: 168px; line-height: .84; letter-spacing: -0.065em; color: #08090a; }
 .pv-tally .pvt-copy p { margin: 0; font-size: 50px; line-height: 1.04; letter-spacing: -0.045em; color: #3c4149; font-weight: 500; text-wrap: balance; }
-.pv-tally .pvt-line { font-size: 22px; color: #2b6f68; letter-spacing: -0.02em; margin-top: 8px; }
+.pv-tally .pvt-line { font-size: 26px; color: #2b6f68; letter-spacing: -0.02em; margin-top: 8px; }
 `
