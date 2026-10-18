@@ -10,6 +10,7 @@ import { AppArt } from '../components/AppArt'
 import { Difficulty } from '../components/AppCard'
 import { CommitModal } from '../components/CommitModal'
 import { PhaseIcon } from '../components/PhaseIcon'
+import { CostCalculator } from '../components/CostCalculator'
 
 export default function AppDetailPage() {
   const { slug } = useParams()
@@ -108,6 +109,14 @@ export default function AppDetailPage() {
             </motion.div>
           ))}
         </div>
+      </section>
+
+      <section style={{ marginTop: 32 }}>
+        <div className="row between wrap" style={{ marginBottom: 14 }}>
+          <h2 style={{ fontSize: 22 }}>The numbers</h2>
+          <span className="label">Running costs, profit and margin</span>
+        </div>
+        <CostCalculator app={app} />
       </section>
 
       <CommitModal app={app} open={open} onClose={() => setOpen(false)} onDone={() => nav(`/app/build/${app.slug}`)} />

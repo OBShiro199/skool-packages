@@ -60,10 +60,9 @@ const QUESTIONS: Q[] = [
 ]
 
 function recommend(a: Record<string, string>): string {
-  const map: Record<string, string> = { sales: 'outbounder', content: 'ethereel', ops: 'closebook', local: 'bookwell', agency: 'helpdeck' }
-  if (map[a.background]) return map[a.background]
-  if (a.enjoy === 'post') return 'ethereel'
-  if (a.enjoy === 'talk') return 'outbounder'
+  const byBackground: Record<string, string> = { sales: 'etcher', content: 'ethereel', ops: 'etcher', local: 'bookwell', agency: 'factorie' }
+  const byEnjoy: Record<string, string> = { post: 'ethereel', talk: 'outbounder', systems: 'etcher', ai: 'factorie' }
+  for (const slug of [byBackground[a.background], byEnjoy[a.enjoy]]) if (getApp(slug)) return slug
   return APPS[Math.floor(Math.random() * APPS.length)].slug
 }
 

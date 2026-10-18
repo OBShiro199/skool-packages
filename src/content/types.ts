@@ -94,6 +94,12 @@ export interface AppContent {
   buildPrd: string
   /** Full design PRD in markdown: tokens, screens, components, motion, onboarding, auth pages. */
   designPrd: string
+  /**
+   * Full landing page PRD in markdown for the fictional brand: every section top to bottom
+   * (nav, hero, logos, problem, demo, features, how it works, comparison, testimonials slot,
+   * pricing with toggle, FAQ, final CTA, footer), exact copy, motion specs, SEO meta, OG image.
+   */
+  landingPrd?: string
   /** The single migration the user runs in Supabase SQL editor. Tables, RLS, triggers, storage buckets. */
   sql: string
   edgeFunctions: EdgeFunctionDef[]
@@ -114,6 +120,35 @@ export interface AppContent {
   repoTree: string
   /** Fake starter files put in the downloadable zip (path relative to repo root). */
   starterFiles: { path: string; content: string }[]
+}
+
+/** One line in the running-cost model. All amounts USD. */
+export interface CostLine {
+  name: string
+  vendor: string
+  /**
+   * fixed: $ per month no matter how many customers.
+   * perCustomer: $ per paying customer per month.
+   * perUnit: $ per usage unit (see CostModel.usage), multiplied by units per customer.
+   */
+  kind: 'fixed' | 'perCustomer' | 'perUnit'
+  amount: number
+  /** Fixed lines that step up with scale, e.g. Supabase Pro at 1 customer, compute add-on at 500. */
+  steps?: { fromCustomers: number; amount: number }[]
+  /** What the free tier covers, if any. */
+  freeTier?: string
+  /** How the number was worked out and when to re-check it. */
+  note: string
+  url?: string
+}
+
+export interface CostModel {
+  /** The main usage driver per customer per month, e.g. minutes of video, tracked prompts, call minutes. */
+  usage: { label: string; unit: string; default: number; min: number; max: number; step: number }
+  plans: { id: string; name: string; price: number; interval: 'month' | 'year'; includes: string }[]
+  lines: CostLine[]
+  /** Assumptions behind the model, one line each. */
+  notes: string[]
 }
 
 export interface AppDef {
@@ -138,5 +173,7 @@ export interface AppDef {
   features: string[]
   /** full = complete playbook, preview = shared steps only with stub PRDs. */
   status: 'full' | 'preview'
+  /** Running costs and pricing model for the Costs tab. */
+  costs?: CostModel
   content: AppContent
 }

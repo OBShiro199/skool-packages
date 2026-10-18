@@ -46,7 +46,7 @@ function Motif({ motif, t }: { motif: AppDef['art']['motif']; t: { bg: string; f
             </rect>
           ))}
           <rect x="84" y="112" width="52" height="16" fill={t.fg} />
-          <text x="110" y="124" fill="#fff" fontFamily="Geist Mono, monospace" fontSize="9" textAnchor="middle">0:42 CLIP</text>
+          <text x="110" y="124" fill="#fff" fontFamily="Geist, sans-serif" fontWeight="500" fontSize="9" textAnchor="middle">0:42 clip</text>
         </g>
       )
     }
@@ -66,7 +66,7 @@ function Motif({ motif, t }: { motif: AppDef['art']['motif']; t: { bg: string; f
             <path d="M32 44 L70 0" stroke="#fff" strokeWidth="2" />
             <animateTransform attributeName="transform" type="translate" values="222 40; 228 34; 222 40" dur="2.4s" repeatCount="indefinite" />
           </g>
-          <text x="256" y="132" fill={t.fg} fontFamily="Geist Mono, monospace" fontSize="10" textAnchor="middle">42% open · 8 replies</text>
+          <text x="256" y="132" fill={t.fg} fontFamily="Geist, sans-serif" fontWeight="500" fontSize="10" textAnchor="middle">42% open · 8 replies</text>
         </g>
       )
     case 'kanban':
@@ -80,7 +80,7 @@ function Motif({ motif, t }: { motif: AppDef['art']['motif']; t: { bg: string; f
               ))}
             </g>
           ))}
-          <text x="294" y="138" fill={t.fg} fontFamily="Geist Mono, monospace" fontSize="10" textAnchor="end">$18,400 won</text>
+          <text x="294" y="138" fill={t.fg} fontFamily="Geist, sans-serif" fontWeight="500" fontSize="10" textAnchor="end">$18,400 won</text>
         </g>
       )
     case 'calendar':
@@ -90,7 +90,7 @@ function Motif({ motif, t }: { motif: AppDef['art']['motif']; t: { bg: string; f
             const on = [3, 8, 9, 12, 17].includes(i)
             return <rect key={i} x={(i % 7) * 34} y={Math.floor(i / 7) * 36} width="30" height="32" fill={on ? t.accent : '#fff'} fillOpacity={on ? 0.9 : 1} stroke={t.fg} strokeOpacity=".2" />
           })}
-          <text x="120" y="126" fill={t.fg} fontFamily="Geist Mono, monospace" fontSize="10" textAnchor="middle">5 bookings today · 0 no-shows</text>
+          <text x="120" y="126" fill={t.fg} fontFamily="Geist, sans-serif" fontWeight="500" fontSize="10" textAnchor="middle">5 bookings today · 0 no-shows</text>
         </g>
       )
     case 'chart':

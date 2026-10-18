@@ -6,6 +6,7 @@ import { getApp } from '../content/apps'
 import { appStats, levelFor } from '../lib/progress'
 import { Bar, Ring } from './Ring'
 import { AppArt } from './AppArt'
+import { AskOlly } from './AskOlly'
 
 function useTheme() {
   const [theme, setTheme] = useState<'light' | 'dark' | null>(() => {
@@ -105,6 +106,7 @@ export default function Shell() {
         </div>
         <Outlet />
       </div>
+      <AskOlly />
     </div>
   )
 }

@@ -1,37 +1,19 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowLeft, ArrowRight, Check, Clock, Package, Sparkles, Trophy } from 'lucide-react'
+import { ArrowRight, Calculator, Check, Lock, Package, Trophy } from 'lucide-react'
 import { getApp, getPhases } from '../content/apps'
 import type { Task } from '../content/types'
 import { useStore, useUser } from '../lib/store'
 import { appStats, fmtMinutes, phaseStats, taskStats } from '../lib/progress'
-import { AppArt } from '../components/AppArt'
-import { Bar, Ring } from '../components/Ring'
+import { Bar } from '../components/Ring'
 import { PhaseIcon } from '../components/PhaseIcon'
-import { TaskCard } from '../components/TaskCard'
+import { TaskCard, type StepState } from '../components/TaskCard'
 import { TriggerContext } from '../components/Blocks'
 import { DownloadCodeModal } from '../components/DownloadCodeModal'
+import { CostCalculator } from '../components/CostCalculator'
 import { toast } from '../components/Toasts'
 import { burst, celebrate } from '../lib/confetti'
-
-function useCountUp(value: number) {
-  const [v, setV] = useState(value)
-  const from = useRef(value)
-  useEffect(() => {
-    const start = performance.now(), a = from.current, b = value
-    let raf = 0
-    const tick = (t: number) => {
-      const k = Math.min(1, (t - start) / 700)
-      setV(Math.round(a + (b - a) * (1 - Math.pow(1 - k, 3))))
-      if (k < 1) raf = requestAnimationFrame(tick)
-      else from.current = b
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [value])
-  return v
-}
 
 export default function BuildPage() {
   const { slug } = useParams()
@@ -48,153 +30,190 @@ export default function BuildPage() {
   const phases = useMemo(() => (app ? getPhases(app) : []), [app])
   const checked = (app && user.progress[app.slug]?.checked) || {}
   const stats = app ? appStats(app, checked) : null
-  const tabId = params.get('tab') ?? (app && user.progress[app.slug]?.lastTab) ?? phases[stats?.currentPhase ?? 0]?.id
-  const phaseIndex = Math.max(0, phases.findIndex((p) => p.id === tabId))
+
+  // A phase unlocks when every phase before it is complete.
+  const unlockedUpTo = stats ? stats.currentPhase : 0
+  const requested = params.get('tab')
+  const showCosts = requested === 'costs'
+  const reqIndex = phases.findIndex((p) => p.id === requested)
+  const phaseIndex = reqIndex >= 0 ? reqIndex : unlockedUpTo
   const phase = phases[phaseIndex]
+  const phaseLocked = phaseIndex > unlockedUpTo
 
-  useEffect(() => { if (app) { setLastTab(app.slug, phase.id); setActive(app.slug) } }, [app, phase?.id]) // eslint-disable-line
+  // Within a phase, a step unlocks when every step before it is complete.
+  const stepStates: StepState[] = useMemo(() => {
+    if (!phase) return []
+    let blocked = phaseLocked
+    return phase.tasks.map((t) => {
+      if (blocked) return 'locked'
+      if (taskStats(t, checked).complete) return 'done'
+      blocked = true
+      return 'current'
+    })
+  }, [phase, checked, phaseLocked])
+  const currentTask = phase?.tasks[stepStates.indexOf('current')]
 
-  // Open the first unfinished task when a tab opens.
-  useEffect(() => {
-    if (!phase) return
-    const first = phase.tasks.find((t) => !taskStats(t, checked).complete)
-    setOpenTask(first?.id ?? null)
-  }, [phase?.id]) // eslint-disable-line
+  useEffect(() => { if (app) { setLastTab(app.slug, showCosts ? 'costs' : phase.id); setActive(app.slug) } }, [app, phase?.id, showCosts]) // eslint-disable-line
+  // Open the current step whenever the phase changes.
+  useEffect(() => { setOpenTask(currentTask?.id ?? null) }, [phase?.id]) // eslint-disable-line
 
   const allItems = useMemo(() => {
-    const m = new Map<string, { task: Task; phaseId: string }>()
-    for (const p of phases) for (const t of p.tasks) for (const i of t.checklist) m.set(i.id, { task: t, phaseId: p.id })
+    const m = new Map<string, { task: Task; phaseId: string; trigger?: string }>()
+    for (const p of phases) for (const t of p.tasks) for (const i of t.checklist) m.set(i.id, { task: t, phaseId: p.id, trigger: i.trigger })
     return m
   }, [phases])
+
+  const readChecked = () => {
+    const st = useStore.getState()
+    return (st.session && st.users[st.session]?.progress[app!.slug]?.checked) || {}
+  }
 
   const onToggle = useCallback((itemId: string, value?: boolean) => {
     if (!app) return
     const ref = allItems.get(itemId)
     if (!ref) return
-    const before = useStore.getState().users[useStore.getState().session!]?.progress[app.slug]?.checked ?? {}
-    const wasTask = taskStats(ref.task, before).complete
+    const before = readChecked()
     const ph = phases.find((p) => p.id === ref.phaseId)!
+    const wasTask = taskStats(ref.task, before).complete
     const wasPhase = phaseStats(ph, before).complete
     toggle(app.slug, itemId, value)
-    const after = useStore.getState().users[useStore.getState().session!]?.progress[app.slug]?.checked ?? {}
+    const after = readChecked()
     if (!wasTask && taskStats(ref.task, after).complete) {
-      toast(`${ref.task.title}`, ref.task.xp)
-      const el = document.getElementById(`task-${ref.task.id}`)
-      const r = el?.getBoundingClientRect()
+      toast(ref.task.title, ref.task.xp)
+      const r = document.getElementById(`task-${ref.task.id}`)?.getBoundingClientRect()
       burst(r ? { x: (r.left + 40) / window.innerWidth, y: (r.top + 30) / window.innerHeight } : undefined)
-      // Advance to the next unfinished task in this phase.
       const next = ph.tasks.find((t) => !taskStats(t, after).complete)
-      setTimeout(() => setOpenTask(next?.id ?? null), 700)
+      setTimeout(() => {
+        setOpenTask(next?.id ?? null)
+        if (next) setTimeout(() => document.getElementById(`task-${next.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 350)
+      }, 900)
     }
-    if (!wasPhase && phaseStats(ph, after).complete) {
-      setTimeout(() => { celebrate(); setPhaseDone(ph.id) }, 500)
-    }
-  }, [app, allItems, phases, toggle])
+    if (!wasPhase && phaseStats(ph, after).complete) setTimeout(() => { celebrate(); setPhaseDone(ph.id) }, 600)
+  }, [app, allItems, phases, toggle]) // eslint-disable-line
 
+  // Copy/download auto-ticks only count for steps that are unlocked.
   const fire = useCallback((trigger: string) => {
+    const now = readChecked()
     for (const [id, ref] of allItems) {
-      if (ref.task.checklist.find((i) => i.id === id)?.trigger === trigger && !checked[id]) onToggle(id, true)
+      if (ref.trigger !== trigger || now[id]) continue
+      if (ref.task.id === currentTask?.id) onToggle(id, true)
     }
-  }, [allItems, checked, onToggle])
-
-  const pctDisplay = useCountUp(Math.round((stats?.pct ?? 0) * 100))
-  const xpDisplay = useCountUp(stats?.xp ?? 0)
+  }, [allItems, currentTask?.id, onToggle]) // eslint-disable-line
 
   if (!app || !stats) return <Navigate to="/app/library" replace />
   if (!user.commitments[app.slug]) return <Navigate to={`/app/library/${app.slug}`} replace />
 
   const ps = stats.perPhase[phaseIndex]
   const goTab = (id: string) => { setParams({ tab: id }); window.scrollTo({ top: 0, behavior: 'smooth' }) }
-  const next = phases[phaseIndex + 1]
-  const prev = phases[phaseIndex - 1]
+  const totalSteps = phases.reduce((n, p) => n + p.tasks.length, 0)
+  const stepsDone = stats.perPhase.reduce((n, p) => n + p.tasksDone, 0)
   const donePhase = phases.find((p) => p.id === phaseDone)
+  const nextAfterDone = donePhase ? phases[phases.indexOf(donePhase) + 1] : undefined
+  const firstEver = stepsDone === 0
 
   return (
     <TriggerContext.Provider value={fire}>
-      <div className="page build">
-        <header className="build-head">
-          <div className="build-art"><AppArt app={app} height={96} /></div>
-          <div className="build-title">
-            <span className="label">Building</span>
-            <h1>{app.name}</h1>
-            <p className="muted">{app.tagline}</p>
+      <div className="journey">
+        <aside className="journey-rail">
+          <div className="rail-app">
+            <span className="label">You are building</span>
+            <b>{app.name}</b>
+            <Bar pct={stats.pct} />
+            <span className="muted" style={{ fontSize: 13 }}>{stepsDone} of {totalSteps} steps · {Math.round(stats.pct * 100)}%</span>
           </div>
-          <div className="build-meter">
-            <div className="row between">
-              <span className="label">Overall progress</span>
-              <span className="mono build-pct">{pctDisplay}%</span>
-            </div>
-            <Bar pct={stats.pct} lg />
-            <div className="row wrap" style={{ gap: 6 }}>
-              <span className="chip chip-signal"><Sparkles size={11} /> {xpDisplay} / {stats.xpTotal} XP</span>
-              <span className="chip"><Check size={11} /> {stats.done}/{stats.total} ticks</span>
-              <span className="chip"><Clock size={11} /> {fmtMinutes(stats.minutesLeft)} left</span>
-            </div>
+          <ol className="rail-list">
+            {phases.map((p, i) => {
+              const s = stats.perPhase[i]
+              const locked = i > unlockedUpTo
+              const active = !showCosts && i === phaseIndex
+              const state = s.complete ? 'done' : locked ? 'locked' : 'current'
+              return (
+                <li key={p.id}>
+                  <button className={`rail-item ${state} ${active ? 'active' : ''}`} onClick={() => goTab(p.id)}>
+                    <span className="rail-dot">{s.complete ? <Check size={13} /> : locked ? <Lock size={11} /> : i + 1}</span>
+                    <span className="rail-text">
+                      <b>{p.label}</b>
+                      <span>{s.complete ? 'Complete' : locked ? 'Locked' : i === unlockedUpTo && s.tasksDone === 0 && i === 0 ? 'Start here' : `${s.tasksDone} of ${s.tasks} steps`}</span>
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ol>
+          <div className="rail-extra">
+            <button className={`rail-item ${showCosts ? 'active' : ''}`} onClick={() => goTab('costs')}>
+              <span className="rail-dot plain"><Calculator size={13} /></span>
+              <span className="rail-text"><b>Costs & running</b><span>Calculator</span></span>
+            </button>
+            <button className="rail-item" onClick={() => setZipOpen(true)}>
+              <span className="rail-dot plain"><Package size={13} /></span>
+              <span className="rail-text"><b>Download all code</b><span>Starter pack .zip</span></span>
+            </button>
           </div>
-          <div className="build-actions">
-            <button className="btn btn-primary" onClick={() => setZipOpen(true)}><Package size={15} /> Download all code</button>
-            <Link className="btn" to={`/app/library/${app.slug}`}>Kit overview</Link>
-          </div>
-        </header>
+        </aside>
 
-        <nav className="phase-tabs" aria-label="Build phases">
-          {phases.map((p, i) => {
-            const s = stats.perPhase[i]
-            const active = i === phaseIndex
-            return (
-              <button key={p.id} className={`phase-tab ${active ? 'active' : ''} ${s.complete ? 'complete' : ''}`} onClick={() => goTab(p.id)}>
-                <Ring pct={s.pct} size={34} stroke={3} tone={s.complete ? 'money' : 'signal'}>
-                  {s.complete ? <Check size={14} color="var(--money)" /> : <PhaseIcon icon={p.icon} size={14} />}
-                </Ring>
-                <span className="phase-tab-text">
-                  <span className="label">{String(i + 1).padStart(2, '0')}{i === stats.currentPhase && !s.complete ? ' · up next' : ''}</span>
-                  <b>{p.label}</b>
-                </span>
-                {active && <motion.span layoutId="tab-underline" className="phase-underline" />}
-              </button>
-            )
-          })}
-        </nav>
+        <main className="journey-main">
+          <AnimatePresence mode="wait">
+            {showCosts ? (
+              <motion.section key="costs" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <header className="phase-intro">
+                  <span className="label">Costs & running</span>
+                  <h1>What {app.name} costs to run, and what it makes</h1>
+                  <p className="muted">Every tool in the kit at today’s prices. Drag the sliders to see costs, profit and margin at 10, 100 or 1,000 customers.</p>
+                </header>
+                <CostCalculator app={app} />
+              </motion.section>
+            ) : (
+              <motion.section key={phase.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+                <header className="phase-intro">
+                  <span className="label">Phase {phaseIndex + 1} of {phases.length}</span>
+                  <h1><span className="phase-icon"><PhaseIcon icon={phase.icon} size={20} /></span>{phase.title}</h1>
+                  <p className="muted">{phase.goal}</p>
+                  {!phaseLocked && (
+                    <div className="phase-progress">
+                      <Bar pct={ps.pct} tone={ps.complete ? 'money' : undefined} />
+                      <span className="muted">{ps.tasksDone} of {ps.tasks} steps · about {fmtMinutes(phase.tasks.filter((t) => !taskStats(t, checked).complete).reduce((m, t) => m + t.minutes, 0))} left</span>
+                    </div>
+                  )}
+                </header>
 
-        <AnimatePresence mode="wait">
-          <motion.section key={phase.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
-            <div className="phase-head">
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <span className="label">Phase {phaseIndex + 1} of {phases.length}</span>
-                <h2>{phase.title}</h2>
-                <p className="muted">{phase.goal}</p>
-              </div>
-              <div className="phase-score">
-                <Ring pct={ps.pct} size={76} stroke={6} tone={ps.complete ? 'money' : 'signal'}>
-                  <span className="mono" style={{ fontSize: 16, fontWeight: 600 }}>{Math.round(ps.pct * 100)}%</span>
-                </Ring>
-                <div className="stack" style={{ gap: 2 }}>
-                  <span className="mono" style={{ fontSize: 13 }}><b>{ps.tasksDone}</b>/{ps.tasks} steps</span>
-                  <span className="mono muted" style={{ fontSize: 12 }}>{ps.xp}/{ps.xpTotal} XP</span>
-                  <span className="mono muted" style={{ fontSize: 12 }}>{fmtMinutes(phase.tasks.reduce((m, t) => m + t.minutes, 0))}</span>
+                {phaseLocked && (
+                  <div className="locked-panel">
+                    <Lock size={20} />
+                    <div style={{ flex: 1 }}>
+                      <b>This phase is locked.</b>
+                      <p className="muted">Finish <b>{phases[unlockedUpTo].label}</b> first. Each phase builds on the one before it, so the steps only work in order.</p>
+                    </div>
+                    <button className="btn btn-primary" onClick={() => goTab(phases[unlockedUpTo].id)}>Go to {phases[unlockedUpTo].label} <ArrowRight size={15} /></button>
+                  </div>
+                )}
+
+                {app.status === 'preview' && !phaseLocked && ['foundations', 'backend', 'outbound', 'inbound', 'paid'].includes(phase.id) && (
+                  <p className="preview-note">Preview kit: the {app.name}-specific parts of this phase are shorter than the flagship kits.</p>
+                )}
+
+                <div className="step-list">
+                  {phase.tasks.map((t, i) => (
+                    <TaskCard key={t.id} task={t} index={i} total={phase.tasks.length} state={stepStates[i]} checked={checked}
+                      open={openTask === t.id} isFirstEver={firstEver && phaseIndex === 0 && i === 0}
+                      prevTitle={i > 0 ? phase.tasks[i - 1].title : phases[unlockedUpTo]?.label}
+                      onOpen={() => setOpenTask(openTask === t.id ? null : t.id)} onToggle={(id) => onToggle(id)} />
+                  ))}
                 </div>
-              </div>
-            </div>
 
-            {app.status === 'preview' && ['foundations', 'backend', 'outbound', 'inbound', 'paid'].includes(phase.id) && (
-              <div className="preview-note">
-                <b>Preview kit.</b> The shared steps are complete. The {app.name}-specific PRDs and marketing plan are shorter than the flagship kits and get expanded in the next drop.
-              </div>
+                {ps.complete && phases[phaseIndex + 1] && (
+                  <div className="next-phase">
+                    <div style={{ flex: 1 }}>
+                      <span className="label">Phase complete</span>
+                      <b>Next: {phases[phaseIndex + 1].title}</b>
+                    </div>
+                    <button className="btn btn-primary" onClick={() => goTab(phases[phaseIndex + 1].id)}>Start {phases[phaseIndex + 1].label} <ArrowRight size={15} /></button>
+                  </div>
+                )}
+              </motion.section>
             )}
-
-            <div className="task-list">
-              {phase.tasks.map((t, i) => (
-                <TaskCard key={t.id} task={t} index={i} checked={checked} open={openTask === t.id}
-                  onOpen={() => setOpenTask(openTask === t.id ? null : t.id)} onToggle={(id) => onToggle(id)} />
-              ))}
-            </div>
-
-            <div className="phase-nav">
-              {prev ? <button className="btn" onClick={() => goTab(prev.id)}><ArrowLeft size={15} /> {prev.label}</button> : <span />}
-              {next && <button className={`btn ${ps.complete ? 'btn-primary' : ''}`} onClick={() => goTab(next.id)}>Next: {next.label} <ArrowRight size={15} /></button>}
-            </div>
-          </motion.section>
-        </AnimatePresence>
+          </AnimatePresence>
+        </main>
 
         <AnimatePresence>
           {donePhase && (
@@ -202,11 +221,11 @@ export default function BuildPage() {
               <Trophy size={22} />
               <div style={{ flex: 1 }}>
                 <b>{donePhase.label} complete.</b>
-                <span> {phases.indexOf(donePhase) + 1} of {phases.length} phases done on {app.name}.</span>
+                <span> {phases.indexOf(donePhase) + 1} of {phases.length} phases done.{nextAfterDone ? ` ${nextAfterDone.label} is unlocked.` : ''}</span>
               </div>
-              {phases[phases.indexOf(donePhase) + 1] && (
-                <button className="btn btn-sm" style={{ background: '#fff', color: '#0F0F0F' }} onClick={() => { goTab(phases[phases.indexOf(donePhase) + 1].id); setPhaseDone(null) }}>
-                  Start {phases[phases.indexOf(donePhase) + 1].label} <ArrowRight size={14} />
+              {nextAfterDone && (
+                <button className="btn btn-sm" style={{ background: '#fff', color: '#0F0F0F' }} onClick={() => { goTab(nextAfterDone.id); setPhaseDone(null) }}>
+                  Start {nextAfterDone.label} <ArrowRight size={14} />
                 </button>
               )}
               <button className="btn btn-sm btn-ghost" style={{ color: '#fff' }} onClick={() => setPhaseDone(null)}>Close</button>
@@ -215,6 +234,7 @@ export default function BuildPage() {
         </AnimatePresence>
 
         <DownloadCodeModal app={app} open={zipOpen} onClose={() => setZipOpen(false)} />
+        <Link to="/app" className="sr-only">Back to dashboard</Link>
       </div>
     </TriggerContext.Provider>
   )

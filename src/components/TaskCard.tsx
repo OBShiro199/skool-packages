@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { Check, ChevronDown, Clock, Sparkles } from 'lucide-react'
+import { ArrowRight, Check, ChevronDown, Lock } from 'lucide-react'
 import type { Task } from '../content/types'
 import type { Checked } from '../lib/progress'
 import { taskStats, fmtMinutes } from '../lib/progress'
@@ -16,37 +16,49 @@ export function Tick({ on, size = 22 }: { on: boolean; size?: number }) {
   )
 }
 
-export function TaskCard({ task, index, checked, open, onOpen, onToggle }: {
-  task: Task; index: number; checked: Checked; open: boolean; onOpen: () => void; onToggle: (itemId: string) => void
+export type StepState = 'done' | 'current' | 'locked'
+
+/**
+ * One step of the journey. Done steps collapse to a ticked row (click to reopen),
+ * the current step is open with its instructions and checklist, locked steps are dimmed.
+ */
+export function TaskCard({ task, index, total, state, checked, open, onOpen, onToggle, isFirstEver, prevTitle }: {
+  task: Task; index: number; total: number; state: StepState; checked: Checked; open: boolean
+  onOpen: () => void; onToggle: (itemId: string) => void; isFirstEver?: boolean; prevTitle?: string
 }) {
   const s = taskStats(task, checked)
+  const locked = state === 'locked'
   return (
-    <motion.article layout="position" className={`task ${open ? 'open' : ''} ${s.complete ? 'complete' : ''}`} id={`task-${task.id}`}>
-      <button className="task-head" onClick={onOpen} aria-expanded={open}>
-        <span className="task-idx mono">{s.complete ? <Tick on size={26} /> : String(index + 1).padStart(2, '0')}</span>
-        <span className="task-title">
+    <motion.article layout="position" className={`step ${state} ${open ? 'open' : ''}`} id={`task-${task.id}`}>
+      <button className="step-head" onClick={locked ? undefined : onOpen} aria-expanded={open} disabled={locked}>
+        <span className="step-num">
+          {state === 'done' ? <Tick on size={28} /> : locked ? <Lock size={14} /> : index + 1}
+        </span>
+        <span className="step-title">
+          {state === 'current' && (
+            <span className="step-badge">{isFirstEver ? 'Start here' : `Step ${index + 1} of ${total}`}</span>
+          )}
           <b>{task.title}</b>
-          <span>{task.outcome}</span>
+          <span>{locked ? `Unlocks when you finish “${prevTitle}”` : task.outcome}</span>
         </span>
-        <span className="task-meta">
-          <span className="chip"><Clock size={12} /> {fmtMinutes(task.minutes)}</span>
-          <span className={`chip ${s.complete ? 'chip-money' : ''}`}><Sparkles size={12} /> {s.complete ? `${task.xp} XP` : `${s.xp}/${task.xp}`}</span>
-          <span className="task-mini mono">{s.done}/{s.total}</span>
-          <ChevronDown size={18} className="chev" />
-        </span>
+        {!locked && (
+          <span className="step-meta">
+            {state !== 'done' && <span className="muted">{fmtMinutes(task.minutes)}</span>}
+            {state === 'done' ? <span className="money">Done</span> : <span className="muted">{s.done}/{s.total}</span>}
+            <ChevronDown size={18} className="chev" />
+          </span>
+        )}
       </button>
-      <div className="task-progress"><i style={{ width: `${s.total ? (s.done / s.total) * 100 : 0}%` }} /></div>
       <AnimatePresence initial={false}>
-        {open && (
+        {open && !locked && (
           <motion.div key="body" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: [0.2, 0.7, 0.1, 1] }} style={{ overflow: 'hidden' }}>
-            <div className="task-body">
-              <div className="task-blocks">
-                {task.blocks.map((b, i) => <BlockView key={i} b={b} />)}
-              </div>
+            <div className="step-body">
+              {task.blocks.map((b, i) => <BlockView key={i} b={b} />)}
+
               <div className="checklist">
-                <div className="row between">
-                  <span className="label">Checklist · tick as you go</span>
-                  <span className="label">{s.done} of {s.total}</span>
+                <div className="checklist-head">
+                  <b>Tick these off to finish this step</b>
+                  <span className="muted">{s.done} of {s.total}</span>
                 </div>
                 {task.checklist.map((item) => {
                   const on = !!checked[item.id]
@@ -57,13 +69,12 @@ export function TaskCard({ task, index, checked, open, onOpen, onToggle }: {
                         {item.label}
                         <motion.i className="strike" initial={false} animate={{ scaleX: on ? 1 : 0 }} transition={{ duration: 0.35, ease: [0.2, 0.7, 0.1, 1] }} />
                       </span>
-                      {item.trigger && !on && <span className="label auto">auto-ticks on {item.trigger.split(':')[0]}</span>}
                     </button>
                   )
                 })}
                 {s.complete && (
                   <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="task-done-note">
-                    <Check size={15} /> Step complete. +{task.xp} XP banked.
+                    <Check size={15} /> Step done. +{task.xp} XP. {index + 1 < total ? <>Next step unlocked <ArrowRight size={14} /></> : 'Phase complete.'}
                   </motion.div>
                 )}
               </div>
