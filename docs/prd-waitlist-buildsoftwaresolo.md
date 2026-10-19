@@ -3,8 +3,9 @@
 **Product:** Build a Profitable $10K p/m App (Skool community)
 **Page:** one-page waitlist at `https://buildsoftwaresolo.com`
 **Owner:** Olly
-**Status:** Ready to build · v1.0 · 19 Oct 2026
-**Doors open:** Monday 2 November 2026 (founding window Mon 2 to Sun 8 Nov)
+**Status:** Ready to build · v1.1 · 19 Oct 2026
+**Doors open:** date not announced yet. The page never mentions a date until Olly sets one in config.
+**Skool:** https://www.skool.com/build-profitable-software
 **Design system:** Quiet Precision v1.0 (attached separately, referred to below as "QP")
 **Layout reference:** the Rosewell Archive page (archive.rosewell.dev). Same section rhythm, new name, new offer, QP styling.
 
@@ -18,21 +19,21 @@ A single, fast, static page that explains the community and collects email addre
 
 Visitors arrive mostly from YouTube video descriptions and pinned comments. They should understand the offer in one screen, see proof, see exactly what is inside (including the 40-lesson curriculum), and join with one field.
 
-The page has three phases driven by the clock, so the same URL works before, during and after launch:
+The page has three phases, set by one value in `content/offer.ts` (not by the clock, because the launch date isn't fixed yet), so the same URL works before, during and after launch:
 
 | Phase | When | Primary action |
 | --- | --- | --- |
-| `waitlist` | now until doors open on Mon 2 Nov | Join the waitlist (email) |
-| `open` | Mon 2 Nov to Sun 8 Nov 23:59 (Europe/London) | Join now at $397/year (link to Skool checkout) |
-| `closed` | from Mon 9 Nov | Join at $97/month or $776/year (link to Skool) |
+| `waitlist` | now, until Olly opens the doors | Join the waitlist (email) |
+| `open` | the 7-day founding window, or until 100 members join | Join now at $397/year (link to Skool) |
+| `closed` | after the founding window | Join at $97/month or $776/year (link to Skool) |
 
-v1 must ship `waitlist`. `open` and `closed` are P1 but cheap: copy and button targets swap from one config file.
+v1 must ship `waitlist`. `open` and `closed` are P1 but cheap: copy and button targets swap from one config file. Switching phase is a one-line change and a redeploy (or an env var, `SITE_PHASE`, so it can be flipped from the Vercel dashboard).
 
 ## 2. Goals, non-goals, success metrics
 
 ### Goals
 
-1. Collect as many qualified waitlist emails as possible before 2 Nov.
+1. Collect as many qualified waitlist emails as possible before doors open.
 2. Make the founding offer ($397/year, first 100, 7 days) unmistakable.
 3. Tag every signup with where it came from (which video, which form on the page).
 4. Feel like a calm, expensive product page: QP surfaces, no hype styling, nothing shifts while you use it.
@@ -42,14 +43,14 @@ v1 must ship `waitlist`. `open` and `closed` are P1 but cheap: copy and button t
 - Payments on this site. Checkout happens on Skool.
 - Accounts, logins or a member area.
 - A blog, CMS or multiple pages beyond `/privacy` and `/terms`.
-- Sending the launch emails (1, 2 and 8 Nov). The page only puts contacts into the audience they are sent from.
+- Sending the launch emails. The page only puts contacts into the audience they are sent from.
 
 ### Success metrics
 
 | Metric | Target | How measured |
 | --- | --- | --- |
 | Visitor to signup conversion | ≥ 25% from YouTube traffic | analytics `waitlist_success` ÷ unique visitors |
-| Waitlist size by Sun 1 Nov | 1,000+ (≈10 waitlisters per founding seat) [confirm target] | Supabase row count |
+| Waitlist size by doors open | 1,000+ (≈10 waitlisters per founding seat) [confirm target] | Supabase row count |
 | Form error rate | < 1% of submits | `waitlist_error` events |
 | Core Web Vitals (mobile) | LCP < 2.0s, CLS < 0.02, INP < 200ms | Vercel Speed Insights |
 | Lighthouse (mobile) | ≥ 95 performance, 100 accessibility | CI or manual run |
@@ -63,19 +64,20 @@ Every number on the page comes from one typed config file (`content/offer.ts`). 
 | Product name | Build a Profitable $10K p/m App |
 | Host | Olly [confirm surname or first name only] |
 | Platform | Skool (private community) |
-| Doors open | Monday 2 November 2026, 12:00 Europe/London [confirm time] |
-| Founding window closes | Sunday 8 November 2026, 23:59 Europe/London |
+| Doors open | not announced. `doorsOpenAt: null`; while null, no date or countdown appears anywhere. |
+| Founding window | 7 days from doors open, or until 100 members join, whichever comes first |
+| Join link | `https://www.skool.com/build-profitable-software` (`SKOOL_JOIN_URL`) |
 | Founding price | $397/year, first 100 members only |
 | Normal price (after launch) | $97/month or $776/year |
 | Founding saving vs annual | $379 (49%) · works out at about $33/month |
-| Founding price kept while you stay a member | yes [confirm, the Rosewell page promised "locked for life"] |
-| Guarantee | 30-day money-back [confirm, carried over from the Rosewell page] |
+| Founding price kept while you stay a member | yes, locked for as long as you stay |
+| Guarantee | 30-day money-back |
 | Credibility line | Built and sold 5 software products, 500+ paying clients across them |
 
 ### What founding members get
 
 1. **Watch me build a SaaS to $10K/month**: every cold email, call, sales call, ad and churn save, as it happens. Private.
-2. **Daily live calls**, Monday to Friday. Group Q&A, fixed time, about 45 minutes [confirm time and length].
+2. **Daily live calls**, Monday to Friday at 5pm UK, 1 hour each. Group Q&A.
 3. **Unlimited Q&A**: every post answered within 24 hours [confirm whether weekends count].
 4. **Private DM support** with Olly for your first 30 days (founding members only).
 5. **40-lesson course**, from idea to first customers to exit (5 weeks × 8 lessons).
@@ -83,6 +85,8 @@ Every number on the page comes from one typed config file (`content/offer.ts`). 
 7. **20 profitable apps ready to clone**, each with a launch template.
 8. **7 deep-dive tool guides**: Claude Code, Stripe, Supabase, Vercel, Trigger.dev, Resend, your own data API.
 9. **Founding-only bonuses**: Olly's real codebases, Claude skills and script packs.
+
+Lead exports: up to 5,000 verified records a month.
 
 Tagline under every form: **No coding experience needed. If you can describe it, Claude can build it.**
 
@@ -206,7 +210,7 @@ Environment variables: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_
 
 > You're on the waitlist for Build a Profitable $10K p/m App.
 >
-> Doors open on Monday 2 November. Founding members pay $397/year instead of $776, and there are only 100 founding spots for 7 days. I'll email you the moment they open, and the day before as a reminder.
+> Founding members pay $397/year instead of $776, and keep that price for as long as they stay. There are only 100 founding spots, for 7 days. I'll email you before doors open and again the moment they do.
 >
 > Until then, hit reply and tell me what you're building (or want to build). I read every one.
 >
@@ -223,8 +227,8 @@ Every form on the page is the same `WaitlistForm` component with a different `lo
 ### 6.0 Announcement bar
 
 - 36px high, full width, white, bottom hairline, 13px centred text.
-- `waitlist`: "Founding price opens Monday 2 November: $397/year for the first 100 members. **Join the waitlist →**" with a countdown at the end: `13d 04h 22m` in tabular numbers inside a fixed-width box so it never changes width.
-- `open`: "Doors are open. Founding price $397/year ends Sunday 8 November. **Join now →**"
+- `waitlist`: "Founding price: $397/year for the first 100 members. Waitlist gets in first. **Join the waitlist →**". Once `doorsOpenAt` is set, a countdown appears at the end (`13d 04h 22m`, tabular numbers in a fixed-width box so it never changes width). Until then, no date or countdown.
+- `open`: "Doors are open. Founding price $397/year for the first 100 members. **Join now →**" (add the end date once known)
 - `closed`: hidden.
 
 ### 6.1 Navigation
@@ -238,7 +242,7 @@ Every form on the page is the same `WaitlistForm` component with a different `lo
 
 Two stacked blocks, centred, max text width 720px.
 
-- Status pill (4px radius, blue-soft fill, blue edge, live dot that pulses): "Waitlist open · doors open Mon 2 Nov"
+- Status pill (4px radius, blue-soft fill, blue edge, live dot that pulses): "Waitlist open · founding spots limited to 100"
 - H1 (display, 48px desktop / 32px mobile, `text-wrap: balance`): **Build and sell a profitable SaaS with AI. Watch me do it live.**
 - Sub (16px body, max 60ch): "I've built and sold 5 software products, with 500+ paying clients across them. Now I'm building my next SaaS to $10K/month, in private, and you get to watch every move."
 - Form card (square, hairline, 24px padding, max 520px):
@@ -281,14 +285,14 @@ Row 1 (two large cards):
 | # | Title | Body | Visual |
 | --- | --- | --- | --- |
 | 01 | Watch me build to $10K/month | A brand new SaaS, built in private. Every cold email, call, sales call, ad and churn save, as it happens. | MRR step chart (blue line, 12 steps, "MRR $0 → $10,000") |
-| 02 | Daily live calls | Monday to Friday, live with me. Bring your product, your numbers and your questions. | Mon–Fri row of five day cells, today's cell in blue-soft with a live dot, time label [confirm time, e.g. "17:00 UK"] |
+| 02 | Daily live calls | Monday to Friday at 5pm UK, an hour live with me. Bring your product, your numbers and your questions. | Mon–Fri row of five day cells, today's cell in blue-soft with a live dot, time label "5pm UK · 1 hour" |
 
 Row 2 (two large cards):
 
 | # | Title | Body | Visual |
 | --- | --- | --- | --- |
 | 03 | The 40-lesson course | Five weeks from idea to first customers to exit. Eight lessons a week. | The five week names as a row: Foundations → Build → First Customers → Growth → Retain & Scale, with "5 weeks · 40 lessons · 7 guides" under it. Links to `#curriculum`. |
-| 04 | 10M+ verified B2B leads | Verified emails and direct numbers, filter by industry and job title, export to CSV. | Mini lead table: filter chips (`Industry: SaaS`, `Title: Founder +1`), a count "148,206 matching" and 5 rows with masked emails (`a.bello@p•••••.io`) and tags `Valid`, `Director`, `C-level`. Caption: "Sample view. Members see full records." [confirm lead features: mobiles, export limits] |
+| 04 | 10M+ verified B2B leads | Verified contact data, filtered by industry and job title. Export up to 5,000 records a month to CSV. | Mini lead table: filter chips (`Industry: SaaS`, `Title: Founder +1`), a count "148,206 matching" and 5 rows with masked emails (`a.bello@p•••••.io`) and tags `Valid`, `Director`, `C-level`. A small meter under it: "5,000 exports a month". Caption: "Sample view. Members see full records." |
 
 Row 3 (four small cards):
 
@@ -356,11 +360,11 @@ Three cells, hairline-divided, icon + 13px label + 14px body:
 
 - **Everything on day one.** The course, leads, apps, guides and the live build unlock the moment doors open. Nothing is drip-fed.
 - **Cancel anytime.** One click in Skool stops your renewal. No calls, no email chains, no "tell us why you're leaving".
-- **30-day guarantee.** Go through everything. If it isn't worth far more than you paid, message me within 30 days for a full refund. [confirm]
+- **30-day guarantee.** Go through everything. If it isn't worth far more than you paid, message me within 30 days for a full refund.
 
 ### 6.12 Pricing (`#pricing`)
 
-- Label "Pricing", H2: **One membership. Everything included.** Sub: "Founding members pay $397/year, kept for as long as they stay." [confirm the "kept" promise]
+- Label "Pricing", H2: **One membership. Everything included.** Sub: "Founding members pay $397/year, locked for as long as they stay."
 - Two-column card (square, hairline, max 960px, centred):
   - **Left: price.** Label "Founding membership" + tag `First 100 only`. Price `$397` (48px/500 tabular) + "/ year". Under it: "~~$776/year~~ · save $379 · about $33/month". Then "After launch: $97/month or $776/year." One line of body: "The build, the calls, the course, the leads, the apps and the guides. One price, no tiers." Then `WaitlistForm location="pricing"`.
   - **Right: what's included.** The nine items from §3 as a checklist (Lucide `check` in success green, 14px body), founding bonuses last with the `Founding only` tag.
@@ -375,14 +379,14 @@ Three cells, hairline-divided, icon + 13px label + 14px body:
 | Question | Answer |
 | --- | --- |
 | What do I get when doors open? | Everything at once: the live $10K build, daily calls Monday to Friday, unlimited Q&A, private DMs for your first 30 days, the 40-lesson course, 10M+ verified leads, 20 clone-ready apps, 7 tool guides and the founding bonuses. |
-| When do doors open, and for how long? | Monday 2 November. The founding price is open for 7 days, until Sunday 8 November, or until 100 people have joined, whichever comes first. |
-| What happens after I join the waitlist? | You get a confirmation email now, a reminder the day before, and an email the moment doors open. Waitlist members hear first, so founding spots go to them first. |
+| When do doors open, and for how long? | Soon. Waitlist members get the date first, by email. Once doors open, the founding price is available for 7 days or until 100 people have joined, whichever comes first. |
+| What happens after I join the waitlist? | You get a confirmation email now, an email with the date before doors open, and another the moment they do. Waitlist members hear first, so founding spots go to them first. |
 | Do I need to know how to code? | No. You build with Claude Code. If you can describe what you want, Claude can build it, and week 2 shows you exactly how. |
-| How do the daily calls work? | A live group call Monday to Friday at a fixed time [confirm time], about 45 minutes. Bring your product and your questions. Calls are recorded for anyone who can't make it [confirm]. |
+| How do the daily calls work? | A live group call Monday to Friday at 5pm UK, for an hour. Bring your product and your questions. Calls are recorded for anyone who can't make it [confirm]. |
 | How quickly are questions answered? | Every post in the community gets an answer within 24 hours. Founding members can also message me directly for their first 30 days. |
-| Are the leads actually usable? | Yes. They're verified B2B contacts you can filter by industry, job title and location and export to CSV for cold email or calling. Week 3 shows you how to use them. [confirm fields and any export limits] |
-| What does it cost after launch? | $97/month or $776/year. Founding members pay $397/year and keep that price while they stay [confirm]. |
-| Can I cancel? What's the guarantee? | Cancel your renewal in one click inside Skool. If it isn't worth far more than you paid, message me within 30 days for a full refund [confirm]. |
+| Are the leads actually usable? | Yes. They're verified B2B contacts you can filter by industry, job title and location and export to CSV for cold email or calling, up to 5,000 verified records a month. Week 3 shows you how to use them. |
+| What does it cost after launch? | $97/month or $776/year. Founding members pay $397/year and keep that price for as long as they stay. |
+| Can I cancel? What's the guarantee? | Cancel your renewal in one click inside Skool. If it isn't worth far more than you paid, message me within 30 days for a full refund. |
 | Is this for people who haven't started yet? | Yes. Week 1 takes you from no idea to a validated one, and week 2 to a live product that takes payments. |
 | How often is new material added? | The live build updates every week, and new lessons, apps and guides are added as I make them. |
 | Where does it happen? | In a private Skool community. You'll get your invite link by email when you join. |
@@ -395,7 +399,7 @@ Single row: icon, "Still deciding?" (16px/500), "Join the waitlist. It costs not
 
 Two columns.
 
-- Left: H2 **Get on the waitlist. Leave whenever you want.** Body: "First in line when doors open on Monday 2 November, at $397/year instead of $776. Cancel anytime, 30-day money-back guarantee." Form (`location="final"`).
+- Left: H2 **Get on the waitlist. Leave whenever you want.** Body: "First in line when doors open, at $397/year instead of $776, locked for as long as you stay. Cancel anytime, 30-day money-back guarantee." Form (`location="final"`).
 - Right: dot-matrix illustration (see §7.6) spelling "build software solo" or the $0 → $10K step, in ghost and faint dots with the final step in blue. `aria-hidden`.
 
 **Phase behaviour for every form** (`WaitlistForm`):
@@ -403,7 +407,7 @@ Two columns.
 | Phase | Renders |
 | --- | --- |
 | `waitlist` | email input + "Join the waitlist" |
-| `open` | one large primary link button "Join now: $397/year" to `SKOOL_JOIN_URL`, microcopy "Founding price ends Sunday 8 November · first 100 only" |
+| `open` | one large primary link button "Join now: $397/year" to `SKOOL_JOIN_URL`, microcopy "Founding price for 7 days · first 100 only" |
 | `closed` | primary link button "Join the community" to `SKOOL_JOIN_URL`, microcopy "$97/month or $776/year · cancel anytime" |
 
 The button keeps the same height and minimum width in every phase so the layout is identical.
@@ -412,7 +416,7 @@ Do not show a "spots left" counter unless it reads a real number from Skool or a
 
 ### 6.16 Mobile sticky CTA
 
-Under 768px, once the hero form scrolls out of view and until the final CTA section is in view, a 56px bar floats 12px above the bottom edge (QP floating shadow): "Founding price opens 2 Nov" + compact button "Join". Tapping scrolls to the nearest form below and focuses it. It overlays, never pushes content (QP §01 "Overlays float"). Hidden when the on-screen keyboard is open (input focused).
+Under 768px, once the hero form scrolls out of view and until the final CTA section is in view, a 56px bar floats 12px above the bottom edge (QP floating shadow): "Founding price $397/year" + compact button "Join". Tapping scrolls to the nearest form below and focuses it. It overlays, never pushes content (QP §01 "Overlays float"). Hidden when the on-screen keyboard is open (input focused).
 
 ### 6.17 Footer
 
@@ -482,7 +486,7 @@ The form card never changes width. Its height morphs (300ms, `--ease-morph`) bet
 | Invalid | input edge danger, message "Enter a full email address, like you@example.com." |
 | Rate limited | "Too many tries from this connection. Wait a few minutes and try again." |
 | Error | "Could not join the waitlist. Check your connection and try again." |
-| Success | ✓ (success green) **You're on the list.** "Check your inbox for a confirmation from Olly. Doors open Monday 2 November." Then an optional one-question step: "Where are you right now?" three secondary buttons `No idea yet` · `Building` · `Launched` and an optional first name field. Saving shows "Thanks, that helps me plan the calls." |
+| Success | ✓ (success green) **You're on the list.** "Check your inbox for a confirmation from Olly. You'll hear first when doors open." Then an optional one-question step: "Where are you right now?" three secondary buttons `No idea yet` · `Building` · `Launched` and an optional first name field. Saving shows "Thanks, that helps me plan the calls." |
 | Exists | **You're already on the list.** "I'll email you the moment doors open." |
 
 Only the form the visitor used changes state. All other forms on the page switch to a one-line "You're on the list ✓" (same height as their microcopy row hidden with `visibility: hidden`) so the visitor isn't asked again. Remember this in `localStorage` (try/catch) so it holds on reload.
@@ -493,7 +497,7 @@ All QP §06 rules apply. Specifically on this page:
 
 - Section content and card rows rise once (360ms, 6px, 25ms stagger, capped at 270ms) the first time each region enters view in a session. IntersectionObserver, threshold 0.15.
 - The only looping animation is the live dot (1.4s pulse).
-- Countdown ticks change digits only; no flip or slide.
+- Countdown (only once a date is set) ticks change digits only; no flip or slide.
 - `prefers-reduced-motion: reduce`: everything renders in its end state, no transitions.
 
 ### 7.6 Dot-matrix illustrations
@@ -532,9 +536,9 @@ Side gutter 16px under 768px, 24px above. Body copy never wider than 65ch.
 ## 10. SEO, metadata, sharing
 
 - `<title>`: "Build a Profitable $10K p/m App · Waitlist"
-- Meta description: "Watch a SaaS get built live to $10K/month, then build your own with AI. 40 lessons, daily calls, 10M+ leads. Founding price $397/year opens 2 November."
+- Meta description: "Watch a SaaS get built live to $10K/month, then build your own with AI. 40 lessons, daily calls, 10M+ leads. Founding price $397/year for the first 100."
 - Canonical `https://buildsoftwaresolo.com/`. `robots.txt` allows all; `sitemap.xml` lists `/`, `/privacy`, `/terms`.
-- OG/Twitter image 1200×630 from `next/og`: white, hairline frame, H1 in Geist 500, "Founding price opens 2 Nov · $397/year" in faint, small dot-matrix MRR step in blue.
+- OG/Twitter image 1200×630 from `next/og`: white, hairline frame, H1 in Geist 500, "Founding price $397/year · first 100 members" in faint, small dot-matrix MRR step in blue.
 - JSON-LD: `Organization` and `FAQPage`. Do not mark up a `Product` with ratings (there are none).
 - Favicon: the dot-matrix mark as SVG plus 32px PNG and 180px apple-touch icon.
 
@@ -571,18 +575,15 @@ A saved Supabase SQL snippet gives Olly a daily view: signups per day, per `ref`
 
 ## 13. Open questions ([confirm] list)
 
-1. Doors-open time on Monday 2 November (default 12:00 UK).
-2. Surname or first name only for the host byline ("Olly" used throughout).
-3. Short wordmark for small screens ("$10K p/m App"), and whether the footer legal name is "Build Software Solo".
-4. Is the founding $397/year kept for as long as a member stays (the old page said "locked for life")?
-5. Is the 30-day money-back guarantee still on, and does it apply to the annual plan?
-6. Daily call time and length, and whether calls are recorded.
-7. Does "answered within 24 hours" include weekends?
-8. Lead database details: direct mobiles included? Export limits or credits?
-9. Sender address for emails and the postal address for the email footer.
-10. Waitlist target number for success (1,000 suggested).
-11. The Skool join URL for the `open` and `closed` phases, and whether Skool can report remaining founding spots.
-12. YouTube channel name and URL for the review attribution and footer.
+1. Surname or first name only for the host byline ("Olly" used throughout).
+2. Short wordmark for small screens ("$10K p/m App"), and whether the footer legal name is "Build Software Solo".
+3. Are the daily calls recorded?
+4. Does "answered within 24 hours" include weekends?
+5. Doors-open date, once decided (set `doorsOpenAt` and the countdown and dates appear).
+6. Sender address for emails and the postal address for the email footer.
+7. Waitlist target number for success (1,000 suggested).
+8. Can Skool report remaining founding spots (for an honest counter)?
+9. YouTube channel name and URL for the review attribution and footer.
 
 ## 14. Acceptance criteria
 
@@ -595,7 +596,8 @@ The page is done when all of these are true:
 - [ ] A filled honeypot or a sub-1.5s submit writes nothing and shows success.
 - [ ] The sixth submit from one IP within 10 minutes is rate limited.
 - [ ] The Supabase anon key cannot read or insert into `waitlist_signups`.
-- [ ] Setting the clock (or a `?phase=` override available only in preview deployments) to each phase shows the correct bar, CTAs and microcopy, with no layout change in the forms.
+- [ ] No date, "November" or countdown appears anywhere while `doorsOpenAt` is null.
+- [ ] Setting `SITE_PHASE` (or a `?phase=` override available only in preview deployments) to each phase shows the correct bar, CTAs and microcopy, with no layout change in the forms.
 - [ ] CLS < 0.02 on mobile: the announcement countdown, carousel, FAQ, curriculum accordion and form states never shift surrounding content.
 - [ ] No monospace font, no all-caps text, no filled or black buttons, no type size outside the QP scale (spot-check with a computed-style script).
 - [ ] Reduced motion shows end states with no animation.
@@ -612,7 +614,7 @@ The page is done when all of these are true:
 | 1. Skeleton (half day) | Next.js app, Tailwind with QP tokens, Geist, rail layout, nav, footer, `offer.ts`, `phase.ts` | Empty sections render at every breakpoint with hairlines in place |
 | 2. Content sections (1–2 days) | Hero + mock, numbers, carousel, inside cards, who it's for, curriculum, wall, reassurance, pricing, FAQ, final CTA, dot-matrix art | Whole page readable with real copy, static forms |
 | 3. Waitlist backend (half day) | Supabase table and RLS, `join` and `profile` actions, Resend email and audience, form states | Acceptance items on signups, duplicates, bots and rate limit pass |
-| 4. Phases, analytics, SEO (half day) | Countdown, phase-driven CTAs, mobile sticky CTA, events, OG image, JSON-LD, privacy and terms | Phase checks pass; OG preview correct on X and iMessage |
+| 4. Phases, analytics, SEO (half day) | Config-driven phases (countdown only when a date is set), CTAs, mobile sticky CTA, events, OG image, JSON-LD, privacy and terms | Phase checks pass; OG preview correct on X and iMessage |
 | 5. QA and launch (half day) | Lighthouse, CLS, a11y, reduced motion, email deliverability, DNS on buildsoftwaresolo.com | Every box in §14 ticked, link added to this week's video descriptions |
 
-Target: live by Friday 23 October, which leaves 10 days of waitlist traffic before doors open.
+Target: live by Friday 23 October, so every new video from then on can link to it.
