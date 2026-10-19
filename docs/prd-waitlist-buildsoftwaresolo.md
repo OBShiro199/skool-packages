@@ -3,7 +3,7 @@
 **Product:** Build a Profitable $10K p/m App (Skool community)
 **Page:** one-page waitlist at `https://buildsoftwaresolo.com`
 **Owner:** Olly
-**Status:** Ready to build · v1.1 · 19 Oct 2026
+**Status:** Ready to build · v1.2 · 19 Oct 2026
 **Doors open:** date not announced yet. The page never mentions a date until Olly sets one in config.
 **Skool:** https://www.skool.com/build-profitable-software
 **Design system:** Quiet Precision v1.0 (attached separately, referred to below as "QP")
@@ -77,8 +77,8 @@ Every number on the page comes from one typed config file (`content/offer.ts`). 
 ### What founding members get
 
 1. **Watch me build a SaaS to $10K/month**: every cold email, call, sales call, ad and churn save, as it happens. Private.
-2. **Daily live calls**, Monday to Friday at 5pm UK, 1 hour each. Group Q&A.
-3. **Unlimited Q&A**: every post answered within 24 hours [confirm whether weekends count].
+2. **Daily live calls**, Monday to Friday at 5pm UK, 1 hour each. Group Q&A, recorded.
+3. **Unlimited Q&A**: every post answered within 24 hours, 7 days a week.
 4. **Private DM support** with Olly for your first 30 days (founding members only).
 5. **40-lesson course**, from idea to first customers to exit (5 weeks × 8 lessons).
 6. **10M+ verified B2B leads**, ready for outreach.
@@ -203,7 +203,7 @@ Environment variables: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_
 
 ### 5.4 Confirmation email
 
-- From: `Olly <olly@buildsoftwaresolo.com>` [confirm address]; reply-to the same, and replies must reach a real inbox.
+- From: `Olly <olly@buildsoftwaresolo.com>`; reply-to the same, and replies must reach a real inbox.
 - Domain verified in Resend with SPF, DKIM and DMARC (`p=none` to start).
 - Subject: `You're on the list`
 - Body (plain, one column, no images needed):
@@ -216,7 +216,7 @@ Environment variables: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_
 >
 > Olly
 
-- Footer: postal address [confirm], one-click unsubscribe (Resend handles the header).
+- Footer: one-click unsubscribe (Resend handles the header). No postal address.
 
 ## 6. Page specification
 
@@ -298,7 +298,7 @@ Row 3 (four small cards):
 
 | # | Title | Body |
 | --- | --- | --- |
-| 05 | Unlimited Q&A | Post any question in the community. Every post answered within 24 hours. |
+| 05 | Unlimited Q&A | Post any question in the community. Every post answered within 24 hours, 7 days a week. |
 | 06 | 20 apps ready to clone | Profitable app ideas with the build and a launch template for each. Pick one and ship. |
 | 07 | 7 tool guides | Claude Code, Stripe, Supabase, Vercel, Trigger.dev, Resend and your own data API, in depth. |
 | 08 | Private DMs with me | Message me directly for your first 30 days. |
@@ -333,7 +333,7 @@ Same as 6.6 with H3 "Get in the day doors open." and `location="reviews"`. Place
 
 ### 6.10 The wall (`#reviews`)
 
-- Label "Reviews", H2: **What people say after watching, then doing.** Sub: "Unedited comments from my YouTube channel." [confirm channel name/link]
+- Label "Reviews", H2: **What people say after watching, then doing.** Sub: "Unedited comments from my YouTube channel." with "YouTube channel" linking to https://www.youtube.com/@OBRosewell
 - Masonry, 3 columns desktop / 2 tablet / 1 mobile (CSS columns, `break-inside: avoid`). Each card: square, hairline, 20px padding; avatar initial circle, handle (13px/500), a pastel tag for the theme, then the comment (14px body).
 - **No star ratings.** YouTube comments do not have ratings, and showing five stars on them would be a made-up claim (QP §09 "Claims").
 - Comments (keep exact wording, typos included; tag in brackets):
@@ -382,8 +382,8 @@ Three cells, hairline-divided, icon + 13px label + 14px body:
 | When do doors open, and for how long? | Soon. Waitlist members get the date first, by email. Once doors open, the founding price is available for 7 days or until 100 people have joined, whichever comes first. |
 | What happens after I join the waitlist? | You get a confirmation email now, an email with the date before doors open, and another the moment they do. Waitlist members hear first, so founding spots go to them first. |
 | Do I need to know how to code? | No. You build with Claude Code. If you can describe what you want, Claude can build it, and week 2 shows you exactly how. |
-| How do the daily calls work? | A live group call Monday to Friday at 5pm UK, for an hour. Bring your product and your questions. Calls are recorded for anyone who can't make it [confirm]. |
-| How quickly are questions answered? | Every post in the community gets an answer within 24 hours. Founding members can also message me directly for their first 30 days. |
+| How do the daily calls work? | A live group call Monday to Friday at 5pm UK, for an hour. Bring your product and your questions. Every call is recorded for anyone who can't make it. |
+| How quickly are questions answered? | Every post in the community gets an answer within 24 hours, weekends included. Founding members can also message me directly for their first 30 days. |
 | Are the leads actually usable? | Yes. They're verified B2B contacts you can filter by industry, job title and location and export to CSV for cold email or calling, up to 5,000 verified records a month. Week 3 shows you how to use them. |
 | What does it cost after launch? | $97/month or $776/year. Founding members pay $397/year and keep that price for as long as they stay. |
 | Can I cancel? What's the guarantee? | Cancel your renewal in one click inside Skool. If it isn't worth far more than you paid, message me within 30 days for a full refund. |
@@ -420,7 +420,7 @@ Under 768px, once the hero form scrolls out of view and until the final CTA sect
 
 ### 6.17 Footer
 
-- Three columns: brand blurb ("Build a Profitable $10K p/m App: a private community where you watch a SaaS get built to $10K/month and build your own alongside it. Run by Olly."), Community links (What's inside, Curriculum, Pricing, FAQ), Channel (YouTube [link], Skool [link]), Contact (`olly@buildsoftwaresolo.com` [confirm], Support).
+- Three columns: brand blurb ("Build a Profitable $10K p/m App: a private community where you watch a SaaS get built to $10K/month and build your own alongside it. Run by Olly."), Community links (What's inside, Curriculum, Pricing, FAQ), Channel (YouTube → https://www.youtube.com/@OBRosewell, Skool → https://www.skool.com/build-profitable-software), Contact (`olly@buildsoftwaresolo.com`, Support).
 - Bottom row: "© 2026 Build Software Solo. All rights reserved." [confirm legal entity] · Privacy · Terms.
 
 ## 7. Design: applying Quiet Precision
@@ -577,19 +577,15 @@ A saved Supabase SQL snippet gives Olly a daily view: signups per day, per `ref`
 
 1. Surname or first name only for the host byline ("Olly" used throughout).
 2. Short wordmark for small screens ("$10K p/m App"), and whether the footer legal name is "Build Software Solo".
-3. Are the daily calls recorded?
-4. Does "answered within 24 hours" include weekends?
-5. Doors-open date, once decided (set `doorsOpenAt` and the countdown and dates appear).
-6. Sender address for emails and the postal address for the email footer.
-7. Waitlist target number for success (1,000 suggested).
-8. Can Skool report remaining founding spots (for an honest counter)?
-9. YouTube channel name and URL for the review attribution and footer.
+3. Doors-open date, once decided (set `doorsOpenAt` and the countdown and dates appear).
+4. Waitlist target number for success (1,000 suggested).
+5. Can Skool report remaining founding spots (for an honest counter)?
 
 ## 14. Acceptance criteria
 
 The page is done when all of these are true:
 
-- [ ] No mention of "Rosewell" anywhere in the page, metadata, OG image or emails.
+- [ ] No visible mention of "Rosewell" anywhere in the page, metadata, OG image or emails. The only exception is the YouTube channel URL (`@OBRosewell`), which is shown as "YouTube", never as the handle.
 - [ ] All prices, dates and counts render from `content/offer.ts`; changing one value there updates every place it appears.
 - [ ] A valid email submitted from any of the forms creates exactly one row in `waitlist_signups` with the correct `form_location`, `ref` and UTM values, and sends one confirmation email.
 - [ ] Re-submitting the same email (any case, with spaces) creates no new row, sends no email, and shows the "already on the list" state.
