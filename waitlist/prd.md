@@ -97,7 +97,7 @@ alter table public.waitlist enable row level security;
 ```
 
 - The form posts to a server route (`/api/waitlist`) that validates, rate-limits to 5 requests per IP per 10 minutes, and upserts on email. A repeat signup updates the app choice and returns the same success message.
-- **Confirmation email** via Resend from `hello@waitlist.buildsoftwaresolo.com` (the domain is verified in Resend). Subject: "You're in". Body: two lines. "You're in. We'll email you when the vault opens." plus one link to the Skool community.
+- **Confirmation email** via Resend from `Olly <olly@waitlist.buildsoftwaresolo.com>` (the domain is verified in Resend) with **reply-to `oburt5669@gmail.com`**, so a signup who hits reply reaches a real inbox. Resend does not receive mail for this domain, and the root domain has no mailbox, so without the reply-to every reply bounces with "554 Relay access denied". Subject: "You're in". Body: two lines. "You're in. We'll email you when the vault opens." plus one link to the Skool community.
 - Success state replaces the form in place (same height) with two words and a tick: **"You're in."** Nothing else: no counter, no "founding spots", no share prompt. Errors sit under the field in plain words.
 - Do not show a spots count or any scarcity copy anywhere on the page.
 - No double opt-in required for launch; store `confirmed_at` when they click the email link if you add it later.
