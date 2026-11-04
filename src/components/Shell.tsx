@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { BookOpen, Copy, Flame, Home, LifeBuoy, LogOut, Menu, UserRound } from 'lucide-react'
+import { BookOpen, Copy, Flame, Home, LifeBuoy, LogOut, Menu, Search, UserRound } from 'lucide-react'
+import { api } from '../leads/api'
 import { handle, streak, useStore, useUser } from '../lib/store'
 import { getApp } from '../content/apps'
 import { appStats, levelFor } from '../lib/progress'
@@ -30,6 +31,11 @@ export default function Shell() {
   const [open, setOpen] = useState(false)
   const loc = useLocation()
   useEffect(() => { setOpen(false); window.scrollTo(0, 0) }, [loc.pathname])
+  // The server session is the real sign-in; if it has ended, sign out here too.
+  useEffect(() => {
+    if (import.meta.env.VITE_HASH_ROUTER) return
+    api.me().catch((e) => e?.status === 401 && signOut())
+  }, [signOut])
 
   return (
     <div className="shell">
@@ -42,6 +48,7 @@ export default function Shell() {
 
         <NavLink to="/app/library" data-tour="clone" className={({ isActive }) => `nav-link cta ${isActive ? 'active' : ''}`}><Copy size={16} /> Clone a Software App</NavLink>
         <NavLink to="/app" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><Home size={16} /> Dashboard</NavLink>
+        <NavLink to="/app/leads" data-tour="leads" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><Search size={16} /> Find Leads</NavLink>
 
         <div data-tour="builds">
         <div className="nav-group label">Your builds</div>
@@ -81,7 +88,7 @@ export default function Shell() {
           </div>
           <div className="row">
             <span style={{ flex: 1 }} />
-            <button className="btn btn-sm btn-ghost" onClick={signOut}><LogOut size={15} /> Sign out</button>
+            <button className="btn btn-sm btn-ghost" onClick={() => { if (!import.meta.env.VITE_HASH_ROUTER) api.logout().catch(() => {}); signOut() }}><LogOut size={15} /> Sign out</button>
           </div>
         </div>
       </aside>

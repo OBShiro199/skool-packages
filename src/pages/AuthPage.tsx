@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, Lock } from 'lucide-react'
 import { normUsername, useStore, useUser } from '../lib/store'
+import { api, ApiError } from '../leads/api'
 import { avatarFor, reviews, tagHue } from '../content/reviews'
 import skoolLogo from '../assets/skool-logo.png'
 import '../styles/auth.css'
@@ -56,12 +57,17 @@ export default function AuthPage() {
     if (!/^[a-z0-9][a-z0-9._-]{1,59}$/.test(u)) return setError('Enter your Skool username, like olly-rosewell.')
     if (password.length < 8) return setError('Enter the password from your Skool DM.')
     setBusy(true)
-    setTimeout(() => {
-      const r = signIn(u, password)
-      setBusy(false)
-      if (!r.ok) return setError(r.error)
-      nav('/app', { replace: true })
-    }, 450)
+    // The server checks the password from the Skool DM and sets the session. Shareable previews
+    // (hash routing, no server) keep the old in-browser demo login.
+    const check = import.meta.env.VITE_HASH_ROUTER ? Promise.resolve() : api.login(u, password).then(() => undefined)
+    check
+      .then(() => {
+        const r = signIn(u, password)
+        if (!r.ok) return setError(r.error)
+        nav('/app', { replace: true })
+      })
+      .catch((err) => setError(err instanceof ApiError ? err.message : 'Could not sign in. Try again.'))
+      .finally(() => setBusy(false))
   }
 
   return (

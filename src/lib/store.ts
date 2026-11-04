@@ -112,8 +112,8 @@ export const useStore = create<State>()(
             set({ users: { ...get().users, [key]: user }, session: key })
             return { ok: true }
           }
-          if (u.password !== password) return { ok: false, error: 'That password does not match.' }
-          set({ session: key, users: { ...get().users, [key]: touchDay(u) } })
+          // The server has already checked the shared password; keep this copy in step when it changes.
+          set({ session: key, users: { ...get().users, [key]: touchDay({ ...u, password }) } })
           return { ok: true }
         },
 

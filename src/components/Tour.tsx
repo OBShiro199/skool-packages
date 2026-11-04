@@ -10,6 +10,7 @@ type Step = { target: string; title: string; body: string }
 const STEPS: Step[] = [
   { target: '', title: 'Welcome to the vault', body: 'This is your dashboard. Here is a 30-second tour of everything you can do in here.' },
   { target: '[data-tour="clone"]', title: 'Clone a software app', body: 'Pick one of the 20 profitable apps. Each comes with the full build, the stack and a launch template you can make your own.' },
+  { target: '[data-tour="leads"]', title: 'Find leads', body: 'Search millions of verified B2B leads in the UK, EU and US. Stack filters, save searches and export up to 5,000 leads a month.' },
   { target: '[data-tour="start"]', title: 'Your next step', body: 'Once you sign the pledge for an app, this card shows exactly where you left off and the next task to tick.' },
   { target: '[data-tour="builds"]', title: 'Your builds', body: 'Every app you commit to lives here, with its progress bar, so you can jump straight back in.' },
   { target: '[data-tour="activity"]', title: 'Your activity', body: 'A day counts when you tick at least one item. Five days a week gets most members to a finished build in under a month.' },
