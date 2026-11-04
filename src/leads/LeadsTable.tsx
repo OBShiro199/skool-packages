@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'motion/react'
 import type { LeadRow } from './api'
-import { displayValue, sizeLabel, type DatasetId } from './defs'
+import { DATASETS, displayValue, sizeLabel, type DatasetId } from './defs'
 
 const Dash = () => <span className="ld-empty">–</span>
 
@@ -52,7 +52,7 @@ export function SkeletonRows({ rows = 12 }: { rows?: number }) {
 
 /** The leads table (PRD 11.3): fixed widths, single-line cells, sideways scroll only. */
 export function LeadsTable({ rows, dataset, selected, setSelected, stale, loading }: { rows: LeadRow[]; dataset: DatasetId; selected: Set<string>; setSelected: (s: Set<string>) => void; stale: boolean; loading: boolean }) {
-  const cols = COLS.filter((c) => !c.mobile || dataset === 'uk-eu')
+  const cols = COLS.filter((c) => !c.mobile || DATASETS[dataset].hasMobiles)
   const all = rows.length > 0 && rows.every((r) => selected.has(r.lead_id))
   const some = rows.some((r) => selected.has(r.lead_id))
   const headBox = useRef<HTMLInputElement>(null)
@@ -117,7 +117,7 @@ export function LeadsTable({ rows, dataset, selected, setSelected, stale, loadin
                 <td><span className="ld-cell">{sizeLabel(r.employee_count_range) ?? <Dash />}</span></td>
                 <td><span className="ld-cell">{r.revenue_range ?? <Dash />}</span></td>
                 <td><span className="ld-cell" title={r.contact_location ?? undefined}>{city || <Dash />}</span></td>
-                {dataset === 'uk-eu' && <td><span className="ld-cell ld-num">{r.mobile_phone ?? <Dash />}</span></td>}
+                {DATASETS[dataset].hasMobiles && <td><span className="ld-cell ld-num">{r.mobile_phone ?? <Dash />}</span></td>}
                 <td>
                   <div className="ld-email">
                     <span className="ld-cell">{r.work_email ?? <Dash />}</span>

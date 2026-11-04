@@ -4,7 +4,7 @@ export type Filters = Record<string, unknown>
 
 export const DATASETS: Record<DatasetId, { id: DatasetId; label: string; hasMobiles: boolean; defaultFilters: Filters; companyEg: string; cityEg: string }> = {
   'uk-eu': { id: 'uk-eu', label: 'UK & EU', hasMobiles: true, defaultFilters: { hasMobile: true }, companyEg: 'Barclays, Ocado…', cityEg: 'London, Manchester…' },
-  us: { id: 'us', label: 'US', hasMobiles: false, defaultFilters: {}, companyEg: 'Acme, Globex…', cityEg: 'Austin, Chicago…' },
+  us: { id: 'us', label: 'US', hasMobiles: true, defaultFilters: {}, companyEg: 'Acme, Globex…', cityEg: 'Austin, Chicago…' },
 }
 export const isDataset = (v: unknown): v is DatasetId => v === 'uk-eu' || v === 'us'
 

@@ -243,8 +243,8 @@ export default function LeadsPage() {
           </div>
         ) : !loading && data?.notice === 'no_mobiles' ? (
           <div className="ld-state">
-            <b>US leads have no mobile numbers.</b>
-            <p>Remove the mobile filter to see them.</p>
+            <b>The mobile filter is not ready for US leads yet.</b>
+            <p>Mobile numbers still show in the results and exports. Remove the mobile filter to see them.</p>
             <button type="button" className="ld-btn" onClick={() => { const f = { ...filters }; delete f.hasMobile; delete f.mobileCodes; setFilters(f) }}>Remove mobile filter</button>
           </div>
         ) : !loading && data && !rows.length ? (

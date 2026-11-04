@@ -23,7 +23,7 @@ export function toCsv(rows: LeadRow[], dataset: DatasetId): string {
       location: r.contact_location ?? '',
       linkedin: r.linkedin_url ?? '',
     }
-    if (dataset === 'uk-eu') o.mobile = r.mobile_phone ?? ''
+    o.mobile = r.mobile_phone ?? ''
     Object.assign(o, {
       work_email: r.work_email ?? '',
       email_status: r.email_status ?? '',
