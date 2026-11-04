@@ -6,7 +6,6 @@ import { normUsername, useStore, useUser } from '../lib/store'
 import { avatarFor, reviews, tagHue } from '../content/reviews'
 import { Curriculum } from '../components/Curriculum'
 import skoolLogo from '../assets/skool-logo.png'
-import ollyLogo from '../assets/brand-face.webp'
 import '../styles/auth.css'
 
 function Review({ r, hidden }: { r: (typeof reviews)[number]; hidden?: boolean }) {
@@ -69,17 +68,7 @@ export default function AuthPage() {
   return (
     <div className="q-auth">
       <aside className="q-show">
-        <div className="q-brand">
-          <img src={ollyLogo} alt="" width={28} height={28} />
-          <b>Build a Profitable $10K p/m App</b>
-        </div>
-
         <div className="q-show-copy">
-          <div className="q-skool laser">
-            <span>A private</span>
-            <img src={skoolLogo} alt="Skool" height={16} />
-            <span>community</span>
-          </div>
           <h2>5 weeks · 40 lessons</h2>
           <p>From idea to first customers to exit. Build a profitable $10K p/m SaaS with AI, one lesson at a time.</p>
         </div>
@@ -93,15 +82,7 @@ export default function AuthPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}>
             <p className="q-eyebrow">Members only</p>
             <h1 className="q-title">Welcome to the vault.</h1>
-            <p className="q-lede">Sign in with the details I sent you on Skool.</p>
-
-            <div className="q-howto">
-              <img src={skoolLogo} alt="Skool" height={16} />
-              <ul>
-                <li><b>Your login</b> is your Skool username.</li>
-                <li><b>Your password</b> was sent to you in a DM on Skool.</li>
-              </ul>
-            </div>
+            <p className="q-lede">Your login is your Skool username. Your password was sent to you in a DM on Skool.</p>
 
             <form onSubmit={submit} className="q-card laser laser-slow" noValidate>
               <label className="q-field">
