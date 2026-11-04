@@ -1,4 +1,5 @@
 import type { DatasetId, Filters } from './defs'
+import { useStore } from '../lib/store'
 
 export type LeadRow = {
   lead_id: string
@@ -45,6 +46,8 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
     throw new ApiError(0, 'network', 'Could not reach the server. Check your connection and try again.')
   }
   const body = await res.json().catch(() => ({}))
+  // An ended server session (expired, password or secret changed) sends the member back to the login page.
+  if (res.status === 401 && !path.endsWith('/vault/login')) useStore.getState().signOut()
   if (!res.ok) {
     const msg =
       body.message ??
