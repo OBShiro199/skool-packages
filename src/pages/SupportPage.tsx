@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { CalendarClock, ChevronDown, ExternalLink, MessageSquare, Send } from 'lucide-react'
-import { useUser } from '../lib/store'
+import { handle, useUser } from '../lib/store'
 import { APPS } from '../content/apps'
 import { toast } from '../components/Toasts'
 
@@ -60,7 +60,7 @@ export default function SupportPage() {
           {sent ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="stack">
               <b>Ticket sent.</b>
-              <p className="muted">We will reply to {user.profile.email} within one working day.</p>
+              <p className="muted">We will reply to {handle(user.profile)} on Skool within one working day.</p>
               <button className="btn" style={{ justifySelf: 'start' }} onClick={() => { setSent(false); setMsg('') }}>Send another</button>
             </motion.div>
           ) : (

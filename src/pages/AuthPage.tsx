@@ -1,21 +1,54 @@
 import { useState } from 'react'
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
-import { ArrowRight, Info, Lock, Mail, User } from 'lucide-react'
-import { useStore, useUser } from '../lib/store'
-import { APPS } from '../content/apps'
-import { AppArt } from '../components/AppArt'
-import { BrandMark } from '../components/Brand'
+import { ArrowRight, Lock, User } from 'lucide-react'
+import { normUsername, useStore, useUser } from '../lib/store'
+import { avatarFor, reviews, tagHue } from '../content/reviews'
+import { Included } from '../components/Included'
+import skoolLogo from '../assets/skool-logo.png'
+import ollyLogo from '../assets/brand-face.webp'
+import '../styles/auth.css'
+
+function Review({ r, hidden }: { r: (typeof reviews)[number]; hidden?: boolean }) {
+  const src = avatarFor(r.handle)
+  return (
+    <figure className="q-review" aria-hidden={hidden || undefined}>
+      <blockquote>{r.text}</blockquote>
+      <figcaption>
+        {src ? <img src={src} alt="" width={28} height={28} /> : <span className="q-initial">{r.handle[0].toUpperCase()}</span>}
+        <span className="q-handle">@{r.handle}</span>
+        <span className={`tag tag-${tagHue[r.tag]}`}>{r.tag}</span>
+      </figcaption>
+    </figure>
+  )
+}
+
+const rows = [reviews.slice(0, 7), reviews.slice(7)]
+
+function Reviews() {
+  return (
+    <div className="q-reviews" role="region" aria-label="What members say">
+      {rows.map((row, n) => (
+        <div key={n} className="q-marquee-wrap">
+          <div className={`q-marquee ${n ? 'rev' : ''}`}>
+            {row.map((r, i) => <Review key={i} r={r} />)}
+            {row.map((r, i) => <Review key={`c${i}`} r={r} hidden />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function AuthPage() {
   const [params, setParams] = useSearchParams()
-  const mode = params.get('mode') === 'signin' ? 'signin' : 'signup'
+  const mode = params.get('mode') === 'signup' ? 'signup' : 'signin'
   const user = useUser()
   const signUp = useStore((s) => s.signUp)
   const signIn = useStore((s) => s.signIn)
   const nav = useNavigate()
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -25,12 +58,13 @@ export default function AuthPage() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    if (!/^\S+@\S+\.\S+$/.test(email)) return setError('Enter a valid email address.')
+    const u = normUsername(username)
+    if (!/^[a-z0-9][a-z0-9._-]{1,59}$/.test(u)) return setError('Enter your Skool username, like olly-rosewell.')
     if (password.length < 8) return setError('Password needs at least 8 characters.')
     if (mode === 'signup' && name.trim().length < 2) return setError('Tell us your first name.')
     setBusy(true)
     setTimeout(() => {
-      const r = mode === 'signup' ? signUp(name, email, password) : signIn(email, password)
+      const r = mode === 'signup' ? signUp(name, u, password) : signIn(u, password)
       setBusy(false)
       if (!r.ok) return setError(r.error)
       nav(mode === 'signup' ? '/onboarding' : '/', { replace: true })
@@ -38,89 +72,76 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="auth">
-      <div className="auth-left">
-        <div className="brand" style={{ padding: 0 }}>
-          <BrandMark />
-          <div><b>BPA Vault</b><small>Build $10K p/m Profitable Apps</small></div>
+    <div className="q-auth">
+      <aside className="q-show">
+        <div className="q-brand">
+          <img src={ollyLogo} alt="" width={28} height={28} />
+          <b>Build a Profitable $10K p/m App</b>
         </div>
 
-        <div className="auth-form-wrap">
+        <div className="q-show-copy">
+          <div className="q-skool laser">
+            <span>A private</span>
+            <img src={skoolLogo} alt="Skool" height={16} />
+            <span>community</span>
+          </div>
+          <h2>Everything you need to build a profitable $10K p/m SaaS.</h2>
+          <p>The leads, the course, the apps, the calls and a live build to $10K/month. All of it unlocks the moment you sign in.</p>
+        </div>
+
+        <Included />
+        <Reviews />
+      </aside>
+
+      <main className="q-form-side">
+        <div className="q-form-wrap">
           <AnimatePresence mode="wait">
-            <motion.div key={mode} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
-              <span className="label">{mode === 'signup' ? 'Members only · Step 1 of 2' : 'Welcome back'}</span>
-              <h1 className="auth-title">{mode === 'signup' ? 'Unlock the vault.' : 'Sign in to keep building.'}</h1>
-              <p className="muted" style={{ marginBottom: 24, fontSize: 15 }}>
+            <motion.div key={mode} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}>
+              <p className="q-eyebrow">{mode === 'signup' ? 'Members only · Step 1 of 2' : 'Members only'}</p>
+              <h1 className="q-title">{mode === 'signup' ? 'Unlock the vault.' : 'Welcome back.'}</h1>
+              <p className="q-lede">
                 {mode === 'signup'
-                  ? '20 SaaS build kits for Claude Code. Pick one, follow the checklist, ship it, sell it.'
-                  : 'Your progress is saved. Pick up exactly where you left off.'}
+                  ? 'Create your vault login with the same username you use on Skool.'
+                  : 'Sign in with your Skool username to pick up where you left off.'}
               </p>
 
-              {mode === 'signup' && (
-                <div className="skool-note">
-                  <Info size={16} style={{ flex: 'none', marginTop: 2 }} />
-                  <div>
-                    <b>Use the same email as your Skool account.</b>
-                    <span> That is how we match your membership to the vault. A different email means no access.</span>
-                  </div>
-                </div>
-              )}
-
-              <form onSubmit={submit} className="stack" style={{ gap: 14 }} noValidate>
+              <form onSubmit={submit} className="q-card laser laser-slow" noValidate>
                 {mode === 'signup' && (
-                  <label className="field">
+                  <label className="q-field">
                     <span>First name</span>
-                    <div className="input-icon"><User size={16} /><input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Olly" autoComplete="given-name" /></div>
+                    <div className="q-input"><User size={16} strokeWidth={1.5} aria-hidden /><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Olly" autoComplete="given-name" /></div>
                   </label>
                 )}
-                <label className="field">
-                  <span>{mode === 'signup' ? 'Skool email' : 'Email'}</span>
-                  <div className="input-icon"><Mail size={16} /><input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" /></div>
+                <label className="q-field">
+                  <span>Skool username</span>
+                  <div className="q-input q-prefix">
+                    <span className="q-pre">skool.com/@</span>
+                    <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="your-name" autoComplete="username" autoCapitalize="none" spellCheck={false} />
+                  </div>
+                  <small>The part after skool.com/@ on your Skool profile.</small>
                 </label>
-                <label className="field">
+                <label className="q-field">
                   <span>Password</span>
-                  <div className="input-icon"><Lock size={16} /><input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} /></div>
+                  <div className="q-input"><Lock size={16} strokeWidth={1.5} aria-hidden /><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} /></div>
                 </label>
-                {error && <motion.div initial={{ x: -6 }} animate={{ x: [6, -4, 2, 0] }} className="auth-error">{error}</motion.div>}
-                <button className="btn btn-primary btn-lg btn-block" disabled={busy}>
-                  {busy ? <span className="spinner" /> : <>{mode === 'signup' ? 'Create my account' : 'Sign in'} <ArrowRight size={16} /></>}
+                <p className="q-error" role="alert">{error}</p>
+                <button className="q-btn" disabled={busy} aria-busy={busy}>
+                  <span className="q-btn-label">{mode === 'signup' ? 'Create my login' : 'Sign in'} <ArrowRight size={16} strokeWidth={1.75} aria-hidden /></span>
+                  {busy && <span className="q-spinner" aria-hidden />}
                 </button>
               </form>
 
-              <p className="muted" style={{ marginTop: 18, fontSize: 14 }}>
-                {mode === 'signup' ? 'Already a member? ' : 'New here? '}
-                <a href="#" onClick={(e) => { e.preventDefault(); setError(''); setParams(mode === 'signup' ? { mode: 'signin' } : {}) }}>
-                  {mode === 'signup' ? 'Sign in' : 'Create an account'}
+              <p className="q-switch">
+                {mode === 'signup' ? 'Already have a login? ' : 'First time here? '}
+                <a href="#" onClick={(e) => { e.preventDefault(); setError(''); setParams(mode === 'signup' ? {} : { mode: 'signup' }) }}>
+                  {mode === 'signup' ? 'Sign in' : 'Create your login'}
                 </a>
               </p>
             </motion.div>
           </AnimatePresence>
         </div>
-
-        <p className="label" style={{ textTransform: 'none', letterSpacing: 0 }}>Demo mode: accounts are stored in this browser only.</p>
-      </div>
-
-      <div className="auth-right" aria-hidden>
-        <div className="auth-marquee">
-          {[0, 1].map((col) => (
-            <div key={col} className={`auth-col ${col ? 'rev' : ''}`}>
-              {[...APPS, ...APPS].map((a, i) => (
-                <div key={`${a.slug}-${i}`} className="auth-tile">
-                  <AppArt app={a} height={120} />
-                  <div className="auth-tile-body">
-                    <b>{a.name}</b>
-                    <span className="mono">${a.price.monthly}/mo · {a.buildHours}h build</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="auth-quote">
-          <span className="serif">“Everyone teaches you to launch. This teaches you to get paid.”</span>
-          <span className="label">Idea → Build → Sell</span>
-        </div>
-      </div>
+        <p className="q-foot">Demo mode: logins are stored in this browser only.</p>
+      </main>
     </div>
   )
 }

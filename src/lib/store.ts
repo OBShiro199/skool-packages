@@ -1,13 +1,25 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-// Mock backend. Everything lives in localStorage, keyed by email, so the
+// Mock backend. Everything lives in localStorage, keyed by Skool username, so the
 // UI behaves like a real multi-user app until Supabase is wired in.
 
 export interface Profile {
-  email: string
+  /** Skool username, lower case, without the @ (accounts made before usernames hold an email here). */
+  username: string
   name: string
   createdAt: string
+}
+
+/** Accepts "olly", "@olly" or "skool.com/@olly" and returns "olly". */
+export function normUsername(input: string): string {
+  return input.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^(www\.)?skool\.com\//, '').replace(/^@/, '').replace(/[/?#].*$/, '')
+}
+
+/** How a member is shown: @username, or the email on older demo accounts. */
+export function handle(p: Profile & { email?: string }): string {
+  const u = p.username ?? p.email ?? ''
+  return u.includes('@') ? u : `@${u}`
 }
 
 export interface Commitment {
@@ -34,9 +46,9 @@ export interface UserData {
 
 interface State {
   users: Record<string, UserData>
-  session: string | null // email
-  signUp: (name: string, email: string, password: string) => { ok: true } | { ok: false; error: string }
-  signIn: (email: string, password: string) => { ok: true } | { ok: false; error: string }
+  session: string | null // username
+  signUp: (name: string, username: string, password: string) => { ok: true } | { ok: false; error: string }
+  signIn: (username: string, password: string) => { ok: true } | { ok: false; error: string }
   signOut: () => void
   completeOnboarding: (answers: Record<string, string>, recommended: string) => void
   commit: (slug: string, c: Omit<Commitment, 'signedAt'>) => void
@@ -49,17 +61,16 @@ interface State {
 }
 
 const today = () => new Date().toISOString().slice(0, 10)
-const norm = (e: string) => e.trim().toLowerCase()
 
 export const useStore = create<State>()(
   persist(
     (set, get) => {
       const patchUser = (fn: (u: UserData) => UserData) => {
-        const email = get().session
-        if (!email) return
-        const u = get().users[email]
+        const key = get().session
+        if (!key) return
+        const u = get().users[key]
         if (!u) return
-        set({ users: { ...get().users, [email]: fn(u) } })
+        set({ users: { ...get().users, [key]: fn(u) } })
       }
       const touchDay = (u: UserData): UserData =>
         u.activeDays.includes(today()) ? u : { ...u, activeDays: [...u.activeDays, today()] }
@@ -68,11 +79,11 @@ export const useStore = create<State>()(
         users: {},
         session: null,
 
-        signUp: (name, email, password) => {
-          const key = norm(email)
-          if (get().users[key]) return { ok: false, error: 'An account with this email already exists. Sign in instead.' }
+        signUp: (name, username, password) => {
+          const key = normUsername(username)
+          if (get().users[key]) return { ok: false, error: 'An account with this Skool username already exists. Sign in instead.' }
           const user: UserData = {
-            profile: { email: key, name: name.trim(), createdAt: new Date().toISOString() },
+            profile: { username: key, name: name.trim(), createdAt: new Date().toISOString() },
             password,
             commitments: {},
             progress: {},
@@ -82,10 +93,10 @@ export const useStore = create<State>()(
           return { ok: true }
         },
 
-        signIn: (email, password) => {
-          const key = norm(email)
+        signIn: (username, password) => {
+          const key = normUsername(username)
           const u = get().users[key]
-          if (!u) return { ok: false, error: 'No account found for that email. Create one first.' }
+          if (!u) return { ok: false, error: 'No account found for that Skool username. Create one first.' }
           if (u.password !== password) return { ok: false, error: 'That password does not match.' }
           set({ session: key, users: { ...get().users, [key]: touchDay(u) } })
           return { ok: true }

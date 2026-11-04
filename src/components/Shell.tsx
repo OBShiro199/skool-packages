@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { BookOpen, Copy, Flame, Home, LifeBuoy, LogOut, Menu, UserRound } from 'lucide-react'
-import { streak, useStore, useUser } from '../lib/store'
+import { handle, streak, useStore, useUser } from '../lib/store'
 import { getApp } from '../content/apps'
 import { appStats, levelFor } from '../lib/progress'
 import { Bar, Ring } from './Ring'
@@ -37,7 +37,7 @@ export default function Shell() {
       <aside className={`sidebar ${open ? 'open' : ''}`}>
         <div className="brand">
           <BrandMark />
-          <div><b>BPA Vault</b><small>{user.profile.email}</small></div>
+          <div><b>BPA Vault</b><small>{handle(user.profile)}</small></div>
         </div>
 
         <NavLink to="/app/library" className={({ isActive }) => `nav-link cta ${isActive ? 'active' : ''}`}><Copy size={16} /> Clone a Software App</NavLink>

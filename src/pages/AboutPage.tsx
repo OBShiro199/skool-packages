@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { RotateCcw, Save } from 'lucide-react'
-import { useStore, useUser } from '../lib/store'
+import { handle, useStore, useUser } from '../lib/store'
 import { getApp } from '../content/apps'
 import { appStats } from '../lib/progress'
 import { useTotals } from '../components/Shell'
@@ -39,7 +39,7 @@ export default function AboutPage() {
           <h2 style={{ fontSize: 18, marginBottom: 14 }}>Profile</h2>
           <div className="stack" style={{ gap: 14 }}>
             <label className="field"><span>Name</span><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></label>
-            <label className="field"><span>Skool email</span><input className="input" value={user.profile.email} readOnly /></label>
+            <label className="field"><span>Skool username</span><input className="input" value={handle(user.profile)} readOnly /></label>
             <button className="btn btn-primary" style={{ justifySelf: 'start' }} onClick={() => { update({ name }); toast('Profile saved') }}><Save size={15} /> Save</button>
           </div>
         </section>
