@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p . && vite build",
+    "build:site": "npm run build && rm -rf ../skool-waitlist/public/vault && cp -r dist/vault ../skool-waitlist/public/vault",
     "typecheck": "tsc -p .",
     "preview": "vite preview",
     "build:preview": "vite build --mode preview"
