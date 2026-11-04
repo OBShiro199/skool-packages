@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
-import { motion, AnimatePresence } from 'motion/react'
-import { ArrowRight, Lock, User } from 'lucide-react'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { motion } from 'motion/react'
+import { ArrowRight, Lock } from 'lucide-react'
 import { normUsername, useStore, useUser } from '../lib/store'
 import { avatarFor, reviews, tagHue } from '../content/reviews'
-import { Included } from '../components/Included'
+import { Curriculum } from '../components/Curriculum'
 import skoolLogo from '../assets/skool-logo.png'
 import ollyLogo from '../assets/brand-face.webp'
 import '../styles/auth.css'
@@ -41,13 +41,9 @@ function Reviews() {
 }
 
 export default function AuthPage() {
-  const [params, setParams] = useSearchParams()
-  const mode = params.get('mode') === 'signup' ? 'signup' : 'signin'
   const user = useUser()
-  const signUp = useStore((s) => s.signUp)
   const signIn = useStore((s) => s.signIn)
   const nav = useNavigate()
-  const [name, setName] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -60,14 +56,13 @@ export default function AuthPage() {
     setError('')
     const u = normUsername(username)
     if (!/^[a-z0-9][a-z0-9._-]{1,59}$/.test(u)) return setError('Enter your Skool username, like olly-rosewell.')
-    if (password.length < 8) return setError('Password needs at least 8 characters.')
-    if (mode === 'signup' && name.trim().length < 2) return setError('Tell us your first name.')
+    if (password.length < 8) return setError('Enter the password from your Skool DM.')
     setBusy(true)
     setTimeout(() => {
-      const r = mode === 'signup' ? signUp(name, u, password) : signIn(u, password)
+      const r = signIn(u, password)
       setBusy(false)
       if (!r.ok) return setError(r.error)
-      nav(mode === 'signup' ? '/onboarding' : '/', { replace: true })
+      nav('/', { replace: true })
     }, 450)
   }
 
@@ -85,60 +80,56 @@ export default function AuthPage() {
             <img src={skoolLogo} alt="Skool" height={16} />
             <span>community</span>
           </div>
-          <h2>Everything you need to build a profitable $10K p/m SaaS.</h2>
-          <p>The leads, the course, the apps, the calls and a live build to $10K/month. All of it unlocks the moment you sign in.</p>
+          <h2>5 weeks · 40 lessons</h2>
+          <p>From idea to first customers to exit. Build a profitable $10K p/m SaaS with AI, one lesson at a time.</p>
         </div>
 
-        <Included />
+        <Curriculum />
         <Reviews />
       </aside>
 
       <main className="q-form-side">
         <div className="q-form-wrap">
-          <AnimatePresence mode="wait">
-            <motion.div key={mode} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}>
-              <p className="q-eyebrow">{mode === 'signup' ? 'Members only · Step 1 of 2' : 'Members only'}</p>
-              <h1 className="q-title">{mode === 'signup' ? 'Unlock the vault.' : 'Welcome back.'}</h1>
-              <p className="q-lede">
-                {mode === 'signup'
-                  ? 'Create your vault login with the same username you use on Skool.'
-                  : 'Sign in with your Skool username to pick up where you left off.'}
-              </p>
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}>
+            <p className="q-eyebrow">Members only</p>
+            <h1 className="q-title">Welcome to the vault.</h1>
+            <p className="q-lede">Sign in with the details I sent you on Skool.</p>
 
-              <form onSubmit={submit} className="q-card laser laser-slow" noValidate>
-                {mode === 'signup' && (
-                  <label className="q-field">
-                    <span>First name</span>
-                    <div className="q-input"><User size={16} strokeWidth={1.5} aria-hidden /><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Olly" autoComplete="given-name" /></div>
-                  </label>
-                )}
-                <label className="q-field">
-                  <span>Skool username</span>
-                  <div className="q-input q-prefix">
-                    <span className="q-pre">skool.com/@</span>
-                    <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="your-name" autoComplete="username" autoCapitalize="none" spellCheck={false} />
-                  </div>
-                  <small>The part after skool.com/@ on your Skool profile.</small>
-                </label>
-                <label className="q-field">
-                  <span>Password</span>
-                  <div className="q-input"><Lock size={16} strokeWidth={1.5} aria-hidden /><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} /></div>
-                </label>
-                <p className="q-error" role="alert">{error}</p>
-                <button className="q-btn" disabled={busy} aria-busy={busy}>
-                  <span className="q-btn-label">{mode === 'signup' ? 'Create my login' : 'Sign in'} <ArrowRight size={16} strokeWidth={1.75} aria-hidden /></span>
-                  {busy && <span className="q-spinner" aria-hidden />}
-                </button>
-              </form>
+            <div className="q-howto">
+              <img src={skoolLogo} alt="Skool" height={16} />
+              <ul>
+                <li><b>Your login</b> is your Skool username.</li>
+                <li><b>Your password</b> was sent to you in a DM on Skool.</li>
+              </ul>
+            </div>
 
-              <p className="q-switch">
-                {mode === 'signup' ? 'Already have a login? ' : 'First time here? '}
-                <a href="#" onClick={(e) => { e.preventDefault(); setError(''); setParams(mode === 'signup' ? {} : { mode: 'signup' }) }}>
-                  {mode === 'signup' ? 'Sign in' : 'Create your login'}
-                </a>
-              </p>
-            </motion.div>
-          </AnimatePresence>
+            <form onSubmit={submit} className="q-card laser laser-slow" noValidate>
+              <label className="q-field">
+                <span className="q-label">
+                  <img src={skoolLogo} alt="Skool" height={13} /> username
+                </span>
+                <div className="q-input q-prefix">
+                  <span className="q-pre">skool.com/@</span>
+                  <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="your-name" autoComplete="username" autoCapitalize="none" spellCheck={false} />
+                </div>
+                <small>The part after skool.com/@ on your Skool profile.</small>
+              </label>
+              <label className="q-field">
+                <span>Password</span>
+                <div className="q-input"><Lock size={16} strokeWidth={1.5} aria-hidden /><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="From your Skool DM" autoComplete="current-password" /></div>
+              </label>
+              <p className="q-error" role="alert">{error}</p>
+              <button className="q-btn" disabled={busy} aria-busy={busy}>
+                <span className="q-btn-label">Sign in <ArrowRight size={16} strokeWidth={1.75} aria-hidden /></span>
+                {busy && <span className="q-spinner" aria-hidden />}
+              </button>
+            </form>
+
+            <p className="q-switch">
+              Can't find the DM?{' '}
+              <a href="https://www.skool.com/build-profitable-software" target="_blank" rel="noopener noreferrer">Message me on Skool</a>
+            </p>
+          </motion.div>
         </div>
         <p className="q-foot">Demo mode: logins are stored in this browser only.</p>
       </main>

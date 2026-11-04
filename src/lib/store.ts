@@ -96,7 +96,19 @@ export const useStore = create<State>()(
         signIn: (username, password) => {
           const key = normUsername(username)
           const u = get().users[key]
-          if (!u) return { ok: false, error: 'No account found for that Skool username. Create one first.' }
+          if (!u) {
+            // Demo: the first sign-in with a username creates that member's account. With a backend,
+            // the account and the DM'd password would already exist.
+            const user: UserData = {
+              profile: { username: key, name: key, createdAt: new Date().toISOString() },
+              password,
+              commitments: {},
+              progress: {},
+              activeDays: [today()],
+            }
+            set({ users: { ...get().users, [key]: user }, session: key })
+            return { ok: true }
+          }
           if (u.password !== password) return { ok: false, error: 'That password does not match.' }
           set({ session: key, users: { ...get().users, [key]: touchDay(u) } })
           return { ok: true }
