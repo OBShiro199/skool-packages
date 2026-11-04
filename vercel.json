@@ -1,1 +1,8 @@
-{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+{
+  "outputDirectory": "dist",
+  "redirects": [{ "source": "/", "destination": "/vault", "permanent": false }],
+  "rewrites": [
+    { "source": "/vault", "destination": "/vault/index.html" },
+    { "source": "/vault/(.*)", "destination": "/vault/index.html" }
+  ]
+}

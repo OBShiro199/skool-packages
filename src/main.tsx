@@ -12,7 +12,7 @@ createRoot(document.getElementById('root')!).render(
     {import.meta.env.VITE_HASH_ROUTER ? (
       <HashRouter><App /></HashRouter>
     ) : (
-      <BrowserRouter><App /></BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}><App /></BrowserRouter>
     )}
   </StrictMode>,
 )
