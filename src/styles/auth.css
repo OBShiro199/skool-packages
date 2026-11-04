@@ -10,36 +10,15 @@
 .q-auth .num { font-variant-numeric: tabular-nums; }
 
 /* ---------- left: what's inside + reviews ---------- */
-.q-show { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 20px; padding: 28px 0 24px; border-left: 1px solid var(--q-hair); background: var(--q-row); overflow: hidden; }
-.q-show-copy { padding-inline: clamp(16px, 4vw, 48px); }
-.q-show-copy { max-width: 680px; }
-.q-skool { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--q-blue-edge); background: var(--q-blue-soft); border-radius: 6px; font-size: 13px; color: var(--q-muted); }
-.q-skool img { height: 16px; width: auto; }
-.q-show-copy h2 { margin: 0; font-size: clamp(24px, 2.6vw, 32px); line-height: 1.12; letter-spacing: -0.035em; font-weight: 500; color: var(--q-ink); text-wrap: balance; }
-.q-show-copy p { margin: 10px 0 0; font-size: 15px; line-height: 24px; color: var(--q-muted); max-width: 60ch; }
-.cur { margin-inline: clamp(16px, 4vw, 48px); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #fff; border: 1px solid var(--q-hair); border-radius: 6px; overflow: hidden; }
-.cur-week { min-width: 0; padding: 0 14px 10px; }
-.cur-week + .cur-week { border-left: 1px solid var(--q-hair); }
-.cur-bar { height: 3px; margin: 0 -14px 12px; background: var(--q-div); }
-.cur-fill { height: 100%; background: var(--q-blue); transform-origin: left; }
-.cur-num { margin: 0; font-size: 12px; color: var(--q-faint); }
-.cur-week h3 { margin: 2px 0 0; font-size: 15px; font-weight: 500; letter-spacing: -0.015em; color: var(--q-ink); }
-.cur-out { margin: 2px 0 6px; min-height: 32px; font-size: 12px; line-height: 16px; color: var(--q-muted); }
-.cur-week ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--q-hair); }
-.cur-week li { display: flex; align-items: center; gap: 8px; height: clamp(22px, 3.2vh, 30px); border-bottom: 1px solid var(--q-div); font-size: 12px; color: var(--q-body); transition: color 200ms; }
-.cur-week li:last-child { border-bottom: 0; }
-.cur-week li .num { width: 22px; flex: none; color: var(--q-faint); transition: color 200ms; }
-.cur-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cur-week li.on { color: var(--q-ink); font-weight: 500; }
-.cur-week li.on .num { color: var(--q-blue); }
+.q-show { min-width: 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 28px 0; border-left: 1px solid var(--q-hair); background: var(--q-row); overflow: hidden; }
 
-.q-reviews { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
-.q-marquee-wrap { flex: 1; min-height: 0; max-height: 170px; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent); }
-.q-marquee { display: flex; gap: 12px; width: max-content; height: 100%; animation: q-marquee 70s linear infinite; }
+.q-reviews { min-height: 0; display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+.q-marquee-wrap { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent); }
+.q-marquee { display: flex; gap: 12px; width: max-content; animation: q-marquee 70s linear infinite; }
 .q-marquee.rev { animation-direction: reverse; }
 @keyframes q-marquee { to { transform: translateX(calc(-50% - 6px)); } }
 .q-review { margin: 0; width: 300px; flex: none; display: flex; flex-direction: column; gap: 12px; padding: 14px; background: #fff; border: 1px solid var(--q-hair); border-radius: 6px; }
-.q-review blockquote { margin: 0; flex: 1; font-size: 13px; line-height: 20px; color: var(--q-body); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.q-review blockquote { margin: 0; flex: 1; font-size: 13px; line-height: 20px; color: var(--q-body); display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
 .q-review figcaption { display: flex; align-items: center; gap: 8px; }
 .q-review img, .q-initial { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex: none; }
 .q-initial { display: grid; place-items: center; background: var(--q-hover); font-size: 12px; font-weight: 500; color: var(--q-body); }

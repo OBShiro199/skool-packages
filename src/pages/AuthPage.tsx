@@ -4,7 +4,6 @@ import { motion } from 'motion/react'
 import { ArrowRight, Lock } from 'lucide-react'
 import { normUsername, useStore, useUser } from '../lib/store'
 import { avatarFor, reviews, tagHue } from '../content/reviews'
-import { Curriculum } from '../components/Curriculum'
 import skoolLogo from '../assets/skool-logo.png'
 import '../styles/auth.css'
 
@@ -68,12 +67,6 @@ export default function AuthPage() {
   return (
     <div className="q-auth">
       <aside className="q-show">
-        <div className="q-show-copy">
-          <h2>5 weeks · 40 lessons</h2>
-          <p>From idea to first customers to exit. Build a profitable $10K p/m SaaS with AI, one lesson at a time.</p>
-        </div>
-
-        <Curriculum />
         <Reviews />
       </aside>
 
