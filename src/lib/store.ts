@@ -42,6 +42,8 @@ export interface UserData {
   progress: Record<string, AppProgress>
   activeDays: string[] // YYYY-MM-DD
   activeApp?: string
+  /** Set once the dashboard tour has been finished or skipped. */
+  tourDone?: boolean
 }
 
 interface State {
@@ -58,6 +60,7 @@ interface State {
   updateProfile: (p: Partial<Pick<Profile, 'name'>>) => void
   resetApp: (slug: string) => void
   resetOnboarding: () => void
+  setTourDone: (done: boolean) => void
 }
 
 const today = () => new Date().toISOString().slice(0, 10)
@@ -154,6 +157,8 @@ export const useStore = create<State>()(
           patchUser((u) => ({ ...u, progress: { ...u.progress, [slug]: { startedAt: new Date().toISOString(), checked: {} } } })),
 
         resetOnboarding: () => patchUser((u) => ({ ...u, onboarding: undefined })),
+
+        setTourDone: (done) => patchUser((u) => ({ ...u, tourDone: done })),
       }
     },
     { name: 'bpa-vault-v1' },

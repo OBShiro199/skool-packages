@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 import { useUser } from './lib/store'
 import { Toasts } from './components/Toasts'
 import AuthPage from './pages/AuthPage'
-import OnboardingPage from './pages/OnboardingPage'
 import Shell from './components/Shell'
 import HomePage from './pages/HomePage'
 import LibraryPage from './pages/LibraryPage'
@@ -14,18 +13,15 @@ import SupportPage from './pages/SupportPage'
 import AboutPage from './pages/AboutPage'
 import LandingPreviewPage from './pages/LandingPreviewPage'
 
-function RequireAuth({ children, onboarded = true }: { children: ReactNode; onboarded?: boolean }) {
+function RequireAuth({ children }: { children: ReactNode }) {
   const user = useUser()
   if (!user) return <Navigate to="/auth" replace />
-  if (onboarded && !user.onboarding) return <Navigate to="/onboarding" replace />
   return <>{children}</>
 }
 
 function Root() {
   const user = useUser()
-  if (!user) return <Navigate to="/auth" replace />
-  if (!user.onboarding) return <Navigate to="/onboarding" replace />
-  return <Navigate to="/app" replace />
+  return <Navigate to={user ? '/app' : '/auth'} replace />
 }
 
 export default function App() {
@@ -34,7 +30,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Root />} />
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/onboarding" element={<RequireAuth onboarded={false}><OnboardingPage /></RequireAuth>} />
+        <Route path="/onboarding" element={<Navigate to="/app" replace />} />
         <Route path="/app" element={<RequireAuth><Shell /></RequireAuth>}>
           <Route index element={<HomePage />} />
           <Route path="library" element={<LibraryPage />} />

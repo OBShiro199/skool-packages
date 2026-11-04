@@ -40,9 +40,10 @@ export default function Shell() {
           <div><b>BPA Vault</b><small>{handle(user.profile)}</small></div>
         </div>
 
-        <NavLink to="/app/library" className={({ isActive }) => `nav-link cta ${isActive ? 'active' : ''}`}><Copy size={16} /> Clone a Software App</NavLink>
+        <NavLink to="/app/library" data-tour="clone" className={({ isActive }) => `nav-link cta ${isActive ? 'active' : ''}`}><Copy size={16} /> Clone a Software App</NavLink>
         <NavLink to="/app" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><Home size={16} /> Dashboard</NavLink>
 
+        <div data-tour="builds">
         <div className="nav-group label">Your builds</div>
         {builds.length === 0 && <p className="muted" style={{ fontSize: 13, padding: '0 10px' }}>No builds yet. Pick a kit to start.</p>}
         {builds.map(({ app, s }) => (
@@ -54,15 +55,18 @@ export default function Shell() {
             <span className="count">{Math.round(s.pct * 100)}%</span>
           </NavLink>
         ))}
+        </div>
 
+        <div data-tour="help">
         <div className="nav-group label">Help</div>
         <NavLink to="/app/docs" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><BookOpen size={16} /> Documentation</NavLink>
         <NavLink to="/app/support" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><LifeBuoy size={16} /> Support</NavLink>
         <NavLink to="/app/about" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><UserRound size={16} /> About You</NavLink>
+        </div>
 
         <div className="side-foot">
           <BackToSkool />
-          <div className="side-card">
+          <div className="side-card" data-tour="xp">
             <div className="row">
               <Ring pct={level.pct} size={40} stroke={4}><span className="mono" style={{ fontSize: 11 }}>L{level.index + 1}</span></Ring>
               <div style={{ flex: 1 }}>

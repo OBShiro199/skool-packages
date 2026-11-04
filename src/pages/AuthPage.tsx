@@ -47,7 +47,7 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  if (user) return <Navigate to={user.onboarding ? '/app' : '/onboarding'} replace />
+  if (user) return <Navigate to="/app" replace />
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,7 +60,7 @@ export default function AuthPage() {
       const r = signIn(u, password)
       setBusy(false)
       if (!r.ok) return setError(r.error)
-      nav('/', { replace: true })
+      nav('/app', { replace: true })
     }, 450)
   }
 

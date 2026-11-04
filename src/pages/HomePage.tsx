@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { ArrowRight } from 'lucide-react'
-import { useUser } from '../lib/store'
-import { getApp } from '../content/apps'
+import { ArrowRight, Compass } from 'lucide-react'
+import { useStore, useUser } from '../lib/store'
+import { APPS } from '../content/apps'
 import { fmtMinutes, taskStats } from '../lib/progress'
 import { useTotals } from '../components/Shell'
-import { AppCard } from '../components/AppCard'
 import { Bar } from '../components/Ring'
 import { PhaseIcon } from '../components/PhaseIcon'
 import { KitLogo } from '../components/KitLogo'
+import { Tour } from '../components/Tour'
 
 function greeting() {
   const h = new Date().getHours()
@@ -19,7 +19,7 @@ export default function HomePage() {
   const user = useUser()!
   const { builds } = useTotals()
   const active = builds.find((b) => b.app.slug === user.activeApp) ?? builds[0]
-  const rec = getApp(user.onboarding?.recommended)
+  const setTourDone = useStore((s) => s.setTourDone)
 
   const nextTask = active
     ? (() => {
@@ -43,11 +43,14 @@ export default function HomePage() {
       <header className="page-head">
         <span className="label">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
         <h1>{greeting()}, {user.profile.name}.</h1>
-        <p>{active ? `${active.app.name} is ${Math.round(active.s.pct * 100)}% built.` : 'Pick a kit and sign your pledge. The first phase takes about an hour.'}</p>
+        <p>{active ? `${active.app.name} is ${Math.round(active.s.pct * 100)}% built.` : 'Pick an app to clone and sign your pledge. The first phase takes about an hour.'}</p>
+        <button className="btn btn-sm" style={{ justifySelf: 'start', marginTop: 12 }} onClick={() => setTourDone(false)}>
+          <Compass size={14} /> Take the tour
+        </button>
       </header>
 
       {active ? (
-        <motion.section className="card continue" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.section className="card continue" data-tour="start" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="continue-body">
             <span className="label">Continue building</span>
             <h2 className="kit-name"><KitLogo app={active.app} size={24} />{active.app.name}</h2>
@@ -68,19 +71,18 @@ export default function HomePage() {
             <Link to={`/app/build/${active.app.slug}?tab=${active.s.phases[active.s.currentPhase].id}`} className="btn btn-primary" style={{ justifySelf: 'start' }}>Pick up where you left off <ArrowRight size={15} /></Link>
           </div>
         </motion.section>
-      ) : rec ? (
-        <section className="card continue">
+      ) : (
+        <section className="card continue" data-tour="start">
           <div className="continue-body">
-            <span className="label" style={{ color: 'var(--signal)' }}>Your match from onboarding</span>
-            <h2 className="kit-name"><KitLogo app={rec} size={24} />{rec.name}</h2>
-            <p className="muted">{rec.oneLiner}</p>
-            <p style={{ fontSize: 14 }}>{rec.whyItSells}</p>
-            <Link to={`/app/library/${rec.slug}`} className="btn btn-primary" style={{ justifySelf: 'start' }}>See the kit <ArrowRight size={15} /></Link>
+            <span className="label" style={{ color: 'var(--signal)' }}>Your first step</span>
+            <h2>Clone your first app</h2>
+            <p className="muted">Pick one of the {APPS.length} profitable apps, sign your pledge, and follow the checklist from setup to first customers.</p>
+            <Link to="/app/library" className="btn btn-primary" style={{ justifySelf: 'start' }}>Browse the apps <ArrowRight size={15} /></Link>
           </div>
         </section>
-      ) : null}
+      )}
 
-      <section className="card" style={{ padding: 18, marginTop: 20 }}>
+      <section className="card" style={{ padding: 18, marginTop: 20 }} data-tour="activity">
         <div className="row between" style={{ marginBottom: 12 }}><span className="label">Activity · last 5 weeks</span><span className="label">{activeCount} active {activeCount === 1 ? 'day' : 'days'}</span></div>
         <div className="heat">
           {days.map((d, i) => <i key={d} title={new Date(d).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })} className={`${activeSet.has(d) ? 'on' : ''} ${i === days.length - 1 ? 'today' : ''}`} />)}
@@ -89,12 +91,7 @@ export default function HomePage() {
         <p className="muted" style={{ fontSize: 13, marginTop: 12 }}>A day counts when you tick at least one item. Founders who tick something 5 days a week finish the build in under a month.</p>
       </section>
 
-      {builds.length === 0 && rec && (
-        <section style={{ marginTop: 28 }}>
-          <div className="row between" style={{ marginBottom: 12 }}><h2 style={{ fontSize: 20 }}>Start here</h2><Link to="/app/library">All kits <ArrowRight size={13} style={{ verticalAlign: -2 }} /></Link></div>
-          <div className="grid cols-3"><AppCard app={rec} match /></div>
-        </section>
-      )}
+      <Tour />
     </div>
   )
 }

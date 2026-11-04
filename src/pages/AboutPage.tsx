@@ -8,23 +8,14 @@ import { useTotals } from '../components/Shell'
 import { Bar } from '../components/Ring'
 import { toast } from '../components/Toasts'
 
-const LABELS: Record<string, string> = { background: 'Background', enjoy: 'Would do daily', hours: 'Hours a week', claude: 'Claude Code experience', goal: 'MRR goal (12 months)' }
-const VALUES: Record<string, string> = {
-  sales: 'Sales or business development', content: 'Content, social or marketing', agency: 'Agency or freelance', ops: 'Operations, admin or finance', local: 'Ran a local business', other: 'Something else',
-  post: 'Post content', talk: 'Message and call strangers', systems: 'Build systems', ai: 'Play with AI tools',
-  never: 'Never opened a terminal', some: 'Tried it a few times', daily: 'Every day',
-}
-
 export default function AboutPage() {
   const user = useUser()!
   const update = useStore((s) => s.updateProfile)
   const resetApp = useStore((s) => s.resetApp)
-  const resetOnb = useStore((s) => s.resetOnboarding)
+  const setTourDone = useStore((s) => s.setTourDone)
   const { xp, level, streak } = useTotals()
   const nav = useNavigate()
   const [name, setName] = useState(user.profile.name)
-  const a = user.onboarding?.answers ?? {}
-  const fmt = (k: string, v: string) => (k === 'goal' ? `$${Number(v).toLocaleString()}/mo` : k === 'hours' ? `${v === '40' ? '20+' : `up to ${v}`} hours` : VALUES[v] ?? v)
 
   return (
     <div className="page">
@@ -45,16 +36,9 @@ export default function AboutPage() {
         </section>
 
         <section className="card" style={{ padding: 20 }}>
-          <div className="row between" style={{ marginBottom: 14 }}>
-            <h2 style={{ fontSize: 18 }}>Your onboarding answers</h2>
-            <button className="btn btn-sm" onClick={() => { resetOnb(); nav('/onboarding') }}><RotateCcw size={13} /> Retake</button>
-          </div>
-          <table className="mini-ledger">
-            <tbody>
-              {Object.keys(LABELS).map((k) => <tr key={k}><td>{LABELS[k]}</td><td>{a[k] ? fmt(k, a[k]) : '–'}</td></tr>)}
-              <tr className="total"><td>Matched kit</td><td>{getApp(user.onboarding?.recommended)?.name ?? '–'}</td></tr>
-            </tbody>
-          </table>
+          <h2 style={{ fontSize: 18, marginBottom: 6 }}>Dashboard tour</h2>
+          <p className="muted" style={{ fontSize: 14, marginBottom: 14 }}>A quick walk through everything the vault can do.</p>
+          <button className="btn btn-sm" onClick={() => { setTourDone(false); nav('/app') }}><RotateCcw size={13} /> Replay the tour</button>
         </section>
       </div>
 
