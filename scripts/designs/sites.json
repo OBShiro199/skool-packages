@@ -1,0 +1,470 @@
+[
+ {
+  "refero_id": "2bf4c61f-de10-4614-ba1b-20c0453bd2a9",
+  "refero_url": "https://styles.refero.design/style/2bf4c61f-de10-4614-ba1b-20c0453bd2a9",
+  "name": "Notion",
+  "site": "https://notion.so/"
+ },
+ {
+  "refero_id": "031056ff-7af1-46db-8daa-115f731c5d26",
+  "refero_url": "https://styles.refero.design/style/031056ff-7af1-46db-8daa-115f731c5d26",
+  "name": "ElevenLabs",
+  "site": "https://elevenlabs.io/"
+ },
+ {
+  "refero_id": "4e3b4717-84c8-4599-baaf-a343c3d619b6",
+  "refero_url": "https://styles.refero.design/style/4e3b4717-84c8-4599-baaf-a343c3d619b6",
+  "name": "Cursor",
+  "site": "https://cursor.com/"
+ },
+ {
+  "refero_id": "f24daf3a-d43f-4dec-85a9-8ac1d5148a03",
+  "refero_url": "https://styles.refero.design/style/f24daf3a-d43f-4dec-85a9-8ac1d5148a03",
+  "name": "Vercel",
+  "site": "https://vercel.com/"
+ },
+ {
+  "refero_id": "0d914ef0-fa84-4c60-a9aa-cef0b5eb6e5d",
+  "refero_url": "https://styles.refero.design/style/0d914ef0-fa84-4c60-a9aa-cef0b5eb6e5d",
+  "name": "Resend",
+  "site": "https://resend.com/"
+ },
+ {
+  "refero_id": "90ce5883-bb24-4466-93f7-801cd617b0d1",
+  "refero_url": "https://styles.refero.design/style/90ce5883-bb24-4466-93f7-801cd617b0d1",
+  "name": "Linear",
+  "site": "https://linear.app/"
+ },
+ {
+  "refero_id": "f99aca3e-5289-4595-a7cc-77a72052f4b8",
+  "refero_url": "https://styles.refero.design/style/f99aca3e-5289-4595-a7cc-77a72052f4b8",
+  "name": "Ventriloc",
+  "site": "https://ventriloc.ca/en"
+ },
+ {
+  "refero_id": "d469cba4-c448-4a43-a033-883f8bfcdc42",
+  "refero_url": "https://styles.refero.design/style/d469cba4-c448-4a43-a033-883f8bfcdc42",
+  "name": "Anthropic",
+  "site": "https://anthropic.com/"
+ },
+ {
+  "refero_id": "b0d80806-b724-4ed1-a1d1-074edd3c9bc9",
+  "refero_url": "https://styles.refero.design/style/b0d80806-b724-4ed1-a1d1-074edd3c9bc9",
+  "name": "Dub",
+  "site": "https://dub.co/"
+ },
+ {
+  "refero_id": "04109c48-f591-4110-9739-622243d4ecc2",
+  "refero_url": "https://styles.refero.design/style/04109c48-f591-4110-9739-622243d4ecc2",
+  "name": "Letters",
+  "site": "https://letters.app/"
+ },
+ {
+  "refero_id": "7967c6d9-e50c-42b5-b4d1-74003ba41781",
+  "refero_url": "https://styles.refero.design/style/7967c6d9-e50c-42b5-b4d1-74003ba41781",
+  "name": "Seline Analytics",
+  "site": "https://seline.so/"
+ },
+ {
+  "refero_id": "632249f1-fd78-4c77-9b34-7bae37ff3e9b",
+  "refero_url": "https://styles.refero.design/style/632249f1-fd78-4c77-9b34-7bae37ff3e9b",
+  "name": "Supabase",
+  "site": "https://supabase.com/"
+ },
+ {
+  "refero_id": "d271a6c4-942f-4abf-a3de-66795f15f031",
+  "refero_url": "https://styles.refero.design/style/d271a6c4-942f-4abf-a3de-66795f15f031",
+  "name": "Sauce Labs",
+  "site": "https://saucelabs.com/"
+ },
+ {
+  "refero_id": "a76ec6ba-20b3-495c-9d89-1e58281e79e7",
+  "refero_url": "https://styles.refero.design/style/a76ec6ba-20b3-495c-9d89-1e58281e79e7",
+  "name": "Column",
+  "site": "https://column.com/"
+ },
+ {
+  "refero_id": "6f9452a4-3b64-4c6f-a05e-528d7a586f24",
+  "refero_url": "https://styles.refero.design/style/6f9452a4-3b64-4c6f-a05e-528d7a586f24",
+  "name": "Dovetail",
+  "site": "https://dovetailapp.com/"
+ },
+ {
+  "refero_id": "8cf4a580-bfb6-4090-a899-f734ffe62370",
+  "refero_url": "https://styles.refero.design/style/8cf4a580-bfb6-4090-a899-f734ffe62370",
+  "name": "Duna",
+  "site": "https://duna.com/"
+ },
+ {
+  "refero_id": "34baa524-5d5b-4165-bbab-d01f05e6d6b9",
+  "refero_url": "https://styles.refero.design/style/34baa524-5d5b-4165-bbab-d01f05e6d6b9",
+  "name": "General Intelligence Company",
+  "site": "https://www.generalintelligencecompany.com/"
+ },
+ {
+  "refero_id": "fc84e9f0-2058-4a0a-8d26-9cc1ba84ec9c",
+  "refero_url": "https://styles.refero.design/style/fc84e9f0-2058-4a0a-8d26-9cc1ba84ec9c",
+  "name": "Monad",
+  "site": "https://www.monad.com/"
+ },
+ {
+  "refero_id": "ced1c98f-d489-48f7-a01f-1fa59a07b706",
+  "refero_url": "https://styles.refero.design/style/ced1c98f-d489-48f7-a01f-1fa59a07b706",
+  "name": "Officevibe",
+  "site": "https://officevibe.com/"
+ },
+ {
+  "refero_id": "fd36bae9-dbf4-4b0f-a48b-e8c6f92edca3",
+  "refero_url": "https://styles.refero.design/style/fd36bae9-dbf4-4b0f-a48b-e8c6f92edca3",
+  "name": "Graphite",
+  "site": "https://graphite.dev/"
+ },
+ {
+  "refero_id": "ac53825c-1e06-4ae0-8489-cace5c5e0339",
+  "refero_url": "https://styles.refero.design/style/ac53825c-1e06-4ae0-8489-cace5c5e0339",
+  "name": "Wispr Flow",
+  "site": "https://wisprflow.ai/"
+ },
+ {
+  "refero_id": "506f983d-e4ed-4e7a-a3b3-851a18f5b402",
+  "refero_url": "https://styles.refero.design/style/506f983d-e4ed-4e7a-a3b3-851a18f5b402",
+  "name": "Featurebase",
+  "site": "https://featurebase.app/"
+ },
+ {
+  "refero_id": "e9f5e976-53f7-42f5-a882-4e63b3c2f734",
+  "refero_url": "https://styles.refero.design/style/e9f5e976-53f7-42f5-a882-4e63b3c2f734",
+  "name": "Ease Health",
+  "site": "https://easehealth.com/"
+ },
+ {
+  "refero_id": "28a7115a-bcf8-4b05-89a5-5290f5842a3c",
+  "refero_url": "https://styles.refero.design/style/28a7115a-bcf8-4b05-89a5-5290f5842a3c",
+  "name": "Handhold",
+  "site": "https://handhold.io/"
+ },
+ {
+  "refero_id": "3b83dfe4-2f53-4a4d-819d-e6045ca5f7dc",
+  "refero_url": "https://styles.refero.design/style/3b83dfe4-2f53-4a4d-819d-e6045ca5f7dc",
+  "name": "xAI",
+  "site": "https://x.ai/"
+ },
+ {
+  "refero_id": "08c8700c-f278-42bc-812e-f60dc6ce996e",
+  "refero_url": "https://styles.refero.design/style/08c8700c-f278-42bc-812e-f60dc6ce996e",
+  "name": "Attio",
+  "site": "https://attio.com/"
+ },
+ {
+  "refero_id": "1eee9aa2-1e23-4675-9f6e-fb98c93969bd",
+  "refero_url": "https://styles.refero.design/style/1eee9aa2-1e23-4675-9f6e-fb98c93969bd",
+  "name": "Getharvest",
+  "site": "https://www.getharvest.com/"
+ },
+ {
+  "refero_id": "5d8ad116-b3d8-4890-a969-5b856b35c678",
+  "refero_url": "https://styles.refero.design/style/5d8ad116-b3d8-4890-a969-5b856b35c678",
+  "name": "Campsite",
+  "site": "https://www.campsite.com/"
+ },
+ {
+  "refero_id": "dbc5ecba-7309-456f-93b4-4356c6b0d293",
+  "refero_url": "https://styles.refero.design/style/dbc5ecba-7309-456f-93b4-4356c6b0d293",
+  "name": "Hellotime",
+  "site": "https://www.hellotime.io/"
+ },
+ {
+  "refero_id": "51734338-9046-47eb-a595-77ffa37b4725",
+  "refero_url": "https://styles.refero.design/style/51734338-9046-47eb-a595-77ffa37b4725",
+  "name": "Getanchor",
+  "site": "https://www.getanchor.ai/"
+ },
+ {
+  "refero_id": "04793c2a-ca1a-4edd-a661-56c965e42aec",
+  "refero_url": "https://styles.refero.design/style/04793c2a-ca1a-4edd-a661-56c965e42aec",
+  "name": "Grain",
+  "site": "https://www.grain.com/"
+ },
+ {
+  "refero_id": "d95a35c2-d3f7-49e7-9ba7-282d52d3211d",
+  "refero_url": "https://styles.refero.design/style/d95a35c2-d3f7-49e7-9ba7-282d52d3211d",
+  "name": "Orderful",
+  "site": "https://www.orderful.com/"
+ },
+ {
+  "refero_id": "eeeb6ac9-fc07-4965-935a-e1989ed831f1",
+  "refero_url": "https://styles.refero.design/style/eeeb6ac9-fc07-4965-935a-e1989ed831f1",
+  "name": "Default",
+  "site": "https://www.default.com/"
+ },
+ {
+  "refero_id": "c556ab50-a242-4854-9395-450c0004bac5",
+  "refero_url": "https://styles.refero.design/style/c556ab50-a242-4854-9395-450c0004bac5",
+  "name": "replit",
+  "site": "https://replit.com/"
+ },
+ {
+  "refero_id": "1bcae895-2245-4d33-aa43-1c1e80719554",
+  "refero_url": "https://styles.refero.design/style/1bcae895-2245-4d33-aa43-1c1e80719554",
+  "name": "Family",
+  "site": "https://family.co/"
+ },
+ {
+  "refero_id": "ed97c4e8-4b0c-46b7-9957-c814854229f7",
+  "refero_url": "https://styles.refero.design/style/ed97c4e8-4b0c-46b7-9957-c814854229f7",
+  "name": "Merlin",
+  "site": "https://www.merlin.computer/"
+ },
+ {
+  "refero_id": "56cd3725-3ff0-459e-894d-5da58d1fc549",
+  "refero_url": "https://styles.refero.design/style/56cd3725-3ff0-459e-894d-5da58d1fc549",
+  "name": "PostHog",
+  "site": "https://posthog.com/"
+ },
+ {
+  "refero_id": "5d7aa503-8cfa-49a4-bd3b-0c2f0f075c70",
+  "refero_url": "https://styles.refero.design/style/5d7aa503-8cfa-49a4-bd3b-0c2f0f075c70",
+  "name": "Cal.com",
+  "site": "https://cal.com/"
+ },
+ {
+  "refero_id": "94ed6ce8-c2e5-45bf-83bd-e5d1daf63efc",
+  "refero_url": "https://styles.refero.design/style/94ed6ce8-c2e5-45bf-83bd-e5d1daf63efc",
+  "name": "Flim",
+  "site": "https://flim.ai/"
+ },
+ {
+  "refero_id": "cc43cfe3-195b-4081-b586-c42db054a466",
+  "refero_url": "https://styles.refero.design/style/cc43cfe3-195b-4081-b586-c42db054a466",
+  "name": "Micro",
+  "site": "https://www.micro.so/"
+ },
+ {
+  "refero_id": "1ded7f89-3df0-4e7c-9cac-28218d038575",
+  "refero_url": "https://styles.refero.design/style/1ded7f89-3df0-4e7c-9cac-28218d038575",
+  "name": "Flatfile",
+  "site": "https://flatfile.com/"
+ },
+ {
+  "refero_id": "b5fdba21-fd4d-427e-b551-1e22c51e42db",
+  "refero_url": "https://styles.refero.design/style/b5fdba21-fd4d-427e-b551-1e22c51e42db",
+  "name": "Revenuecat",
+  "site": "https://revenuecat.com/"
+ },
+ {
+  "refero_id": "d9a60077-619a-4cb7-95ed-0c428c2b51ed",
+  "refero_url": "https://styles.refero.design/style/d9a60077-619a-4cb7-95ed-0c428c2b51ed",
+  "name": "Incident",
+  "site": "https://incident.io/"
+ },
+ {
+  "refero_id": "9501cfdc-3eb3-4b64-90f6-9afdded48945",
+  "refero_url": "https://styles.refero.design/style/9501cfdc-3eb3-4b64-90f6-9afdded48945",
+  "name": "Plain",
+  "site": "https://plain.com/"
+ },
+ {
+  "refero_id": "ae175f23-1ec7-47ea-9380-7bff7041028b",
+  "refero_url": "https://styles.refero.design/style/ae175f23-1ec7-47ea-9380-7bff7041028b",
+  "name": "Timescale",
+  "site": "https://www.timescale.com/"
+ },
+ {
+  "refero_id": "2eab438d-32cd-40c2-b160-1e4127dac569",
+  "refero_url": "https://styles.refero.design/style/2eab438d-32cd-40c2-b160-1e4127dac569",
+  "name": "Gleap",
+  "site": "https://gleap.io/"
+ },
+ {
+  "refero_id": "45080e55-1fbe-4726-be23-4c9f54e442aa",
+  "refero_url": "https://styles.refero.design/style/45080e55-1fbe-4726-be23-4c9f54e442aa",
+  "name": "FeedHive",
+  "site": "https://feedhive.com/"
+ },
+ {
+  "refero_id": "78fec83e-4b27-44ab-9f64-31e9dee53e46",
+  "refero_url": "https://styles.refero.design/style/78fec83e-4b27-44ab-9f64-31e9dee53e46",
+  "name": "Firecrawl",
+  "site": "https://www.firecrawl.dev/"
+ },
+ {
+  "refero_id": "15d10d6c-1844-46c6-ae69-c99a56e6ad41",
+  "refero_url": "https://styles.refero.design/style/15d10d6c-1844-46c6-ae69-c99a56e6ad41",
+  "name": "Swap",
+  "site": "https://www.swap-commerce.com/"
+ },
+ {
+  "refero_id": "4e3aa524-b146-416c-907f-382c079ea80c",
+  "refero_url": "https://styles.refero.design/style/4e3aa524-b146-416c-907f-382c079ea80c",
+  "name": "Tally Forms",
+  "site": "https://tally.so/"
+ },
+ {
+  "refero_id": "f58e99d1-940d-4254-8822-5d856bba6505",
+  "refero_url": "https://styles.refero.design/style/f58e99d1-940d-4254-8822-5d856bba6505",
+  "name": "Notion",
+  "site": "https://www.notion.com/"
+ },
+ {
+  "refero_id": "08c0ead0-1899-47b4-bfdc-865ab459bbe5",
+  "refero_url": "https://styles.refero.design/style/08c0ead0-1899-47b4-bfdc-865ab459bbe5",
+  "name": "Cap",
+  "site": "https://cap.so/"
+ },
+ {
+  "refero_id": "e4b9d41a-8165-47dd-818a-5f6810046ea9",
+  "refero_url": "https://styles.refero.design/style/e4b9d41a-8165-47dd-818a-5f6810046ea9",
+  "name": "Pirsch Analytics",
+  "site": "https://pirsch.io/"
+ },
+ {
+  "refero_id": "80d7ef36-ed7e-48bb-b558-f772eb40106f",
+  "refero_url": "https://styles.refero.design/style/80d7ef36-ed7e-48bb-b558-f772eb40106f",
+  "name": "Mintlify",
+  "site": "https://mintlify.com/"
+ },
+ {
+  "refero_id": "41af8353-6a8f-416d-947b-57932f591497",
+  "refero_url": "https://styles.refero.design/style/41af8353-6a8f-416d-947b-57932f591497",
+  "name": "Programa",
+  "site": "https://programa.design/"
+ },
+ {
+  "refero_id": "cd293b92-71a3-4cc2-a56b-0fa60425b42a",
+  "refero_url": "https://styles.refero.design/style/cd293b92-71a3-4cc2-a56b-0fa60425b42a",
+  "name": "Shares",
+  "site": "https://shares.io/"
+ },
+ {
+  "refero_id": "2e9b3dcb-f937-488d-891c-351c7366188f",
+  "refero_url": "https://styles.refero.design/style/2e9b3dcb-f937-488d-891c-351c7366188f",
+  "name": "Modern Treasury",
+  "site": "https://moderntreasury.com/"
+ },
+ {
+  "refero_id": "729ba7a8-35d5-44f3-abc0-1078ff6a3467",
+  "refero_url": "https://styles.refero.design/style/729ba7a8-35d5-44f3-abc0-1078ff6a3467",
+  "name": "Todoist",
+  "site": "https://todoist.com/"
+ },
+ {
+  "refero_id": "2186dddd-60ee-4898-b11d-88483daf477e",
+  "refero_url": "https://styles.refero.design/style/2186dddd-60ee-4898-b11d-88483daf477e",
+  "name": "Juicebox.ai",
+  "site": "https://juicebox.ai/"
+ },
+ {
+  "refero_id": "240234ba-9cf5-4a91-b618-76963551d425",
+  "refero_url": "https://styles.refero.design/style/240234ba-9cf5-4a91-b618-76963551d425",
+  "name": "Zendesk",
+  "site": "https://zendesk.com/"
+ },
+ {
+  "refero_id": "e9a1c1e1-2c35-47c0-864f-d1e9fea57579",
+  "refero_url": "https://styles.refero.design/style/e9a1c1e1-2c35-47c0-864f-d1e9fea57579",
+  "name": "Devin",
+  "site": "https://devin.ai/"
+ },
+ {
+  "refero_id": "c445eb73-e403-4a00-8b90-f454c9181fd6",
+  "refero_url": "https://styles.refero.design/style/c445eb73-e403-4a00-8b90-f454c9181fd6",
+  "name": "Obscura",
+  "site": "https://obscura.net/"
+ },
+ {
+  "refero_id": "78558b01-c101-4b8e-8401-db91269b1150",
+  "refero_url": "https://styles.refero.design/style/78558b01-c101-4b8e-8401-db91269b1150",
+  "name": "Checkly",
+  "site": "https://www.checklyhq.com/"
+ },
+ {
+  "refero_id": "8b5cfe6d-a2bd-4edb-854e-9185cec46c09",
+  "refero_url": "https://styles.refero.design/style/8b5cfe6d-a2bd-4edb-854e-9185cec46c09",
+  "name": "Panxo",
+  "site": "https://panxo.com/"
+ },
+ {
+  "refero_id": "e1afed53-6854-40dd-8157-dfc1dd3505f0",
+  "refero_url": "https://styles.refero.design/style/e1afed53-6854-40dd-8157-dfc1dd3505f0",
+  "name": "Hatch",
+  "site": "https://www.hatch.fm/"
+ },
+ {
+  "refero_id": "c21fd0f0-1375-4094-83e7-0de484940100",
+  "refero_url": "https://styles.refero.design/style/c21fd0f0-1375-4094-83e7-0de484940100",
+  "name": "Obviously",
+  "site": "https://www.obviously.ai/"
+ },
+ {
+  "refero_id": "7368cfab-6313-4e50-97e5-c3318c52e7fe",
+  "refero_url": "https://styles.refero.design/style/7368cfab-6313-4e50-97e5-c3318c52e7fe",
+  "name": "Heptabase",
+  "site": "https://heptabase.com/"
+ },
+ {
+  "refero_id": "24d3b281-04a6-4cc7-8a74-634b08472291",
+  "refero_url": "https://styles.refero.design/style/24d3b281-04a6-4cc7-8a74-634b08472291",
+  "name": "Opennote",
+  "site": "https://www.opennote.com/"
+ },
+ {
+  "refero_id": "312423bf-72ea-42fb-b8f5-ab0104e778f3",
+  "refero_url": "https://styles.refero.design/style/312423bf-72ea-42fb-b8f5-ab0104e778f3",
+  "name": "Adaline",
+  "site": "https://www.adaline.ai/"
+ },
+ {
+  "refero_id": "abbaa70a-5fe2-44a9-9c5f-272e68c450c3",
+  "refero_url": "https://styles.refero.design/style/abbaa70a-5fe2-44a9-9c5f-272e68c450c3",
+  "name": "Customer.io",
+  "site": "https://customer.io/"
+ },
+ {
+  "refero_id": "aaca1e02-7b5a-4c03-ac40-454f0d477356",
+  "refero_url": "https://styles.refero.design/style/aaca1e02-7b5a-4c03-ac40-454f0d477356",
+  "name": "Ready",
+  "site": "https://ready.so/"
+ },
+ {
+  "refero_id": "b5ca4e9a-2322-4796-b4c5-3b3bf194821f",
+  "refero_url": "https://styles.refero.design/style/b5ca4e9a-2322-4796-b4c5-3b3bf194821f",
+  "name": "Clay",
+  "site": "https://clay.com/"
+ },
+ {
+  "refero_id": "1ab3cde9-0833-4e38-8ada-fc23156f730e",
+  "refero_url": "https://styles.refero.design/style/1ab3cde9-0833-4e38-8ada-fc23156f730e",
+  "name": "Cora",
+  "site": "https://cora.computer/"
+ },
+ {
+  "refero_id": "0c77bb2a-c7cd-499b-b5cd-90268eefe906",
+  "refero_url": "https://styles.refero.design/style/0c77bb2a-c7cd-499b-b5cd-90268eefe906",
+  "name": "Fly.io",
+  "site": "https://fly.io/"
+ },
+ {
+  "refero_id": "1b2aaf14-43b0-4c23-bd25-1d49924fe85e",
+  "refero_url": "https://styles.refero.design/style/1b2aaf14-43b0-4c23-bd25-1d49924fe85e",
+  "name": "Buymeacoffee",
+  "site": "https://buymeacoffee.com/"
+ },
+ {
+  "refero_id": "03dcd158-bc4d-447b-aaf2-8e522671a109",
+  "refero_url": "https://styles.refero.design/style/03dcd158-bc4d-447b-aaf2-8e522671a109",
+  "name": "Evervault",
+  "site": "https://evervault.com/"
+ },
+ {
+  "refero_id": "dd89ce6c-f0aa-4ca8-bd63-19dcd81920a7",
+  "refero_url": "https://styles.refero.design/style/dd89ce6c-f0aa-4ca8-bd63-19dcd81920a7",
+  "name": "ToDesktop",
+  "site": "https://www.todesktop.com/"
+ },
+ {
+  "refero_id": "a5089389-4220-4fc2-82d9-973203d2e2f5",
+  "refero_url": "https://styles.refero.design/style/a5089389-4220-4fc2-82d9-973203d2e2f5",
+  "name": "Navan",
+  "site": "https://navan.com/"
+ }
+]

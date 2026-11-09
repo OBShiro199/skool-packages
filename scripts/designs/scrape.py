@@ -13,10 +13,32 @@ REVEAL = """
   const st = document.createElement('style')
   st.textContent = '*,*::before,*::after{animation-play-state:paused!important;animation-delay:-60s!important;transition:none!important}'
   document.head.appendChild(st)
-  let n = 0
+  // Remove cookie/consent banners, chat widgets and any fixed overlay that dims or covers the page.
+  const vw = innerWidth, vh = innerHeight
   document.querySelectorAll('body *').forEach((el) => {
     const s = getComputedStyle(el)
-    if ((+s.opacity < 0.05 || s.visibility === 'hidden') && el.getBoundingClientRect().height > 8 && !el.closest('[aria-hidden="true"], dialog, [role="dialog"]')) {
+    const id = ((el.id || '') + ' ' + (typeof el.className === 'string' ? el.className : '')).toLowerCase()
+    if (/cookie|consent|gdpr|privacy-banner|cc-window|truste|onetrust|cookiebot|osano|termly|cky-|cmp|intercom|crisp|drift|hubspot-messages|chat-widget/.test(id)) { el.remove(); return }
+    if (s.position === 'fixed' || s.position === 'sticky') {
+      const r = el.getBoundingClientRect()
+      const covers = r.width * r.height > vw * vh * 0.3
+      const tag = el.tagName.toLowerCase()
+      if (covers && tag !== 'header' && tag !== 'nav' && !el.querySelector('nav')) el.remove()
+    }
+  })
+  document.querySelectorAll('dialog, [role="dialog"], [aria-modal="true"]').forEach((el) => el.remove())
+  // small floating boxes that talk about cookies (banners without a telltale class name)
+  document.querySelectorAll('body *').forEach((el) => {
+    const s = getComputedStyle(el)
+    if ((s.position === 'fixed' || s.position === 'absolute') && /cookie|privacy policy/i.test(el.innerText || '') && el.getBoundingClientRect().height < vh * 0.5 && (el.innerText || '').length < 600) el.remove()
+  })
+  document.documentElement.style.overflow = 'visible'; document.body.style.overflow = 'visible'
+  let n = 0
+  if (!window.__FORCE_REVEAL) { window.scrollTo(0, 0); return 0 }
+  document.querySelectorAll('body *').forEach((el) => {
+    const s = getComputedStyle(el)
+    if (s.position === 'fixed' || el.closest('header, nav, [role="menu"], [role="listbox"], [class*="dropdown" i], [class*="menu" i], [class*="popover" i], [class*="tooltip" i]')) return
+    if ((+s.opacity < 0.05 || s.visibility === 'hidden') && el.getBoundingClientRect().height > 8 && !el.closest('[aria-hidden="true"]')) {
       el.style.setProperty('opacity', '1', 'important'); el.style.setProperty('visibility', 'visible', 'important'); el.style.setProperty('transform', 'none', 'important'); n++
     }
   })
@@ -26,12 +48,13 @@ REVEAL = """
 """
 def actions():
     a = [{'type': 'wait', 'milliseconds': 1500}]
-    for _ in range(14):
+    for _ in range(int(os.environ.get('SCROLLS', '14'))):
         a += [{'type': 'scroll', 'direction': 'down'}, {'type': 'wait', 'milliseconds': 450}]
-    a += [{'type': 'executeJavascript', 'script': REVEAL}, {'type': 'wait', 'milliseconds': 1500}, {'type': 'executeJavascript', 'script': JS}]
+    force = 'true' if os.environ.get('FORCE_REVEAL', '1') == '1' else 'false'
+    a += [{'type': 'executeJavascript', 'script': f'window.__FORCE_REVEAL = {force};' + REVEAL}, {'type': 'wait', 'milliseconds': 1500}, {'type': 'executeJavascript', 'script': JS}]
     return a
 def fc(url, measure=True):
-    body = json.dumps({'url': url, 'onlyMainContent': False, 'waitFor': 2500, 'timeout': 150000,
+    body = json.dumps({'url': url, 'onlyMainContent': False, 'waitFor': 2500, 'timeout': int(os.environ.get('FC_TIMEOUT', '150000')),
                        'formats': (['branding'] if measure else []) + [{'type': 'screenshot', 'fullPage': True}],
                        'actions': actions()}).encode()
     req = urllib.request.Request('https://api.firecrawl.dev/v2/scrape', body, {'Authorization': 'Bearer ' + KEYS['FIRECRAWL_API_KEY'], 'Content-Type': 'application/json'})

@@ -24,7 +24,7 @@ def write(name, url, measured, branding, views):
     for v in views:
         content.append({'type': 'image', 'source': {'type': 'base64', 'media_type': 'image/jpeg', 'data': base64.b64encode(v).decode()}})
     content.append({'type': 'text', 'text': f'Write the {name} Style Reference now, in the exact format.'})
-    md, stop = claude(WRITER, system, content, 32000)
+    md, stop = claude(WRITER, system, content, int(os.environ.get("MAX_OUT", "32000")))
     md = md.strip()
     if md.startswith('```'): md = re.sub(r'^```\w*\n|\n```$', '', md)
     if stop == 'max_tokens': raise RuntimeError('document cut off')
