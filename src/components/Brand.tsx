@@ -2,7 +2,7 @@ import bpaLogo from '../assets/bpa-logo.webp'
 import { ArrowUpLeft } from 'lucide-react'
 import skoolLogo from '../assets/skool-logo.png'
 
-const COMMUNITY = 'https://www.skool.com/solo-saas-mastermind-7774'
+export const COMMUNITY = 'https://www.skool.com/build-profitable-software'
 
 /** The BPA community logo (Olly with the stack), used wherever the vault's mark appears. */
 export function BrandMark({ size = 36 }: { size?: number }) {

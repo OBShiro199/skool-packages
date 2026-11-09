@@ -31,7 +31,7 @@ export default function SupportPage() {
       </header>
 
       <div className="grid cols-3" style={{ marginBottom: 28 }}>
-        <a className="card support-tile" href="https://www.skool.com/solo-saas-mastermind-7774" target="_blank" rel="noreferrer"><MessageSquare size={18} /><b>Ask the community</b><span className="muted">Post in Skool with the #help tag. Fastest for build questions.</span><span className="label">Open Skool <ExternalLink size={10} /></span></a>
+        <a className="card support-tile" href="https://www.skool.com/build-profitable-software" target="_blank" rel="noreferrer"><MessageSquare size={18} /><b>Ask the community</b><span className="muted">Post in Skool with the #help tag. Fastest for build questions.</span><span className="label">Open Skool <ExternalLink size={10} /></span></a>
         <div className="card support-tile"><CalendarClock size={18} /><b>Weekly build call</b><span className="muted">Live screen-share fixes every Thursday, 6pm UK. Link in the Skool calendar.</span><span className="label">Thursdays · 60 min</span></div>
         <div className="card support-tile"><Send size={18} /><b>Private ticket</b><span className="muted">For billing or anything with keys or screenshots you do not want public.</span><span className="label">Form below</span></div>
       </div>

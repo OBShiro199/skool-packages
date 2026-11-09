@@ -84,7 +84,7 @@ export default function HomePage() {
 
       <Link to="/app/designs" className="card home-link" style={{ marginTop: 20 }}>
         <Palette size={18} />
-        <span style={{ flex: 1 }}><b>Designs</b><span className="muted">Copy a ready-made design system into Claude Code so your app looks polished from day one.</span></span>
+        <span style={{ flex: 1 }}><b>Designs</b><span className="muted">Browse design systems from the best-looking sites and copy one into Claude Code as DESIGN.md.</span></span>
         <ArrowRight size={16} />
       </Link>
 

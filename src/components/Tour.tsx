@@ -11,13 +11,13 @@ const STEPS: Step[] = [
   { target: '', title: 'Welcome to the vault', body: 'This is your dashboard. Here is a 30-second tour of everything you can do in here.' },
   { target: '[data-tour="clone"]', title: 'Clone a software app', body: 'Pick one of the 20 profitable apps. Each comes with the full build, the stack and a launch template you can make your own.' },
   { target: '[data-tour="leads"]', title: 'Find leads', body: 'Search millions of verified B2B leads in the UK, EU and US. Stack filters, save searches and export up to 5,000 leads a month.' },
-  { target: '[data-tour="designs"]', title: 'Designs', body: 'Ready-made design systems for Claude Code. Copy one into your project as DESIGN.md and every screen comes out looking polished.' },
+  { target: '[data-tour="designs"]', title: 'Designs', body: 'A library of design systems from the best-looking sites. Copy one into your project as DESIGN.md and Claude Code builds in that style.' },
   { target: '[data-tour="start"]', title: 'Your next step', body: 'Once you sign the pledge for an app, this card shows exactly where you left off and the next task to tick.' },
   { target: '[data-tour="builds"]', title: 'Your builds', body: 'Every app you commit to lives here, with its progress bar, so you can jump straight back in.' },
   { target: '[data-tour="activity"]', title: 'Your activity', body: 'A day counts when you tick at least one item. Five days a week gets most members to a finished build in under a month.' },
   { target: '[data-tour="xp"]', title: 'XP, levels and streaks', body: 'Every task earns XP. Level up as you build and keep your streak alive.' },
   { target: '[data-tour="help"]', title: 'Docs and support', body: 'Step-by-step documentation for the stack, plus support if something breaks.' },
-  { target: '.olly-launcher', title: 'Ask Olly', body: 'Stuck on anything? Message me here and I will get back to you.' },
+  { target: '.olly-launcher', title: 'Ask Olly', body: 'Stuck on anything? This opens the Skool community, where you can post your question or message me.' },
   { target: '.back-skool', title: 'Back to Skool', body: 'The daily calls, Q&A and the live $10K build all happen in the Skool community. This takes you straight there.' },
 ]
 
