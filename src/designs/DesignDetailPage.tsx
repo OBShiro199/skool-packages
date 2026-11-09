@@ -41,7 +41,7 @@ export default function DesignDetailPage() {
     <div className="dz-detail">
       <section className="dz-left">
         <Link to=".." relative="path" className="dz-back"><ArrowLeft size={14} /> All designs</Link>
-        <ScrollPreview slug={d.slug} height={d.preview_h} auto />
+        <ScrollPreview slug={d.slug} height={d.preview_h} />
         <div className="dz-title">
           <SiteLogo name={d.name} logo={d.logo} size={44} />
           <h1>{d.name}</h1>

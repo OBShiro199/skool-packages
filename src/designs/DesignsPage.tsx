@@ -9,18 +9,13 @@ import '../styles/designs.css'
 type Sort = 'featured' | 'newest' | 'az'
 
 function Card({ d, i }: { d: DesignSummary; i: number }) {
-  const [hover, setHover] = useState(false)
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: Math.min(i, 12) * 0.03, ease: [0.16, 1, 0.3, 1] }}>
       <Link
         to={d.slug}
         className="dz-card"
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        onFocus={() => setHover(true)}
-        onBlur={() => setHover(false)}
       >
-        <div className="dz-tile"><ScrollPreview slug={d.slug} height={d.preview_h} active={hover} /></div>
+        <div className="dz-tile"><ScrollPreview slug={d.slug} height={d.preview_h} /></div>
         <div className="dz-meta">
           <SiteLogo name={d.name} logo={d.logo} />
           <div className="dz-meta-text">
