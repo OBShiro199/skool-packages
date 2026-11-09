@@ -1,6 +1,6 @@
 /* Designs library */
 .dz-page { max-width: 1240px; }
-.dz-toolbar { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 12px; }
+.dz-toolbar { display: flex; gap: 12px; align-items: center; justify-content: flex-start; flex-wrap: wrap; margin-bottom: 12px; }
 .dz-seg { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
 .dz-seg button { border: 0; background: none; padding: 6px 12px; border-radius: 6px; font: inherit; font-size: 13.5px; color: var(--muted); cursor: pointer; }
 .dz-seg button.on { background: var(--fill); color: var(--ink); font-weight: 500; }

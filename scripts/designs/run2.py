@@ -1,5 +1,5 @@
 import json, os, re, sys, urllib.request
-from scrape import fc, shots
+from scrape import fc, shots, measured_of
 from gen2 import write, tag
 from parse import parse
 OUT = 'out2'; os.makedirs(OUT, exist_ok=True)
@@ -13,10 +13,9 @@ def do(site):
     else:
         page = fc(site['site'])
         png = urllib.request.urlopen(page['screenshot'], timeout=120).read()
-        views, ph = shots(png, slug, OUT)
-        js = ((page.get('actions') or {}).get('javascriptReturns') or [{}])[0]
+        views, ph, frac, longest = shots(png, slug, OUT)
         branding = dict(page.get('branding') or {}); imgs = branding.pop('images', {}) or {}
-        d = {'measured': js.get('value') if isinstance(js, dict) else str(js), 'branding': branding, 'preview_h': ph, 'logo': imgs.get('favicon') or imgs.get('logo'), 'nviews': len(views)}
+        d = {'measured': measured_of(page), 'blank': frac, 'blank_run': longest, 'branding': branding, 'preview_h': ph, 'logo': imgs.get('favicon') or imgs.get('logo'), 'nviews': len(views)}
         for i, v in enumerate(views): open(f'{OUT}/{slug}.v{i}.jpg', 'wb').write(v)
         json.dump(d, open(raw, 'w'))
     mdf = f'{OUT}/{slug}.md'

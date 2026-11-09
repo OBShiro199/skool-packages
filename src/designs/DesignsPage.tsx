@@ -6,8 +6,6 @@ import { loadIndex, type DesignSummary } from './data'
 import { ScrollPreview, SiteLogo } from './Preview'
 import '../styles/designs.css'
 
-type Sort = 'featured' | 'newest' | 'az'
-
 function Card({ d, i }: { d: DesignSummary; i: number }) {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: Math.min(i, 12) * 0.03, ease: [0.16, 1, 0.3, 1] }}>
@@ -34,7 +32,6 @@ export default function DesignsPage() {
   const [params, setParams] = useSearchParams()
   const q = params.get('q') ?? ''
   const cat = params.get('c') ?? 'All'
-  const sort = (params.get('s') as Sort) ?? 'featured'
   const set = (k: string, v: string, dflt: string) => setParams((p) => { if (v === dflt) p.delete(k); else p.set(k, v); return p }, { replace: true })
 
   useEffect(() => { loadIndex().then(setAll).catch((e) => setError(e.message)) }, [])
@@ -43,10 +40,8 @@ export default function DesignsPage() {
   const list = useMemo(() => {
     const n = q.trim().toLowerCase()
     let l = (all ?? []).filter((d) => (cat === 'All' || d.category === cat) && (!n || `${d.name} ${d.vibe} ${d.tags.join(' ')} ${d.category}`.toLowerCase().includes(n)))
-    if (sort === 'az') l = [...l].sort((a, b) => a.name.localeCompare(b.name))
-    if (sort === 'newest') l = [...l].sort((a, b) => b.added.localeCompare(a.added))
     return l
-  }, [all, q, cat, sort])
+  }, [all, q, cat])
 
   return (
     <div className="page dz-page">
@@ -57,13 +52,6 @@ export default function DesignsPage() {
       </header>
 
       <div className="dz-toolbar">
-        <div className="dz-seg" role="tablist">
-          {(['featured', 'newest', 'az'] as Sort[]).map((s) => (
-            <button key={s} role="tab" aria-selected={sort === s} className={sort === s ? 'on' : ''} onClick={() => set('s', s, 'featured')}>
-              {s === 'featured' ? 'Featured' : s === 'newest' ? 'Newest' : 'A to Z'}
-            </button>
-          ))}
-        </div>
         <div className="input-icon dz-search"><Search size={15} /><input className="input" placeholder="Search: dark, editorial, fintech…" value={q} onChange={(e) => set('q', e.target.value, '')} /></div>
       </div>
       <div className="dz-cats">
