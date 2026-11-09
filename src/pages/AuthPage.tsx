@@ -50,7 +50,6 @@ export default function AuthPage() {
   const nav = useNavigate()
   const [mode, setMode] = useState<'signin' | 'create'>(remembered() ? 'signin' : 'create')
   const [handle, setHandle] = useState('')
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [code, setCode] = useState('')
@@ -89,7 +88,7 @@ export default function AuthPage() {
     const old = mode === 'create' ? useStore.getState().users[h] : undefined
     const imported = old ? { commitments: old.commitments, progress: old.progress, activeDays: old.activeDays, tourDone: old.tourDone, activeApp: old.activeApp } : undefined
     const go = mode === 'create'
-      ? api.signup({ handle: h, name: name.trim() || h, email: em, password, code: code.trim(), import: imported })
+      ? api.signup({ handle: h, name: h, email: em, password, code: code.trim(), import: imported })
       : api.login(em, password)
     go.then(finish)
       .catch((err) => {
@@ -124,19 +123,13 @@ export default function AuthPage() {
 
             <form onSubmit={submit} className={`q-card laser laser-slow ${create ? 'q-compact' : ''}`} noValidate>
               {create && (
-                <div className="q-row2">
-                  <label className="q-field">
-                    <span className="q-label"><img src={skoolLogo} alt="Skool" height={13} /> handle</span>
-                    <div className="q-input q-prefix">
-                      <span className="q-pre">skool.com/@</span>
-                      <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="your-name" autoComplete="nickname" autoCapitalize="none" spellCheck={false} />
-                    </div>
-                  </label>
-                  <label className="q-field">
-                    <span>Your name</span>
-                    <div className="q-input"><input value={name} onChange={(e) => setName(e.target.value)} placeholder="First name" autoComplete="given-name" /></div>
-                  </label>
-                </div>
+                <label className="q-field">
+                  <span className="q-label"><img src={skoolLogo} alt="Skool" height={13} /> handle</span>
+                  <div className="q-input q-prefix">
+                    <span className="q-pre">skool.com/@</span>
+                    <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="your-name" autoComplete="nickname" autoCapitalize="none" spellCheck={false} />
+                  </div>
+                </label>
               )}
               <label className="q-field">
                 <span>{create ? 'Best email' : 'Email'}</span>
