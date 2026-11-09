@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowUpRight, Check, Copy, Download } from 'lucide-react'
 import { loadDesign, tokens, type DesignFull } from './data'
 import { ScrollPreview, SiteLogo } from './Preview'
+import { SaveDesign } from './SaveButton'
 import { toast } from '../components/Toasts'
 import '../styles/designs.css'
 
@@ -45,6 +46,8 @@ export default function DesignDetailPage() {
         <div className="dz-title">
           <SiteLogo name={d.name} logo={d.logo} size={44} />
           <h1>{d.name}</h1>
+          <span style={{ flex: 1 }} />
+          <SaveDesign slug={d.slug} name={d.name} variant="button" />
         </div>
         <p className="dz-vibe">{d.vibe}</p>
         <div className="dz-swatches">

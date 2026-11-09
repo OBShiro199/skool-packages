@@ -44,11 +44,12 @@ export function toCsv(rows: LeadRow[], dataset: DatasetId): string {
   return [keys.join(','), ...out.map((o) => keys.map((k) => cell(k, o[k])).join(','))].join('\n')
 }
 
-export function downloadCsv(csv: string, dataset: DatasetId) {
+export function downloadCsv(csv: string, dataset: DatasetId, name?: string) {
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
-  a.download = `leads-${dataset}-${new Date().toISOString().slice(0, 10)}.csv`
+  const slug = name ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) : ''
+  a.download = `leads-${slug ? `${slug}-` : ''}${dataset}-${new Date().toISOString().slice(0, 10)}.csv`
   document.body.appendChild(a)
   a.click()
   a.remove()

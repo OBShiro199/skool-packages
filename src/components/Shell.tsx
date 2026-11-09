@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { BookOpen, Copy, Flame, Home, LifeBuoy, LogOut, Menu, Palette, Search, UserRound } from 'lucide-react'
 import { api } from '../leads/api'
+import { cloudEnabled, onSyncState, setUnauthorizedHandler } from '../lib/cloud'
 import { handle, streak, useStore, useUser } from '../lib/store'
 import { getApp } from '../content/apps'
 import { appStats, levelFor } from '../lib/progress'
@@ -31,11 +32,16 @@ export default function Shell() {
   const [open, setOpen] = useState(false)
   const loc = useLocation()
   useEffect(() => { setOpen(false); window.scrollTo(0, 0) }, [loc.pathname])
-  // The server session is the real sign-in; if it has ended, sign out here too.
+  const hydrate = useStore((s) => s.hydrate)
+  const [sync, setSync] = useState({ pending: 0, failing: false })
+  // The account on the server is the truth: load it on every visit, and sign out here if the session has ended.
   useEffect(() => {
-    if (import.meta.env.VITE_HASH_ROUTER) return
-    api.me().catch((e) => e?.status === 401 && signOut())
-  }, [signOut])
+    if (!cloudEnabled) return
+    setUnauthorizedHandler(signOut)
+    api.me().then(hydrate).catch((e) => (e?.status === 401 || e?.status === 403) && signOut())
+    const off = onSyncState(setSync)
+    return () => { off() }
+  }, [signOut, hydrate])
 
   return (
     <div className="shell">
@@ -99,6 +105,7 @@ export default function Shell() {
           <button className="btn btn-sm btn-ghost mobile-nav-btn" onClick={() => setOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
           <span className="label">Build $10K p/m Profitable Apps</span>
           <span className="grow" />
+          {sync.pending > 0 && <span className={`chip sync-chip ${sync.failing ? 'warn' : ''}`} role="status">{sync.failing ? 'Offline: will save when back' : 'Saving…'}</span>}
           <span className="chip"><Flame size={12} /> {days}d</span>
           <span className="chip chip-signal">{xp} XP · {level.name}</span>
           <PoweredBySkool />

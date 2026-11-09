@@ -451,3 +451,5 @@ input[type="range"]::-moz-range-thumb { background: var(--surface); border: 1.5p
 .home-link:hover { border-color: var(--line-2); }
 .home-link b { display: block; font-size: 14.5px; }
 .home-link .muted { font-size: 13.5px; }
+.sync-chip { color: var(--muted); }
+.sync-chip.warn { color: #b45309; border-color: #f3d9a4; background: #fffaf0; }

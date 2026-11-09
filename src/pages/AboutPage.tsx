@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { RotateCcw, Save } from 'lucide-react'
+import { KeyRound, RotateCcw, Save } from 'lucide-react'
+import { api, ApiError } from '../leads/api'
+import { cloudEnabled } from '../lib/cloud'
 import { handle, useStore, useUser } from '../lib/store'
 import { getApp } from '../content/apps'
 import { appStats } from '../lib/progress'
@@ -16,6 +18,16 @@ export default function AboutPage() {
   const { xp, level, streak } = useTotals()
   const nav = useNavigate()
   const [name, setName] = useState(user.profile.name)
+  const [pw, setPw] = useState({ current: '', next: '' })
+  const [pwBusy, setPwBusy] = useState(false)
+  const changePw = () => {
+    if (pw.next.length < 8) return toast('Choose a new password of at least 8 characters.')
+    setPwBusy(true)
+    api.changePassword(pw.current, pw.next)
+      .then(() => { setPw({ current: '', next: '' }); toast('Password changed') })
+      .catch((e) => toast(e instanceof ApiError ? e.message : 'Could not change your password.'))
+      .finally(() => setPwBusy(false))
+  }
 
   return (
     <div className="page">
@@ -30,10 +42,22 @@ export default function AboutPage() {
           <h2 style={{ fontSize: 18, marginBottom: 14 }}>Profile</h2>
           <div className="stack" style={{ gap: 14 }}>
             <label className="field"><span>Name</span><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></label>
-            <label className="field"><span>Skool username</span><input className="input" value={handle(user.profile)} readOnly /></label>
+            <label className="field"><span>Skool handle</span><input className="input" value={handle(user.profile)} readOnly /></label>
+            {user.profile.email && <label className="field"><span>Email (your login)</span><input className="input" value={user.profile.email} readOnly /></label>}
             <button className="btn btn-primary" style={{ justifySelf: 'start' }} onClick={() => { update({ name }); toast('Profile saved') }}><Save size={15} /> Save</button>
           </div>
         </section>
+
+        {cloudEnabled && (
+          <section className="card" style={{ padding: 20 }}>
+            <h2 style={{ fontSize: 18, marginBottom: 14 }}>Password</h2>
+            <div className="stack" style={{ gap: 14 }}>
+              <label className="field"><span>Current password</span><input className="input" type="password" autoComplete="current-password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} /></label>
+              <label className="field"><span>New password</span><input className="input" type="password" autoComplete="new-password" placeholder="At least 8 characters" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} /></label>
+              <button className="btn" style={{ justifySelf: 'start' }} disabled={pwBusy || !pw.current || !pw.next} onClick={changePw}><KeyRound size={15} /> Change password</button>
+            </div>
+          </section>
+        )}
 
         <section className="card" style={{ padding: 20 }}>
           <h2 style={{ fontSize: 18, marginBottom: 6 }}>Dashboard tour</h2>

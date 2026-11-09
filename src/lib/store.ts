@@ -1,14 +1,18 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { localDay, push } from './cloud'
 
-// Mock backend. Everything lives in localStorage, keyed by Skool username, so the
-// UI behaves like a real multi-user app until Supabase is wired in.
+// The member's account lives on the server (Supabase, via /api/vault/*). This store is the on-screen copy:
+// `hydrate` fills it from /api/vault/me after sign-in, and every change is applied here immediately and
+// queued to the server by ./cloud. It is also cached in localStorage so the Vault opens instantly.
+// Shareable previews (hash routing, no server) use the local-only signUp/signIn below instead.
 
 export interface Profile {
   /** Skool username, lower case, without the @ (accounts made before usernames hold an email here). */
   username: string
   name: string
   createdAt: string
+  email?: string
 }
 
 /** Accepts "olly", "@olly" or "skool.com/@olly" and returns "olly". */
@@ -44,6 +48,16 @@ export interface UserData {
   activeApp?: string
   /** Set once the dashboard tour has been finished or skipped. */
   tourDone?: boolean
+  savedDesigns?: string[]
+}
+
+/** What /api/vault/me returns. */
+export interface ServerState {
+  profile: { user_id: string; skool_handle: string; email: string; display_name: string; tour_done: boolean; active_app: string | null; created_at: string }
+  commitments: Record<string, Commitment>
+  progress: Record<string, { startedAt: string; lastTab: string | null; checked: Record<string, string> }>
+  activeDays: string[]
+  savedDesigns: string[]
 }
 
 interface State {
@@ -61,9 +75,12 @@ interface State {
   resetApp: (slug: string) => void
   resetOnboarding: () => void
   setTourDone: (done: boolean) => void
+  toggleDesign: (slug: string) => void
+  /** Replace the on-screen copy with the member's saved account (after sign-in, and on every load). */
+  hydrate: (s: ServerState) => void
 }
 
-const today = () => new Date().toISOString().slice(0, 10)
+const today = () => localDay()
 
 export const useStore = create<State>()(
   persist(
@@ -119,11 +136,35 @@ export const useStore = create<State>()(
 
         signOut: () => set({ session: null }),
 
+        hydrate: (st) => {
+          const key = st.profile.skool_handle
+          const user: UserData = {
+            profile: { username: key, name: st.profile.display_name, createdAt: st.profile.created_at, email: st.profile.email },
+            password: '',
+            commitments: st.commitments ?? {},
+            progress: Object.fromEntries(Object.entries(st.progress ?? {}).map(([k, v]) => [k, { startedAt: v.startedAt, checked: v.checked ?? {}, lastTab: v.lastTab ?? undefined }])),
+            activeDays: st.activeDays ?? [],
+            activeApp: st.profile.active_app ?? undefined,
+            tourDone: st.profile.tour_done,
+            savedDesigns: st.savedDesigns ?? [],
+          }
+          // only this member's data is kept in the browser
+          set({ users: { [key]: user }, session: key })
+        },
+
+        toggleDesign: (slug) =>
+          patchUser((u) => {
+            const saved = u.savedDesigns ?? []
+            const on = !saved.includes(slug)
+            push({ op: 'design', slug, saved: on })
+            return { ...u, savedDesigns: on ? [slug, ...saved] : saved.filter((x) => x !== slug) }
+          }),
+
         completeOnboarding: (answers, recommended) =>
           patchUser((u) => ({ ...u, onboarding: { answers, recommended, completedAt: new Date().toISOString() } })),
 
         commit: (slug, c) =>
-          patchUser((u) => ({
+          patchUser((u) => (push({ op: 'commit', app: slug, typedName: c.typedName, signature: c.signature }), {
             ...u,
             activeApp: slug,
             commitments: { ...u.commitments, [slug]: { ...c, signedAt: new Date().toISOString() } },
@@ -136,6 +177,7 @@ export const useStore = create<State>()(
             const isOn = !!p.checked[itemId]
             const next = value ?? !isOn
             if (next === isOn) return u
+            push({ op: 'tick', app: slug, item: itemId, on: next, day: today() })
             const checked = { ...p.checked }
             if (next) checked[itemId] = new Date().toISOString()
             else delete checked[itemId]
@@ -146,19 +188,20 @@ export const useStore = create<State>()(
           patchUser((u) => {
             const p = u.progress[slug]
             if (!p || p.lastTab === tab) return u
+            push({ op: 'tab', app: slug, tab })
             return { ...u, progress: { ...u.progress, [slug]: { ...p, lastTab: tab } } }
           }),
 
-        setActiveApp: (slug) => patchUser((u) => ({ ...u, activeApp: slug })),
+        setActiveApp: (slug) => patchUser((u) => { if (u.activeApp !== slug) push({ op: 'active', app: slug }); return { ...u, activeApp: slug } }),
 
-        updateProfile: (p) => patchUser((u) => ({ ...u, profile: { ...u.profile, ...p } })),
+        updateProfile: (p) => patchUser((u) => { if (p.name) push({ op: 'profile', name: p.name }); return { ...u, profile: { ...u.profile, ...p } } }),
 
         resetApp: (slug) =>
-          patchUser((u) => ({ ...u, progress: { ...u.progress, [slug]: { startedAt: new Date().toISOString(), checked: {} } } })),
+          patchUser((u) => (push({ op: 'reset', app: slug }), { ...u, progress: { ...u.progress, [slug]: { startedAt: new Date().toISOString(), checked: {} } } })),
 
         resetOnboarding: () => patchUser((u) => ({ ...u, onboarding: undefined })),
 
-        setTourDone: (done) => patchUser((u) => ({ ...u, tourDone: done })),
+        setTourDone: (done) => patchUser((u) => { if (!!u.tourDone !== done) push({ op: 'tour', done }); return { ...u, tourDone: done } }),
       }
     },
     { name: 'bpa-vault-v1' },

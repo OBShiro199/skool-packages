@@ -4,6 +4,8 @@ import { motion } from 'motion/react'
 import { Search } from 'lucide-react'
 import { loadIndex, type DesignSummary } from './data'
 import { ScrollPreview, SiteLogo } from './Preview'
+import { SaveDesign } from './SaveButton'
+import { useUser } from '../lib/store'
 import '../styles/designs.css'
 
 function Card({ d, i }: { d: DesignSummary; i: number }) {
@@ -13,7 +15,7 @@ function Card({ d, i }: { d: DesignSummary; i: number }) {
         to={d.slug}
         className="dz-card"
       >
-        <div className="dz-tile"><ScrollPreview slug={d.slug} height={d.preview_h} /></div>
+        <div className="dz-tile"><ScrollPreview slug={d.slug} height={d.preview_h} /><SaveDesign slug={d.slug} name={d.name} /></div>
         <div className="dz-meta">
           <SiteLogo name={d.name} logo={d.logo} />
           <div className="dz-meta-text">
@@ -36,12 +38,13 @@ export default function DesignsPage() {
 
   useEffect(() => { loadIndex().then(setAll).catch((e) => setError(e.message)) }, [])
 
-  const cats = useMemo(() => ['All', ...[...new Set((all ?? []).map((d) => d.category))].sort()], [all])
+  const savedSlugs = useUser()?.savedDesigns ?? []
+  const cats = useMemo(() => ['All', 'Saved', ...[...new Set((all ?? []).map((d) => d.category))].sort()], [all])
   const list = useMemo(() => {
     const n = q.trim().toLowerCase()
-    let l = (all ?? []).filter((d) => (cat === 'All' || d.category === cat) && (!n || `${d.name} ${d.vibe} ${d.tags.join(' ')} ${d.category}`.toLowerCase().includes(n)))
+    let l = (all ?? []).filter((d) => (cat === 'All' || (cat === 'Saved' ? savedSlugs.includes(d.slug) : d.category === cat)) && (!n || `${d.name} ${d.vibe} ${d.tags.join(' ')} ${d.category}`.toLowerCase().includes(n)))
     return l
-  }, [all, q, cat])
+  }, [all, q, cat, savedSlugs])
 
   return (
     <div className="page dz-page">
