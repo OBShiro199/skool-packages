@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { BookOpen, Copy, Flame, Home, LifeBuoy, LogOut, Menu, Search, UserRound } from 'lucide-react'
+import { BookOpen, Copy, Flame, Home, LifeBuoy, LogOut, Menu, Palette, Search, UserRound } from 'lucide-react'
 import { api } from '../leads/api'
 import { handle, streak, useStore, useUser } from '../lib/store'
 import { getApp } from '../content/apps'
@@ -49,6 +49,7 @@ export default function Shell() {
         <NavLink to="/app/library" data-tour="clone" className={({ isActive }) => `nav-link cta ${isActive ? 'active' : ''}`}><Copy size={16} /> Clone a Software App</NavLink>
         <NavLink to="/app" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><Home size={16} /> Dashboard</NavLink>
         <NavLink to="/app/leads" data-tour="leads" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><Search size={16} /> Find Leads</NavLink>
+        <NavLink to="/app/designs" data-tour="designs" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}><Palette size={16} /> Designs</NavLink>
 
         <div data-tour="builds">
         <div className="nav-group label">Your builds</div>

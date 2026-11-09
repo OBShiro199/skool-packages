@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { ArrowRight, Compass } from 'lucide-react'
+import { ArrowRight, Compass, Palette } from 'lucide-react'
 import { useStore, useUser } from '../lib/store'
 import { APPS } from '../content/apps'
 import { fmtMinutes, taskStats } from '../lib/progress'
@@ -81,6 +81,12 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      <Link to="/app/designs" className="card home-link" style={{ marginTop: 20 }}>
+        <Palette size={18} />
+        <span style={{ flex: 1 }}><b>Designs</b><span className="muted">Copy a ready-made design system into Claude Code so your app looks polished from day one.</span></span>
+        <ArrowRight size={16} />
+      </Link>
 
       <section className="card" style={{ padding: 18, marginTop: 20 }} data-tour="activity">
         <div className="row between" style={{ marginBottom: 12 }}><span className="label">Activity · last 5 weeks</span><span className="label">{activeCount} active {activeCount === 1 ? 'day' : 'days'}</span></div>

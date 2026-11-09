@@ -13,6 +13,7 @@ import SupportPage from './pages/SupportPage'
 import AboutPage from './pages/AboutPage'
 import LandingPreviewPage from './pages/LandingPreviewPage'
 import LeadsPage from './leads/LeadsPage'
+import DesignsPage from './pages/DesignsPage'
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const user = useUser()
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/app" element={<RequireAuth><Shell /></RequireAuth>}>
           <Route index element={<HomePage />} />
           <Route path="leads" element={<LeadsPage />} />
+          <Route path="designs" element={<DesignsPage />} />
           <Route path="library" element={<LibraryPage />} />
           <Route path="library/:slug" element={<AppDetailPage />} />
           <Route path="build/:slug" element={<BuildPage />} />
