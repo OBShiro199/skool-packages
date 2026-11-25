@@ -39,7 +39,7 @@ export const FILTERS: FilterDef[] = [
     key: 'tenure', keys: ['tenureMin', 'tenureMax'], label: 'Time in role', group: 'Person', kind: 'range', unit: 'months',
     presets: [{ label: 'New in role (under 6 months)', max: 6 }, { label: '6 to 12 months', min: 6, max: 12 }, { label: '1 to 3 years', min: 12, max: 36 }, { label: 'Over 3 years', min: 36 }],
   },
-  { key: 'skills', label: 'Skills', group: 'Person', kind: 'pills', placeholder: 'Salesforce, Cyber security…' },
+  { key: 'skills', label: 'Skills', group: 'Person', kind: 'pills', placeholder: 'Salesforce, Cyber security…', hint: 'Symbols are ignored, so C++ and C# also match C.' },
   { key: 'languages', label: 'Languages', group: 'Person', kind: 'pills', placeholder: 'German, French…' },
   { key: 'openToWork', label: 'Open to work', group: 'Person', kind: 'bool', bool: ['Open to work', 'Not open to work'] },
   { key: 'companies', label: 'Company name', group: 'Company', kind: 'pills', placeholder: (d) => DATASETS[d].companyEg },
@@ -62,7 +62,7 @@ export const FILTERS: FilterDef[] = [
   { key: 'isHiring', label: 'Hiring now', group: 'Company', kind: 'bool', bool: ['Hiring', 'Not hiring'] },
   { key: 'funding', label: 'Funding stage', group: 'Company', kind: 'multi', facet: 'funding' },
   { key: 'hasFunding', label: 'Has raised funding', group: 'Company', kind: 'bool', bool: ['Has funding', 'No funding'] },
-  { key: 'tech', label: 'Tech stack', group: 'Company', kind: 'pills', placeholder: 'HubSpot, Azure, Shopify…' },
+  { key: 'tech', label: 'Tech stack', group: 'Company', kind: 'pills', placeholder: 'HubSpot, Azure, Shopify…', hint: 'Symbols are ignored, so .NET also matches NET.' },
   { key: 'hasWebsite', label: 'Has company website', group: 'Company', kind: 'bool', bool: ['Has website', 'No website'] },
   { key: 'countries', label: 'Country', group: 'Location', kind: 'multi', facet: 'country' },
   { key: 'cities', label: 'City or region', group: 'Location', kind: 'pills', placeholder: (d) => DATASETS[d].cityEg },
@@ -128,24 +128,41 @@ const SYNONYMS: Record<string, string[]> = {
   ciso: ['chief information security'], md: ['managing director'], vp: ['vice president'], hr: ['human resources', 'people'],
   founder: ['co-founder', 'owner'],
 }
+// "hr" used to expand to "people", which as a prefix also matched "PeopleSoft Developer".
+SYNONYMS.hr = ['human resources', 'people director', 'head of people', 'people partner']
+
+/** "https://www.Acme.co.uk/about" → "acme.co.uk", so pasted links match the stored domain. */
+export const bareDomain = (v: string) =>
+  v.trim().toLowerCase().replace(/^[a-z]+:\/\//, '').replace(/^www\./, '').replace(/[/?#].*$/, '').replace(/:\d+$/, '')
+
+const hasWord = (s: unknown) => typeof s === 'string' && /[\p{L}\p{N}]/u.test(s)
+const expand = (vals: string[]) => {
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const t of vals) {
+    for (const x of [t, ...(SYNONYMS[t.trim().toLowerCase()] ?? [])]) {
+      if (!seen.has(x.toLowerCase())) { seen.add(x.toLowerCase()); out.push(x) }
+    }
+  }
+  return out
+}
 
 export function toServer(f: Filters, q: string): Filters {
   const out: Filters = {}
   for (const [k, v] of Object.entries(f)) {
     if (v === undefined || v === null || v === '') continue
-    if (Array.isArray(v) && v.length === 0) continue
+    if (Array.isArray(v)) {
+      // values made only of symbols ("&", "-") match nothing, and the server would drop the filter
+      const kept = (v as unknown[]).filter(hasWord) as string[]
+      if (!kept.length) continue
+      out[k] = k === 'domains' ? kept.map(bareDomain) : kept
+      continue
+    }
     out[k] = v
   }
-  if (Array.isArray(out.titles)) {
-    const seen = new Set<string>()
-    const titles: string[] = []
-    for (const t of out.titles as string[]) {
-      for (const x of [t, ...(SYNONYMS[t.trim().toLowerCase()] ?? [])]) {
-        if (!seen.has(x.toLowerCase())) { seen.add(x.toLowerCase()); titles.push(x) }
-      }
-    }
-    out.titles = titles
-  }
+  // CEO also finds "Chief Executive", both when including and excluding titles
+  if (Array.isArray(out.titles)) out.titles = expand(out.titles as string[])
+  if (Array.isArray(out.titlesNot)) out.titlesNot = expand(out.titlesNot as string[])
   if (q.trim()) out.q = q.trim()
   return out
 }

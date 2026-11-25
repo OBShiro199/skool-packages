@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, X } from 'lucide-react'
 import type { Facets } from './api'
-import { compact, displayValue, filterKeys, type DatasetId, type FilterDef, type Filters } from './defs'
+import { bareDomain, compact, displayValue, filterKeys, type DatasetId, type FilterDef, type Filters } from './defs'
 import { flagFor } from './flags'
 
 type Props = { def: FilterDef; filters: Filters; setFilters: (f: Filters) => void; facets: Facets | null; dataset: DatasetId; onDone?: () => void }
@@ -57,11 +57,14 @@ export function PillsEditor({ def, filters, setFilters, facets, dataset }: Props
   const [text, setText] = useState('')
   const vals = (filters[def.key] as string[] | undefined) ?? []
   const add = (raw: string) => {
-    const parts = raw.split(',').map((s) => s.trim()).filter(Boolean)
-    if (!parts.length) return
+    const parts = raw
+      .split(',')
+      .map((s) => (def.key === 'domains' ? bareDomain(s) : s.trim()))
+      .filter((s) => /[\p{L}\p{N}]/u.test(s))
+    if (!parts.length) return setText('')
     const next = [...vals]
     for (const p of parts) if (!next.some((v) => v.toLowerCase() === p.toLowerCase())) next.push(p)
-    setFilters(set(filters, def.key, next.slice(0, 50)))
+    setFilters(set(filters, def.key, next.slice(0, 40)))
     setText('')
   }
   const remove = (v: string) => {
@@ -131,6 +134,8 @@ export function RangeEditor({ def, filters, setFilters, onDone }: Props) {
   const [lo, setLo] = useState(typeof filters[kMin] === 'number' ? String(filters[kMin]) : '')
   const [hi, setHi] = useState(typeof filters[kMax] === 'number' ? String(filters[kMax]) : '')
   const apply = (min?: number, max?: number) => {
+    latest.current.applied = true
+    if (min !== undefined && max !== undefined && min > max) [min, max] = [max, min]
     let next = set(set(filters, kMin, undefined), kMax, undefined)
     if (min !== undefined && Number.isFinite(min)) next = set(next, kMin, min)
     if (max !== undefined && Number.isFinite(max)) next = set(next, kMax, max)
@@ -138,6 +143,21 @@ export function RangeEditor({ def, filters, setFilters, onDone }: Props) {
     onDone?.()
   }
   const num = (s: string) => (s.trim() === '' ? undefined : Number(s))
+  // Typed numbers apply when the popover closes too, not only on Apply.
+  const latest = useRef({ lo, hi, filters, setFilters, applied: false })
+  latest.current = { ...latest.current, lo, hi, filters, setFilters }
+  useEffect(() => () => {
+    const l = latest.current
+    if (l.applied) return
+    const was = [l.filters[kMin], l.filters[kMax]].map((v) => (typeof v === 'number' ? String(v) : ''))
+    if (l.lo === was[0] && l.hi === was[1]) return
+    let a = num(l.lo), b = num(l.hi)
+    if (a !== undefined && b !== undefined && a > b) [a, b] = [b, a]
+    let next = set(set(l.filters, kMin, undefined), kMax, undefined)
+    if (a !== undefined) next = set(next, kMin, a)
+    if (b !== undefined) next = set(next, kMax, b)
+    l.setFilters(next)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="ld-editor">
       {def.presets && (
@@ -150,8 +170,8 @@ export function RangeEditor({ def, filters, setFilters, onDone }: Props) {
         </div>
       )}
       <form className="ld-range" onSubmit={(e) => { e.preventDefault(); apply(num(lo), num(hi)) }}>
-        <label>From<input className="ld-input" inputMode="numeric" value={lo} onChange={(e) => setLo(e.target.value.replace(/[^0-9]/g, ''))} /></label>
-        <label>To<input className="ld-input" inputMode="numeric" value={hi} onChange={(e) => setHi(e.target.value.replace(/[^0-9]/g, ''))} /></label>
+        <label>From<input className="ld-input" inputMode="numeric" maxLength={7} value={lo} onChange={(e) => setLo(e.target.value.replace(/[^0-9]/g, ''))} /></label>
+        <label>To<input className="ld-input" inputMode="numeric" maxLength={7} value={hi} onChange={(e) => setHi(e.target.value.replace(/[^0-9]/g, ''))} /></label>
         <button className="ld-btn" type="submit">Apply</button>
       </form>
       {def.hint && <p className="ld-hint">{def.hint}</p>}

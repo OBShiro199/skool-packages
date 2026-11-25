@@ -38,14 +38,17 @@ export function toCsv(rows: LeadRow[], dataset: DatasetId): string {
   const keys = Object.keys(out[0])
   const cell = (k: string, v: string) => {
     let s = v
-    if (k !== 'mobile' && /^[=+\-@]/.test(s)) s = `'${s}` // formula injection guard
+    // formula injection guard; phone numbers like +44 7700 are left alone
+    const phone = k === 'mobile' && /^\+?[\d ()-]+$/.test(s)
+    if (!phone && /^[\s]*[=+\-@\t\r]/.test(s)) s = `'${s}`
     return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
   }
   return [keys.join(','), ...out.map((o) => keys.map((k) => cell(k, o[k])).join(','))].join('\n')
 }
 
 export function downloadCsv(csv: string, dataset: DatasetId, name?: string) {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+  // the byte-order mark makes Excel read accented names (Müller, Zürich) correctly
+  const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
   const slug = name ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) : ''

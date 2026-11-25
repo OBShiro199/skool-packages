@@ -7,14 +7,15 @@ import { chipParts, DATASETS, defsFor, displayValue, filterKeys, FILTERS, isSet,
 import { flagFor } from './flags'
 
 type Props = { dataset: DatasetId; filters: Filters; setFilters: (f: Filters) => void; facets: Facets | null }
+type BarProps = Props & { onClearAll: () => void; hasText: boolean }
 
 const def = (key: string) => FILTERS.find((f) => f.key === key)!
 
 /** Chips, "Add filter", quick filters and "Clear all" (PRD 10.2, 10.3, 11.1). */
-export function FilterBar({ dataset, filters, setFilters, facets }: Props) {
+export function FilterBar({ dataset, filters, setFilters, facets, onClearAll, hasText }: BarProps) {
   const defs = defsFor(dataset)
   const chips = defs.filter((d) => !QUICK_KEYS.includes(d.key) && isSet(filters, d))
-  const anySet = defs.some((d) => isSet(filters, d))
+  const anySet = hasText || defs.some((d) => isSet(filters, d))
 
   return (
     <div className="ld-filterbar" role="toolbar" aria-label="Filters">
@@ -31,7 +32,7 @@ export function FilterBar({ dataset, filters, setFilters, facets }: Props) {
       <QuickBool k="hasLinkedin" noun="LinkedIn" {...{ filters, setFilters }} />
       <QuickBool k="hasWebsite" noun="website" {...{ filters, setFilters }} />
       <span className="ld-grow" />
-      <button type="button" className="ld-link ld-clear" style={{ visibility: anySet ? 'visible' : 'hidden' }} onClick={() => setFilters({})}>
+      <button type="button" className="ld-link ld-clear" style={{ visibility: anySet ? 'visible' : 'hidden' }} onClick={onClearAll}>
         Clear all
       </button>
     </div>

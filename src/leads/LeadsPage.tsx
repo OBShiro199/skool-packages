@@ -64,7 +64,7 @@ export default function LeadsPage() {
   const [panel, setPanel] = useState<'lists' | 'exports' | 'add' | null>(null)
   const [facets, setFacets] = useState<Facets | null>(null)
   const [current, setCurrent] = useState<SavedSearch | null>(null)
-  const [openingSaved, setOpeningSaved] = useState(!!initial.search)
+  const [openingSaved, setOpeningSaved] = useState(!!initial.search && !initial.filters)
 
   const [data, setData] = useState<Page | null>(() => cachedPage(JSON.stringify([initial.dataset, toServer(initialFilters, initial.q), initial.page])))
   const [loading, setLoading] = useState(() => !data)
@@ -78,6 +78,8 @@ export default function LeadsPage() {
   const exportBtn = useRef<HTMLButtonElement>(null)
 
   const serverFilters = useMemo(() => toServer(filters, q), [filters, q])
+  const filtersRef = useRef(filters)
+  filtersRef.current = filters
   const queryKey = JSON.stringify([dataset, serverFilters, page])
 
   // any filter, text or dataset change: back to page 1, selection cleared
@@ -117,7 +119,10 @@ export default function LeadsPage() {
       .then(({ searches }) => {
         const s = searches.find((x) => x.id === initial.search)
         if (!s) return toast('That saved search no longer exists')
-        applySaved(s)
+        // The URL already holds this search's filters, possibly edited since: keep them and only
+        // remember which saved search is open. A bare ?search= link loads the saved filters.
+        if (initial.filters) setCurrent(s)
+        else applySaved(s)
       })
       .catch(() => toast('Could not open that saved search'))
       .finally(() => setOpeningSaved(false))
@@ -198,11 +203,19 @@ export default function LeadsPage() {
     } catch {
       sets = undefined
     }
-    const empty = !defsFor(dataset).some((def) => def.key in filters || (def.keys ?? []).some((k) => k in filters))
-    const { filters: kept, dropped } = empty ? { filters: { ...DATASETS[d].defaultFilters }, dropped: 0 } : fitToDataset(filters, d, sets)
+    const now = filtersRef.current
+    const empty = !defsFor(dataset).some((def) => def.key in now || (def.keys ?? []).some((k) => k in now))
+    const { filters: kept, dropped } = empty ? { filters: { ...DATASETS[d].defaultFilters }, dropped: 0 } : fitToDataset(now, d, sets)
     setDataset(d)
     setFilters(Object.keys(kept).length ? kept : { ...DATASETS[d].defaultFilters })
     if (dropped) toast(`Removed ${dropped} ${dropped === 1 ? "filter that doesn't" : "filters that don't"} apply to ${DATASETS[d].label} leads`)
+  }
+
+  function clearAll() {
+    setFilters({})
+    setText('')
+    setQ('')
+    setCurrent(null)
   }
 
   const rows = data?.rows ?? []
@@ -210,6 +223,9 @@ export default function LeadsPage() {
   const firstLoad = loading && !data
   const stale = loading && !!data && data.key !== queryKey
   const pages = count === null ? MAX_PAGES : Math.min(MAX_PAGES, Math.max(1, Math.ceil(count / PER_PAGE)))
+  useEffect(() => {
+    if (data && data.key === queryKey && count !== null && count > 0 && page > pages) setPage(pages)
+  }, [data, queryKey, count, page, pages])
   const from = count ? (page - 1) * PER_PAGE + 1 : 0
   const to = count ? Math.min(count, (page - 1) * PER_PAGE + rows.length) : 0
 
@@ -280,7 +296,7 @@ export default function LeadsPage() {
         )}
       </div>
 
-      <FilterBar dataset={dataset} filters={filters} setFilters={setFilters} facets={facets} />
+      <FilterBar dataset={dataset} filters={filters} setFilters={setFilters} facets={facets} onClearAll={clearAll} hasText={!!q || !!current} />
 
       <div className="ld-results">
         {error ? (
@@ -299,7 +315,7 @@ export default function LeadsPage() {
           <div className="ld-state">
             <b>No leads match</b>
             <p>Remove a filter or two to widen the search.</p>
-            <button type="button" className="ld-btn" onClick={() => { setFilters({}); setText(''); setQ('') }}>Clear filters</button>
+            <button type="button" className="ld-btn" onClick={clearAll}>Clear filters</button>
           </div>
         ) : (
           <LeadsTable rows={rows} dataset={dataset} selected={selected} setSelected={setSelected} stale={stale} loading={firstLoad} />
