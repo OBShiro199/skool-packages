@@ -31,13 +31,32 @@ const valueSets = (f: Facets) => Object.fromEntries(Object.entries(f).map(([k, v
 
 type Page = { key: string; rows: LeadRow[]; count: number; notice?: 'no_mobiles' }
 
+// Pages already fetched this visit (5 minutes, last 60). Coming back to Find Leads from another tab,
+// paging back, or undoing a filter shows the rows at once instead of waiting on the server again.
+const pageCache = new Map<string, { at: number; page: Page }>()
+const PAGE_TTL = 5 * 60_000
+function cachedPage(key: string): Page | null {
+  const hit = pageCache.get(key)
+  if (!hit || Date.now() - hit.at > PAGE_TTL) return null
+  return hit.page
+}
+function rememberPage(page: Page) {
+  pageCache.delete(page.key)
+  pageCache.set(page.key, { at: Date.now(), page })
+  while (pageCache.size > 60) pageCache.delete(pageCache.keys().next().value as string)
+}
+// The last search a member looked at. The sidebar opens Find Leads with a bare URL, so without this
+// every trip to another tab and back threw away their filters and searched from scratch.
+let lastParams = ''
+
 /** Find Leads (PRD 11): dataset switch, stackable filters, exact counts, 20 rows a page, export. */
 export default function LeadsPage() {
   const [params, setParams] = useSearchParams()
-  const initial = useMemo(() => readParams(params), []) // eslint-disable-line react-hooks/exhaustive-deps
+  const initial = useMemo(() => readParams(params.toString() || !lastParams ? params : new URLSearchParams(lastParams)), []) // eslint-disable-line react-hooks/exhaustive-deps
+  const initialFilters = useMemo(() => fitToDataset(initial.filters ?? (initial.search ? {} : DATASETS[initial.dataset].defaultFilters), initial.dataset).filters, [initial])
 
   const [dataset, setDataset] = useState<DatasetId>(initial.dataset)
-  const [filters, setFiltersRaw] = useState<Filters>(() => fitToDataset(initial.filters ?? (initial.search ? {} : DATASETS[initial.dataset].defaultFilters), initial.dataset).filters)
+  const [filters, setFiltersRaw] = useState<Filters>(initialFilters)
   const [text, setText] = useState(initial.q)
   const [q, setQ] = useState(initial.q)
   const [page, setPage] = useState(initial.page)
@@ -47,8 +66,8 @@ export default function LeadsPage() {
   const [current, setCurrent] = useState<SavedSearch | null>(null)
   const [openingSaved, setOpeningSaved] = useState(!!initial.search)
 
-  const [data, setData] = useState<Page | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<Page | null>(() => cachedPage(JSON.stringify([initial.dataset, toServer(initialFilters, initial.q), initial.page])))
+  const [loading, setLoading] = useState(() => !data)
   const [error, setError] = useState('')
   const [retry, setRetry] = useState(0)
 
@@ -112,18 +131,42 @@ export default function LeadsPage() {
     if (q) p.q = q
     if (page > 1) p.page = String(page)
     if (current) p.search = current.id
+    lastParams = new URLSearchParams(p).toString()
     setParams(p, { replace: true })
   }, [dataset, filters, q, page, current, setParams])
 
   // the page: one request returns the rows and the exact count
   useEffect(() => {
     if (openingSaved) return
+    setError('')
+    const hit = cachedPage(queryKey)
+    if (hit) {
+      setData(hit)
+      setLoading(false)
+      return
+    }
     const ctl = new AbortController()
     setLoading(true)
-    setError('')
-    api
-      .search(dataset, serverFilters, (page - 1) * PER_PAGE, PER_PAGE, ctl.signal)
-      .then((r) => setData({ key: queryKey, rows: r.rows, count: r.count.n, notice: r.notice }))
+    // a short pause so ticking several options in a row sends one search, not one per click
+    const wait = new Promise<void>((resolve) => setTimeout(resolve, 180))
+    wait
+      .then(() => {
+        if (ctl.signal.aborted) throw new DOMException('aborted', 'AbortError')
+        return api.search(dataset, serverFilters, (page - 1) * PER_PAGE, PER_PAGE, ctl.signal)
+      })
+      .then((r) => {
+        const fresh = { key: queryKey, rows: r.rows, count: r.count.n, notice: r.notice }
+        rememberPage(fresh)
+        setData(fresh)
+        // warm the next page so "Next" is instant
+        const nextKey = JSON.stringify([dataset, serverFilters, page + 1])
+        if (r.count.n > page * PER_PAGE && page < MAX_PAGES && !cachedPage(nextKey)) {
+          api
+            .search(dataset, serverFilters, page * PER_PAGE, PER_PAGE)
+            .then((n) => rememberPage({ key: nextKey, rows: n.rows, count: n.count.n, notice: n.notice }))
+            .catch(() => {})
+        }
+      })
       .catch((e) => {
         if (ctl.signal.aborted) return
         setError(e instanceof ApiError ? e.message : 'Search is unavailable right now. Try again in a moment.')

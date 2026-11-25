@@ -18,7 +18,7 @@ export function MultiEditor({ def, filters, setFilters, facets }: Props) {
     for (const v of selected) if (!list.some((o) => o.value === v)) list.unshift({ value: v, n: null })
     const needle = q.trim().toLowerCase()
     if (needle) list = list.filter((o) => selected.includes(o.value) || displayValue(def.facet, o.value).toLowerCase().includes(needle))
-    return list.slice(0, 250)
+    return list.slice(0, 500)
   }, [all, def, q, selected])
   const toggle = (v: string) => {
     const next = selected.includes(v) ? selected.filter((x) => x !== v) : [...selected, v]

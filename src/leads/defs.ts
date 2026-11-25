@@ -95,6 +95,7 @@ export function displayValue(facet: string | undefined, v: string): string {
   if (facet === 'size') return v === '10001+' ? '10,001+ employees' : `${v.replace(' to ', '–')} employees`
   if (facet === 'email_status') return v === 'VALID' ? 'Valid' : v === 'CATCH_ALL' ? 'Accept-all domain' : v
   if (facet === 'country' || facet === 'hq_country') return v === 'GB' ? 'United Kingdom' : v === 'US' ? 'United States' : v
+  if (facet === 'funding') return v.replace(/\b([a-z])/g, (c) => c.toUpperCase()).replace(/\bPe\b/, 'PE').replace(/\bIpo\b/, 'IPO').replace(/\bPpp\b/, 'PPP')
   if (facet === 'tag') return v.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase())
   return v
 }
