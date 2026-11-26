@@ -58,7 +58,11 @@ export function ClaudeDialog({ onClose }: { onClose: () => void }) {
         <CopyField value={url} />
         <ol className="ld-claude-steps">
           <li>In Claude, open <b>Settings → Connectors</b> and choose <b>Add custom connector</b>.</li>
-          <li>Name it <b>Build Software Solo Leads</b> and paste the URL above.</li>
+          <li>
+            Name it <b>BPA Leads</b>{' '}
+            <button type="button" className="ld-claude-name" onClick={() => { void navigator.clipboard?.writeText('BPA Leads'); toast('Copied “BPA Leads”') }}>Copy name</button>{' '}
+            and paste the URL above.
+          </li>
           <li>Click <b>Connect</b>, sign in with your Vault email and password, and allow access.</li>
           <li>In a chat, switch it on from the connectors menu and ask away.</li>
         </ol>
