@@ -33,7 +33,7 @@ const year = new Date().getFullYear()
 export const FILTERS: FilterDef[] = [
   {
     key: 'keywords', label: 'Keywords', group: 'Person', kind: 'pills', placeholder: 'SaaS, recruitment, Shopify, solar…',
-    hint: 'Finds leads with any of these words in their job title, company name, skills or tech stack.',
+    hint: 'Finds leads with any of these words in their job title or company name. Use Skills or Tech stack for those.',
   },
   { key: 'titles', label: 'Job title', group: 'Person', kind: 'pills', placeholder: 'CEO, Head of Sales, IT Manager…', hint: 'Matches any title containing a word you add. CEO also finds Chief Executive.' },
   { key: 'titlesNot', label: 'Exclude titles', group: 'Person', kind: 'pills', placeholder: 'Intern, Assistant…' },
