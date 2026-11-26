@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import { Dialog } from './dialogs'
+import { ClaudeLogo } from './claude-logo'
 import { toast } from '../components/Toasts'
 
 // "Use in Claude": connect the Build Software Solo Leads connector (an MCP server with OAuth) to
@@ -50,6 +51,7 @@ export function ClaudeDialog({ onClose }: { onClose: () => void }) {
   return (
     <Dialog title="Use Find Leads in Claude" onClose={onClose} width={560}>
       <div className="ld-dialog-body ld-claude">
+        <div className="ld-claude-mark"><ClaudeLogo size={28} /></div>
         <p className="ld-claude-lede">
           Ask Claude for leads in plain English and download the CSV right in the chat. It searches the same UK, EU and US databases, signs in with your Vault account and uses your monthly exports.
         </p>

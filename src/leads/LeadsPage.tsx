@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { ChevronDown, ChevronLeft, ChevronRight, Download, FolderOpen, History, ListChecks, ListPlus, Search, Sparkles, X } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Download, FolderOpen, History, ListChecks, ListPlus, Search, X } from 'lucide-react'
 import { api, ApiError, type Facets, type LeadRow, type SavedSearch } from './api'
 import { DATASETS, defsFor, fitToDataset, toServer, type DatasetId, type Filters } from './defs'
 import { encodeFilters, readParams } from './url'
@@ -11,6 +11,7 @@ import { Popover } from './Popover'
 import { ExportAllDialog, SavedList, SaveDialog } from './dialogs'
 import { AddToListDialog, ExportsDialog, ListsDialog } from './library'
 import { ClaudeDialog } from './claude'
+import { ClaudeLogo } from './claude-logo'
 import { cloudEnabled } from '../lib/cloud'
 import { downloadCsv, toCsv } from './csv'
 import { toast } from '../components/Toasts'
@@ -297,7 +298,7 @@ export default function LeadsPage() {
         <button type="button" className="ld-btn" onClick={() => setShowSaved(true)}><FolderOpen size={14} /> Saved</button>
         {cloudEnabled && <button type="button" className="ld-btn" onClick={() => setPanel('lists')}><ListChecks size={14} /> Lists</button>}
         {cloudEnabled && <button type="button" className="ld-btn" onClick={() => setPanel('exports')}><History size={14} /> Exports</button>}
-        {cloudEnabled && <button type="button" className="ld-btn ld-btn-claude" onClick={() => setPanel('claude')}><Sparkles size={14} /> Use in Claude</button>}
+        {cloudEnabled && <button type="button" className="ld-btn ld-btn-claude" onClick={() => setPanel('claude')}><ClaudeLogo /> Use in Claude</button>}
         <button type="button" className="ld-btn" onClick={() => setSaving(true)}>{current ? 'Save' : 'Save search'}</button>
         <button ref={exportBtn} type="button" className="ld-btn" disabled={!rows.length} onClick={() => setExportMenu(true)} aria-haspopup="menu">
           <Download size={14} /> Export <ChevronDown size={13} />

@@ -154,8 +154,9 @@
 .ld-dialog .ld-saved { max-height: 52vh; overflow: auto; }
 
 /* Use in Claude */
-.ld-btn-claude { border-color: #ead7cf; color: #b4542f; background: #fdf6f3; }
-.ld-btn-claude:hover { background: #fbeee8; }
+.ld-btn-claude { border-color: #ecdcd4; color: #08090a; background: #fff; }
+.ld-btn-claude svg { flex: none; }
+.ld-btn-claude:hover { background: #fdf6f3; border-color: #e3c7ba; }
 .ld-claude { display: grid; gap: 14px; }
 .ld-claude-lede { margin: 0; font-size: 14px; line-height: 1.55; color: #3c4149; }
 .ld-claude-url { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 12px; border: 1px solid #e6e6e9; border-radius: 10px; background: #fafafb; }
@@ -166,3 +167,4 @@
 .ld-claude-prompts button { text-align: left; padding: 9px 12px; border-radius: 9px; border: 1px solid #efeff1; background: #fff; font: inherit; font-size: 13px; color: #3c4149; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
 .ld-claude-prompts button:hover { background: #fafafb; border-color: #dcdde0; }
 .ld-claude-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid #efeff1; }
+.ld-claude-mark { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: #fdf3ee; }
