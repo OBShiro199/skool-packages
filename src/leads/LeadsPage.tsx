@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { ChevronDown, ChevronLeft, ChevronRight, Download, FolderOpen, History, ListChecks, ListPlus, Search, X } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, Download, FolderOpen, History, ListChecks, ListPlus, Search, Sparkles, X } from 'lucide-react'
 import { api, ApiError, type Facets, type LeadRow, type SavedSearch } from './api'
 import { DATASETS, defsFor, fitToDataset, toServer, type DatasetId, type Filters } from './defs'
 import { encodeFilters, readParams } from './url'
@@ -10,6 +10,7 @@ import { LeadsTable } from './LeadsTable'
 import { Popover } from './Popover'
 import { ExportAllDialog, SavedList, SaveDialog } from './dialogs'
 import { AddToListDialog, ExportsDialog, ListsDialog } from './library'
+import { ClaudeDialog } from './claude'
 import { cloudEnabled } from '../lib/cloud'
 import { downloadCsv, toCsv } from './csv'
 import { toast } from '../components/Toasts'
@@ -69,7 +70,7 @@ export default function LeadsPage() {
   const [q, setQ] = useState(initial.q)
   const [page, setPage] = useState(initial.page)
   const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [panel, setPanel] = useState<'lists' | 'exports' | 'add' | null>(null)
+  const [panel, setPanel] = useState<'lists' | 'exports' | 'add' | 'claude' | null>(null)
   const [facets, setFacets] = useState<Facets | null>(null)
   const [current, setCurrent] = useState<SavedSearch | null>(null)
   const [openingSaved, setOpeningSaved] = useState(!!initial.search && !initial.filters)
@@ -296,6 +297,7 @@ export default function LeadsPage() {
         <button type="button" className="ld-btn" onClick={() => setShowSaved(true)}><FolderOpen size={14} /> Saved</button>
         {cloudEnabled && <button type="button" className="ld-btn" onClick={() => setPanel('lists')}><ListChecks size={14} /> Lists</button>}
         {cloudEnabled && <button type="button" className="ld-btn" onClick={() => setPanel('exports')}><History size={14} /> Exports</button>}
+        {cloudEnabled && <button type="button" className="ld-btn ld-btn-claude" onClick={() => setPanel('claude')}><Sparkles size={14} /> Use in Claude</button>}
         <button type="button" className="ld-btn" onClick={() => setSaving(true)}>{current ? 'Save' : 'Save search'}</button>
         <button ref={exportBtn} type="button" className="ld-btn" disabled={!rows.length} onClick={() => setExportMenu(true)} aria-haspopup="menu">
           <Download size={14} /> Export <ChevronDown size={13} />
@@ -364,6 +366,7 @@ export default function LeadsPage() {
       )}
       {panel === 'lists' && <ListsDialog onClose={() => setPanel(null)} />}
       {panel === 'exports' && <ExportsDialog onClose={() => setPanel(null)} />}
+      {panel === 'claude' && <ClaudeDialog onClose={() => setPanel(null)} />}
       {panel === 'add' && <AddToListDialog dataset={dataset} ids={[...selected]} onClose={() => setPanel(null)} onDone={() => setSelected(new Set())} />}
       {showSaved && <SavedList onClose={() => setShowSaved(false)} onOpen={(s) => { applySaved(s); setShowSaved(false) }} />}
       {exportingAll && count !== null && (
