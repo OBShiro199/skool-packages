@@ -163,6 +163,16 @@ export default function LeadsPage() {
         const fresh = { key: queryKey, rows: r.rows, count: r.count.n, notice: r.notice }
         rememberPage(fresh)
         setData(fresh)
+        // load the other dataset's filter options and first page in the background, so switching is instant
+        const other: DatasetId = dataset === 'us' ? 'uk-eu' : 'us'
+        const otherKey = JSON.stringify([other, toServer({ ...DATASETS[other].defaultFilters }, ''), 1])
+        if (!cachedPage(otherKey)) {
+          loadFacets(other).catch(() => {})
+          api
+            .search(other, toServer({ ...DATASETS[other].defaultFilters }, ''), 0, PER_PAGE)
+            .then((n) => rememberPage({ key: otherKey, rows: n.rows, count: n.count.n, notice: n.notice }))
+            .catch(() => {})
+        }
         // warm the next page so "Next" is instant
         const nextKey = JSON.stringify([dataset, serverFilters, page + 1])
         if (r.count.n > page * PER_PAGE && page < MAX_PAGES && !cachedPage(nextKey)) {
