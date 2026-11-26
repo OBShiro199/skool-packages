@@ -29,6 +29,14 @@ async function loadFacets(d: DatasetId): Promise<Facets> {
 }
 const valueSets = (f: Facets) => Object.fromEntries(Object.entries(f).map(([k, v]) => [k, new Set(v.map((o) => o.value))]))
 
+/** The filters a member lands on when switching dataset: defaults if they had none, else what still applies. */
+function filtersAfterSwitch(now: Filters, from: DatasetId, to: DatasetId, sets?: Record<string, Set<string>>): { filters: Filters; dropped: number } {
+  const empty = !defsFor(from).some((def) => def.key in now || (def.keys ?? []).some((k) => k in now))
+  if (empty) return { filters: { ...DATASETS[to].defaultFilters }, dropped: 0 }
+  const fit = fitToDataset(now, to, sets)
+  return { filters: Object.keys(fit.filters).length ? fit.filters : { ...DATASETS[to].defaultFilters }, dropped: fit.dropped }
+}
+
 type Page = { key: string; rows: LeadRow[]; count: number; notice?: 'no_mobiles' }
 
 // Pages already fetched this visit (5 minutes, last 60). Coming back to Find Leads from another tab,
@@ -165,11 +173,13 @@ export default function LeadsPage() {
         setData(fresh)
         // load the other dataset's filter options and first page in the background, so switching is instant
         const other: DatasetId = dataset === 'us' ? 'uk-eu' : 'us'
-        const otherKey = JSON.stringify([other, toServer({ ...DATASETS[other].defaultFilters }, ''), 1])
+        const otherFacets = facetCache.get(other)?.facets
+        const otherFilters = toServer(filtersAfterSwitch(filters, dataset, other, otherFacets ? valueSets(otherFacets) : undefined).filters, q)
+        const otherKey = JSON.stringify([other, otherFilters, 1])
         if (!cachedPage(otherKey)) {
           loadFacets(other).catch(() => {})
           api
-            .search(other, toServer({ ...DATASETS[other].defaultFilters }, ''), 0, PER_PAGE)
+            .search(other, otherFilters, 0, PER_PAGE)
             .then((n) => rememberPage({ key: otherKey, rows: n.rows, count: n.count.n, notice: n.notice }))
             .catch(() => {})
         }
@@ -213,11 +223,9 @@ export default function LeadsPage() {
     } catch {
       sets = undefined
     }
-    const now = filtersRef.current
-    const empty = !defsFor(dataset).some((def) => def.key in now || (def.keys ?? []).some((k) => k in now))
-    const { filters: kept, dropped } = empty ? { filters: { ...DATASETS[d].defaultFilters }, dropped: 0 } : fitToDataset(now, d, sets)
+    const { filters: kept, dropped } = filtersAfterSwitch(filtersRef.current, dataset, d, sets)
     setDataset(d)
-    setFilters(Object.keys(kept).length ? kept : { ...DATASETS[d].defaultFilters })
+    setFilters(kept)
     if (dropped) toast(`Removed ${dropped} ${dropped === 1 ? "filter that doesn't" : "filters that don't"} apply to ${DATASETS[d].label} leads`)
   }
 
